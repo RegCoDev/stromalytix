@@ -26,6 +26,9 @@ def build_pi_system_prompt(context: CompanyContext) -> str:
     """
     context_block = context.to_chat_context_string()
 
+    # Build reading context from active signals
+    reading_block = _build_reading_context(context)
+
     return f"""You are a Process Intelligence Analyst for Stromalytix.
 You help biofabrication companies interpret their process data,
 investigate root causes, and connect experimental parameters to
@@ -34,6 +37,9 @@ business outcomes.
 CURRENT COMPANY CONTEXT:
 {context_block}
 
+RELEVANT READING (cite when applicable):
+{reading_block}
+
 YOUR CAPABILITIES:
 - Interpret process mining KPIs and critical control points
 - Investigate hypotheses about lot failures and process deviations
@@ -41,10 +47,12 @@ YOUR CAPABILITIES:
 - Synthesize simulation predictions with empirical evidence
 - Identify convergent signals across data layers
 - Recommend protocol adjustments based on evidence
+- Cite relevant reading from APQC best practices and TE/biofab literature
 
 RESPONSE STYLE:
 - Be concise and evidence-driven
 - Reference specific lots, batches, or parameters from context
+- When citing literature, use the format: [Author, Year] or [Standard Title]
 - When the user states a causal claim, create a hypothesis
 - When evidence supports/contradicts a hypothesis, cite it explicitly
 - Flag convergent signals (simulation + empirical agreement) as high-confidence
@@ -184,6 +192,50 @@ def _clean_tags(text: str) -> str:
     text = re.sub(r"<new_hypothesis>.*?</new_hypothesis>", "", text, flags=re.DOTALL)
     text = re.sub(r'<evidence\s+(?:for|against)="[^"]*">.*?</evidence>', "", text, flags=re.DOTALL)
     return text.strip()
+
+
+def _build_reading_context(context: CompanyContext) -> str:
+    """Build a reading context block for the system prompt from active signals."""
+    try:
+        from core.reading_engine import ReadingEngine
+        engine = ReadingEngine()
+
+        # Collect signals from context
+        pi_signals = set()
+        for lot in context.flagged_lots:
+            if lot.get("failure_mode"):
+                mode = lot["failure_mode"].lower()
+                if "viability" in mode:
+                    pi_signals.add("viability_below_threshold")
+                if "batch" in mode or "lot" in mode:
+                    pi_signals.add("batch_effect")
+                    pi_signals.add("lot_churn_correlation")
+                if "deviation" in mode:
+                    pi_signals.add("protocol_deviation")
+                if "variance" in mode or "cv" in mode:
+                    pi_signals.add("high_cv")
+
+        for hyp in context.hypotheses:
+            if hyp.get("status") == "open":
+                stmt = hyp.get("statement", "").lower()
+                if "lot" in stmt:
+                    pi_signals.add("flagged_lot")
+                if "batch" in stmt:
+                    pi_signals.add("batch_effect")
+
+        if not pi_signals:
+            pi_signals = {"parameter_out_of_range", "conformance_failure"}
+
+        biz = engine.get_business_reading(list(pi_signals), max_results=3)
+        lines = []
+        for item in biz:
+            lines.append(f"- APQC {item['pcf_id']} ({item['pcf_name']}): {item['best_practice_summary'][:200]}")
+            for ref in item.get("reading", [])[:1]:
+                lines.append(f"  Ref: {ref.get('title', 'N/A')}")
+
+        return "\n".join(lines) if lines else "No specific reading matched current signals."
+    except Exception:
+        return "Reading engine unavailable."
 
 
 def get_available_companies() -> list:
