@@ -709,6 +709,50 @@ def _render_biosim_tab():
             use_container_width=True
         )
 
+        # Row 3.5: Scaffold Mechanics (FEA)
+        if profile.stiffness_kpa and profile.cell_density_per_ml:
+            from core.fem_solver import predict_scaffold_deformation, predict_stress_distribution
+
+            st.markdown("### 🏗️ Scaffold Mechanics (FEA)")
+
+            fea_result = predict_scaffold_deformation(
+                stiffness_kpa=profile.stiffness_kpa,
+                cell_density_per_ml=profile.cell_density_per_ml,
+            )
+
+            fea_col1, fea_col2, fea_col3 = st.columns(3)
+            with fea_col1:
+                st.metric("Max Deformation", f"{fea_result['max_deformation_um']:.1f} um")
+            with fea_col2:
+                st.metric("Strain", f"{fea_result['strain_percent']:.2f}%")
+            with fea_col3:
+                risk = fea_result["failure_risk"]
+                risk_color = {"low": "#00ff88", "medium": "#ffd700", "high": "#ff4444"}.get(risk, "#888")
+                st.markdown(
+                    f'<p style="font-size: 0.85em; color: #888;">Failure Risk</p>'
+                    f'<p style="font-size: 1.5em; font-weight: bold; color: {risk_color};">{risk.upper()}</p>',
+                    unsafe_allow_html=True,
+                )
+
+            st.markdown(
+                f'<div style="border: 1px solid #444; padding: 0.8rem; border-radius: 0.5rem; '
+                f'background: #1a1a1a; margin: 0.5rem 0;">'
+                f'<span style="color: #aaa;">{fea_result["recommendation"]}</span></div>',
+                unsafe_allow_html=True,
+            )
+
+            if profile.porosity_percent:
+                stress_result = predict_stress_distribution(
+                    stiffness_kpa=profile.stiffness_kpa,
+                    porosity_percent=profile.porosity_percent,
+                )
+                st.markdown(
+                    f'<div style="border: 1px solid #444; padding: 0.8rem; border-radius: 0.5rem; '
+                    f'background: #1a1a1a; margin: 0.5rem 0;">'
+                    f'<span style="color: #aaa;">{stress_result["recommendation"]}</span></div>',
+                    unsafe_allow_html=True,
+                )
+
         # Row 4: CC3D Simulation Brief (Task 6)
         st.markdown("### 🔬 Simulation Brief — What CC3D Would Predict")
 
