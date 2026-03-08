@@ -738,13 +738,26 @@ elif st.session_state.phase == "results":
         unsafe_allow_html=True
     )
 
-    # Grayed-out button
-    st.button(
-        "⚡ Run Live CC3D Simulation (Coming Soon)",
-        disabled=True,
-        use_container_width=True,
-        help="Full CC3D integration arrives in Q3 2026. Join the waitlist for early access."
-    )
+    # CC3D Live Execution
+    from core.cc3d_runner import verify_cc3d_installation, run_cc3d_simulation
+    cc3d_status = verify_cc3d_installation()
+    if cc3d_status["installed"]:
+        if st.button("⚡ Run CC3D Preview (Beta)", use_container_width=True):
+            with st.spinner("Running CC3D simulation..."):
+                cc3d_result = run_cc3d_simulation(sim_brief, timeout=120)
+                if cc3d_result["success"]:
+                    st.success(f"CC3D completed: {cc3d_result['mcs_completed']} MCS in {cc3d_result['duration_seconds']}s")
+                    if cc3d_result["output"]:
+                        st.code(cc3d_result["output"], language="text")
+                else:
+                    st.warning(f"CC3D: {cc3d_result.get('error', 'Unknown error')}")
+    else:
+        st.button(
+            "⚡ Run CC3D Preview (Beta)",
+            disabled=True,
+            use_container_width=True,
+            help="CC3D not configured — install at compucell3d.org to enable live simulation."
+        )
 
     # Row 5: Signup CTA
     st.divider()
