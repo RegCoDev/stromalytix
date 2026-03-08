@@ -7,7 +7,6 @@ Main Streamlit application for 3D cell culture variance analysis.
 import csv
 import json
 import os
-import subprocess
 from datetime import datetime
 from pathlib import Path
 
@@ -17,8 +16,9 @@ import streamlit as st
 def ensure_vectorstore():
     """Build ChromaDB on first deploy if it doesn't exist."""
     if not Path("data/chroma_db").exists():
-        with st.spinner("🔬 Building knowledge base from 4,900+ abstracts — first load only, ~2 minutes..."):
-            subprocess.run(["python", "scripts/embed_and_index.py"], check=True)
+        with st.spinner("🔬 Building knowledge base — first load only, ~2 minutes..."):
+            from scripts.embed_and_index import main as build_index
+            build_index()
 
 
 from core.chat import extract_construct_profile, initialize_chat, send_message
