@@ -958,7 +958,43 @@ def _render_biosim_tab():
         except Exception as e:
             st.warning(f"Further reading unavailable: {e}")
 
-        # Row 5: Signup CTA
+        # Row 5: Export & Download
+        st.divider()
+        export_col1, export_col2 = st.columns(2)
+        with export_col1:
+            try:
+                from core.export import generate_pdf_report
+                pdf_path = generate_pdf_report(report, client_name="")
+                with open(pdf_path, "rb") as f:
+                    st.download_button(
+                        "Download PDF Report",
+                        data=f.read(),
+                        file_name=Path(pdf_path).name,
+                        mime="application/pdf",
+                        use_container_width=True,
+                    )
+            except Exception as e:
+                st.button("Download PDF Report", disabled=True, use_container_width=True,
+                          help=f"PDF export unavailable: {e}")
+
+        with export_col2:
+            try:
+                from core.export import export_figure_png
+                from core.tissue_viz import render_construct_3d
+                viz_fig = render_construct_3d(profile=profile, title=profile.target_tissue or "Construct")
+                png_bytes = export_figure_png(viz_fig)
+                st.download_button(
+                    "Download 3D Visualization (PNG)",
+                    data=png_bytes,
+                    file_name=f"stromalytix_{profile.target_tissue or 'construct'}_3d.png",
+                    mime="image/png",
+                    use_container_width=True,
+                )
+            except Exception as e:
+                st.button("Download 3D Viz (PNG)", disabled=True, use_container_width=True,
+                          help=f"PNG export unavailable: {e}")
+
+        # Row 6: Signup CTA
         st.divider()
         st.markdown("### 💾 Save this analysis + get early access to the full platform")
 

@@ -2,8 +2,10 @@
 PDF Export for Stromalytix
 
 Generates white-label PDF variance reports from VarianceReport objects.
+Includes Plotly figure PNG/SVG export via kaleido.
 """
 
+import io
 import os
 from datetime import datetime
 from pathlib import Path
@@ -11,6 +13,16 @@ from pathlib import Path
 from fpdf import FPDF
 
 from core.models import VarianceReport
+
+
+def export_figure_png(fig, width: int = 1200, height: int = 800) -> bytes:
+    """Export a Plotly figure to PNG bytes via kaleido."""
+    return fig.to_image(format="png", width=width, height=height, scale=2)
+
+
+def export_figure_svg(fig, width: int = 1200, height: int = 800) -> bytes:
+    """Export a Plotly figure to SVG bytes via kaleido."""
+    return fig.to_image(format="svg", width=width, height=height)
 
 
 def generate_pdf_report(report: VarianceReport, client_name: str = "") -> str:

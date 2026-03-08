@@ -25,6 +25,7 @@ dependencies = [
     "scikit-fem>=12.0.1",
     "networkx>=3.6.1",
     "scikit-learn>=1.8.0",
+    "kaleido>=1.2.0",
 ]
 
 [dependency-groups]
