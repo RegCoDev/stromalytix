@@ -112,6 +112,23 @@ _MATERIAL_DEFAULTS = {
 
 # Cell-type mechanotransduction curves
 # {curve_key: [(stiffness_kpa, mean_viability_pct, sd, source_doi)]}
+#
+# DATA PROVENANCE WARNING:
+# These curves are LITERATURE ESTIMATES — viability values are inferred from
+# functional endpoint trends in the cited papers, NOT directly extracted from
+# viability assay figures. The DOIs are real and topically relevant, but the
+# specific (stiffness, viability%, SD) tuples are modeled approximations.
+#
+# Hepatocyte: Natarajan et al. Biomaterials 2015 — reports hepatocyte
+#   morphology/function vs stiffness; viability trend inferred from functional data.
+# HUVEC: Califano & Reinhart-King, Biomech Model Mechanobiol 2010 — reports
+#   EC spreading/migration vs stiffness (NOT viability); bell-curve shape mapped
+#   from spreading optimum to estimated viability response.
+# Neuron: Nature Comms 2019 — mechanosensing paper; neuron preference for
+#   soft substrates is well-established (Georges et al. 2006); values estimated.
+# Default: Generic soft tissue curve estimated from multiple hydrogel papers.
+#
+# TODO: Replace with directly digitized data from primary viability assays.
 MECHANO_VIABILITY_CURVES = {
     "hepatocyte": [
         (0.2, 91.0, 5.2, "10.1016/j.biomaterials.2015.07.069"),
@@ -172,8 +189,8 @@ def predict_stiffness_from_rheology(
     Swelling correction from Flory-Rehner theory.
 
     Source: Rubinstein & Colby Polymer Physics 2003
-    GelMA validation: Nichol et al. Biomaterials 2010
-    R^2 = 0.94 across 12 GelMA formulations
+    GelMA validation: fitted to Nichol et al. Biomaterials 2010 data
+    Estimated R^2 ~ 0.94 across ~12 GelMA formulations (computed, not from paper)
 
     Returns: (E_kpa, uncertainty_kpa)
     """
@@ -186,7 +203,7 @@ def predict_stiffness_from_rheology(
     E_kpa = 3 * G_kpa * swelling_correction
 
     # Uncertainty from calibration dataset variance
-    # Nichol 2010: R^2=0.94, residual SD ~12% of prediction
+    # Fitted to Nichol 2010 data: estimated residual SD ~12% of prediction
     uncertainty_kpa = E_kpa * 0.12
 
     return round(E_kpa, 2), round(uncertainty_kpa, 2)
@@ -282,10 +299,14 @@ def predict_viability_from_stiffness(
 ) -> tuple:
     """
     Predict cell viability from scaffold stiffness using
-    published cell-type-specific mechanotransduction curves.
+    cell-type-specific mechanotransduction curves.
 
-    Interpolates between calibrated data points.
-    Reports SD from literature dataset.
+    NOTE: Curves are literature estimates inferred from functional
+    endpoint trends, not directly digitized viability assay data.
+    See MECHANO_VIABILITY_CURVES provenance comment for details.
+
+    Interpolates between estimated data points.
+    Reports estimated SD.
 
     Returns:
     (viability_mean_pct, viability_sd_pct, reference_doi, limiting_factor)
