@@ -213,3 +213,19 @@ def test_high_viscosity_recommends_large_nozzle():
     char = _make_char(viscosity_pas_at_37c=200, gelation_time_s=60)
     report = predict_lot_performance(char)
     assert report.recommended_nozzle_diameter_mm == 0.6
+
+
+# --- Modality guards ---
+
+def test_modality_guard_raises_for_dlp():
+    """predict_printability should reject DLP modality with helpful error."""
+    import pytest
+    with pytest.raises(ValueError, match="dlp_physics"):
+        predict_printability(100, 60, modality="dlp")
+
+
+def test_modality_guard_raises_for_ooc():
+    """predict_printability should reject OoC modality with helpful error."""
+    import pytest
+    with pytest.raises(ValueError, match="ooc_physics"):
+        predict_printability(100, 60, modality="ooc")
