@@ -43,6 +43,7 @@ class ProcessEvent:
     batch_id: Optional[str] = None
     protocol_version: Optional[str] = None
     deviation_note: Optional[str] = None
+    biofab_method: Optional[str] = None  # bioprinting|ooc|organoid|acoustic|scaffold_free
 
     # Business
     customer_id: Optional[str] = None

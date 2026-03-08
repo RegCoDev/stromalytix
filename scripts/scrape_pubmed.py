@@ -22,11 +22,18 @@ if not Entrez.email:
     raise ValueError("NCBI_EMAIL not found in .env file")
 
 # Search clusters - 200 abstracts each
+# Original 4 clusters + 5 biofab-method-specific clusters
 SEARCH_CLUSTERS = {
     "physiological_relevance": "(3D cell culture) AND (physiological relevance OR organotypic OR tissue function OR in vivo correlation)",
     "disease_phenotype": "(disease model OR 3D scaffold) AND (fibrosis OR tumor microenvironment OR iPSC OR cardiac disease phenotype)",
     "druggability": "(drug response OR 3D model) AND (IC50 OR ECM stiffness OR drug resistance OR bioink OR screening)",
-    "process_parameters": "(GelMA OR stiffness OR bioink) AND (cell viability OR rheology OR scaffold porosity OR oxygen diffusion OR 3D bioprinting)"
+    "process_parameters": "(GelMA OR stiffness OR bioink) AND (cell viability OR rheology OR scaffold porosity OR oxygen diffusion OR 3D bioprinting)",
+    # Biofab method-specific clusters
+    "bioprinting": "(bioprinting OR 3D bioprinting OR extrusion bioprinting) AND (cell viability OR print fidelity OR bioink OR process parameters OR GelMA)",
+    "organ_on_chip": "(organ-on-chip OR organ on chip OR microphysiological system OR microfluidic organ) AND (shear stress OR flow rate OR PDMS OR TEER OR barrier function)",
+    "organoid": "(organoid OR spheroid OR self-organization) AND (Matrigel OR differentiation OR intestinal organoid OR brain organoid OR tumor organoid OR protocol optimization)",
+    "acoustic_assembly": "(acoustic assembly OR acoustic levitation OR ultrasound cell patterning OR acoustic hologram) AND (tissue engineering OR cell aggregate OR node spacing)",
+    "scaffold_free": "(scaffold-free OR scaffold free OR cell sheet OR spheroid fusion OR microtissue) AND (tissue engineering OR self-assembly OR hanging drop OR agarose mold)",
 }
 
 # Output directory

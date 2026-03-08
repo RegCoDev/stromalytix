@@ -22,7 +22,10 @@ COLUMN_MAPPINGS = {
     "deviation_note": ["deviation", "deviation_note", "notes", "comment", "observation"],
     "protocol_version": ["protocol", "protocol_version", "sop", "version"],
     "batch_id": ["batch", "batch_id", "lot", "lot_number"],
+    "biofab_method": ["biofab_method", "method", "fabrication_method", "biofabrication_method"],
 }
+
+BIOFAB_METHODS = {"bioprinting", "ooc", "organoid", "acoustic", "scaffold_free"}
 
 
 def _find_column(headers: List[str], candidates: List[str]) -> Optional[str]:
@@ -118,6 +121,7 @@ class ELNCSVConnector(BaseConnector):
                 deviation_col = self._column_map.get("deviation_note")
                 protocol_col = self._column_map.get("protocol_version")
                 batch_col = self._column_map.get("batch_id")
+                biofab_col = self._column_map.get("biofab_method")
 
                 event = ProcessEvent(
                     event_id=f"eln_{i}",
@@ -131,6 +135,7 @@ class ELNCSVConnector(BaseConnector):
                     deviation_note=row.get(deviation_col) if deviation_col else None,
                     protocol_version=row.get(protocol_col) if protocol_col else None,
                     batch_id=row.get(batch_col) if batch_col else None,
+                    biofab_method=row.get(biofab_col) if biofab_col else None,
                     raw=dict(row),
                 )
                 events.append(event)
