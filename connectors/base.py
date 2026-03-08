@@ -61,9 +61,8 @@ class BaseConnector:
         raise NotImplementedError
 
     def to_event_log(self, events: list):
-        """Convert ProcessEvents to PM4Py DataFrame."""
+        """Convert ProcessEvents to DataFrame with standard PM columns."""
         import pandas as pd
-        import pm4py
         records = [{
             "case:concept:name": e.case_id,
             "concept:name": e.activity,
@@ -76,9 +75,5 @@ class BaseConnector:
         df = pd.DataFrame(records)
         if df.empty:
             return df
-        return pm4py.format_dataframe(
-            df,
-            case_id="case:concept:name",
-            activity_key="concept:name",
-            timestamp_key="time:timestamp"
-        )
+        df["time:timestamp"] = pd.to_datetime(df["time:timestamp"])
+        return df.sort_values("time:timestamp")

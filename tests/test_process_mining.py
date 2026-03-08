@@ -68,10 +68,7 @@ def test_find_critical_control_points_returns_list():
         {"case:concept:name": "c2", "concept:name": "seeding", "time:timestamp": datetime(2026,3,1,13), "viability": 50},
         {"case:concept:name": "c2", "concept:name": "measurement", "time:timestamp": datetime(2026,3,1,15), "viability": 88},
     ])
-    import pm4py
-    df = pm4py.format_dataframe(df, case_id="case:concept:name",
-                                 activity_key="concept:name",
-                                 timestamp_key="time:timestamp")
+    df["time:timestamp"] = pd.to_datetime(df["time:timestamp"])
     miner.event_logs["ccp_log"] = df
     ccps = miner.find_critical_control_points("ccp_log", "viability")
     assert isinstance(ccps, list)
