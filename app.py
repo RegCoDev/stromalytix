@@ -780,6 +780,44 @@ def _render_biosim_tab():
                     unsafe_allow_html=True,
                 )
 
+        # Row 3.8: Hepatic DILI Detection Intelligence (if hepatic tissue)
+        tissue_lower = (profile.target_tissue or "").lower()
+        cell_str_lower = " ".join(profile.cell_types or []).lower()
+        hepatic_keywords = ["hepat", "liver", "hepg", "hepar", "heparg", "albumin"]
+        if any(kw in tissue_lower or kw in cell_str_lower for kw in hepatic_keywords):
+            try:
+                from core.hepatic_intelligence import predict_hepatic_quality
+                st.markdown("### 🫀 Hepatic DILI Detection Intelligence")
+                hq = predict_hepatic_quality(profile)
+
+                h1, h2, h3 = st.columns(3)
+                h1.metric(
+                    "DILI Sensitivity",
+                    f"{hq.predicted_dilirank_sensitivity:.0%}",
+                    help="Predicted % of DILIrank high-concern compounds detected",
+                )
+                h2.metric("Specificity", f"{hq.predicted_specificity:.0%}")
+                h3.metric(
+                    "F1 Score", f"{hq.f1_score:.2f}",
+                    help="Balanced DILI detection performance",
+                )
+
+                st.caption(hq.benchmark_comparison)
+
+                if hq.optimization_recommendations:
+                    with st.expander("Optimization Recommendations"):
+                        for rec in hq.optimization_recommendations:
+                            st.markdown(f"- {rec}")
+
+                if hq.key_drivers:
+                    with st.expander("Performance Drivers"):
+                        for d in hq.key_drivers:
+                            st.markdown(f"- {d}")
+
+                st.session_state["hepatic_quality_score"] = hq
+            except Exception as e:
+                st.warning(f"Hepatic intelligence unavailable: {e}")
+
         # Row 4: CC3D Simulation Brief (Task 6)
         st.markdown("### 🔬 Simulation Brief — What CC3D Would Predict")
 
