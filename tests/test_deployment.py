@@ -19,3 +19,14 @@ def test_readme_exists():
 def test_gitignore_has_secrets():
     text = Path(".gitignore").read_text()
     assert "secrets.toml" in text
+
+
+def test_pi_ui_importable():
+    from core.pi_ui import render_pi_dashboard
+    assert callable(render_pi_dashboard)
+
+
+def test_fem_solver_importable():
+    from core.fem_solver import predict_scaffold_deformation, predict_stress_distribution
+    assert callable(predict_scaffold_deformation)
+    assert callable(predict_stress_distribution)
