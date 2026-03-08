@@ -6,10 +6,20 @@ Main Streamlit application for 3D cell culture variance analysis.
 
 import csv
 import json
+import os
+import subprocess
 from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
+
+
+def ensure_vectorstore():
+    """Build ChromaDB on first deploy if it doesn't exist."""
+    if not Path("data/chroma_db").exists():
+        with st.spinner("🔬 Building knowledge base from 4,900+ abstracts — first load only, ~2 minutes..."):
+            subprocess.run(["python", "scripts/embed_and_index.py"], check=True)
+
 
 from core.chat import extract_construct_profile, initialize_chat, send_message
 from core.models import ConstructProfile, VarianceReport
@@ -23,6 +33,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+ensure_vectorstore()
 
 # CSS injection for dark theme
 st.markdown(
