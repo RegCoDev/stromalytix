@@ -190,8 +190,37 @@ def test_simulation_brief_has_confidence_tags():
 
 def test_confidence_values_are_valid():
     """Verify confidence values are only 'high', 'medium', or 'low'."""
-    # This test will initially be skipped - placeholder for future implementation
-    pytest.skip("Confidence validation to be implemented after tagging is added")
+    mock_profile = ConstructProfile(
+        target_tissue="cardiac",
+        cell_types=["cardiomyocytes"],
+        scaffold_material="GelMA",
+        stiffness_kpa=10.0,
+        porosity_percent=70.0
+    )
+
+    mock_report = VarianceReport(
+        construct_profile=mock_profile,
+        benchmark_ranges={"stiffness_kpa": {"min": 5, "max": 15, "unit": "kPa"}},
+        deviation_scores={"stiffness_kpa": 0.0},
+        risk_flags={"stiffness_kpa": "green"},
+        ai_narrative="Mock cardiac construct analysis.",
+        supporting_pmids=["12345678"]
+    )
+
+    sim_brief = generate_simulation_brief(mock_profile, mock_report)
+
+    if "key_parameters" not in sim_brief:
+        pytest.skip("No key_parameters in simulation brief")
+
+    params = sim_brief["key_parameters"]
+    if "adhesion_energies" not in params or not isinstance(params["adhesion_energies"], dict):
+        pytest.skip("No adhesion_energies in key_parameters")
+
+    valid_values = {"high", "medium", "low"}
+    for key, val in params["adhesion_energies"].items():
+        if isinstance(val, dict) and "confidence" in val:
+            assert val["confidence"] in valid_values, \
+                f"Confidence for {key} must be high/medium/low, got: {val['confidence']}"
 
 
 def test_simulation_brief_has_supporting_pmids():

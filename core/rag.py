@@ -325,6 +325,8 @@ def generate_simulation_brief(profile: ConstructProfile, report: VarianceReport)
     profile_json = profile.model_dump_json(indent=2)
     narrative = report.ai_narrative
 
+    supporting_pmids_str = json.dumps(report.supporting_pmids)
+
     prompt = f"""Based on this construct profile and variance report, generate a CC3D simulation brief.
 
 CONSTRUCT PROFILE:
@@ -333,13 +335,20 @@ CONSTRUCT PROFILE:
 VARIANCE ANALYSIS:
 {narrative}
 
+SUPPORTING PMIDs FROM LITERATURE:
+{supporting_pmids_str}
+
 Generate a CC3D (CompuCell3D) simulation brief. Output JSON with:
 
 {{
   "simulation_question": "The single most important unknown this simulation would answer (1 sentence)",
   "key_parameters": {{
     "cell_types": ["list", "of", "cell types"],
-    "adhesion_energies": {{"cell1-cell1": 10, "cell1-medium": 15, ...}},
+    "adhesion_energies": {{
+      "cell1-cell1": {{"value": 10, "confidence": "high", "source_pmids": ["12345678"]}},
+      "cell1-medium": {{"value": 15, "confidence": "medium", "source_pmids": []}},
+      "cell1-ecm": {{"value": 8, "confidence": "low", "source_pmids": []}}
+    }},
     "volume_constraints": {{"target_volume": 100, "lambda_volume": 2}},
     "scaffold_stiffness": "value in Pa or qualitative",
     "simulation_steps": 10000
@@ -352,6 +361,14 @@ Generate a CC3D (CompuCell3D) simulation brief. Output JSON with:
   "risk_prediction": "What failure mode CC3D would most likely reveal for this specific construct (1-2 sentences)",
   "validation_experiment": "The single wet lab experiment that would validate the simulation prediction (1 sentence)"
 }}
+
+CONFIDENCE TAGGING RULES for adhesion_energies:
+- Each adhesion energy MUST be an object with "value", "confidence", and "source_pmids" keys.
+- "confidence" MUST be exactly one of: "high", "medium", or "low"
+  - "high": Parameter value directly cited in the supporting PMIDs listed above
+  - "medium": Parameter inferred from similar tissue types in literature
+  - "low": Parameter estimated from general biophysics principles
+- "source_pmids": List of PMIDs that support this value (can be empty for "low" confidence)
 
 Return ONLY the JSON, no other text."""
 
