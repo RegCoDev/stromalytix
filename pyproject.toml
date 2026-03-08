@@ -19,6 +19,7 @@ dependencies = [
     "openai",
     "tiktoken",
     "anthropic>=0.84.0",
+    "fpdf2>=2.8.7",
 ]
 
 [dependency-groups]
