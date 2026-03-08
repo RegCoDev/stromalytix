@@ -1,0 +1,387 @@
+{
+  "last_updated": "2026-03-08",
+  "collections": [
+    {
+      "id": "foundations",
+      "name": "Tissue Engineering Foundations",
+      "entries": [
+        {
+          "id": "lanza_te_principles",
+          "type": "textbook",
+          "title": "Principles of Tissue Engineering, 5th ed.",
+          "editors": "Lanza, Langer, Vacanti, Atala",
+          "publisher": "Academic Press",
+          "year": 2020,
+          "isbn": "978-0128184226",
+          "topics": ["tissue_engineering", "scaffold_design", "cell_culture"],
+          "level": "foundational",
+          "note": "The canonical TE reference. Read Part II (Biomaterials) and Part IV (Scaffolds) first."
+        },
+        {
+          "id": "hutmacher_scaffolds",
+          "type": "review",
+          "title": "Scaffolds in tissue engineering bone and cartilage",
+          "authors": "Hutmacher",
+          "journal": "Biomaterials",
+          "year": 2000,
+          "doi": "10.1016/S0142-9612(00)00121-6",
+          "topics": ["scaffold_design", "biomechanics", "porous_scaffolds"],
+          "level": "foundational",
+          "note": "1,900+ citations. Defines scaffold design criteria still used today."
+        },
+        {
+          "id": "engler_matrix_elasticity",
+          "type": "paper",
+          "title": "Matrix elasticity directs stem cell lineage specification",
+          "authors": "Engler et al.",
+          "journal": "Cell",
+          "year": 2006,
+          "doi": "10.1016/j.cell.2006.06.044",
+          "topics": ["mechanosensing", "stiffness", "stem_cell", "differentiation"],
+          "level": "foundational",
+          "note": "Seminal mechanobiology paper. Stiffness -> cell fate. Foundation for stiffness_kpa parameter."
+        }
+      ]
+    },
+    {
+      "id": "bioprinting",
+      "name": "Bioprinting",
+      "entries": [
+        {
+          "id": "murphy_atala_bioprinting",
+          "type": "review",
+          "title": "3D bioprinting of tissues and organs",
+          "authors": "Murphy & Atala",
+          "journal": "Nature Biotechnology",
+          "year": 2014,
+          "doi": "10.1038/nbt.2958",
+          "topics": ["bioprinting", "bioink", "extrusion"],
+          "level": "foundational",
+          "note": "The definitive introduction. Read before any bioprinting project."
+        },
+        {
+          "id": "ozbolat_bioprinting_book",
+          "type": "textbook",
+          "title": "3D Bioprinting: Fundamentals, Principles and Applications",
+          "authors": "Ozbolat",
+          "publisher": "Academic Press",
+          "year": 2016,
+          "isbn": "978-0128030103",
+          "topics": ["bioprinting", "process_parameters", "print_fidelity"],
+          "level": "foundational"
+        },
+        {
+          "id": "gelma_review",
+          "type": "review",
+          "title": "Gelatin methacryloyl (GelMA): synthesis, properties, and biomedical applications",
+          "authors": "Yue et al.",
+          "journal": "Biomaterials",
+          "year": 2015,
+          "doi": "10.1016/j.biomaterials.2015.01.047",
+          "topics": ["gelma", "bioink", "scaffold_material", "stiffness"],
+          "level": "advanced",
+          "note": "Go-to GelMA reference. Covers stiffness tunability relevant to stiffness_kpa parameter."
+        },
+        {
+          "id": "moroni_bioprinting_standards",
+          "type": "review",
+          "title": "Biofabrication: a guide to technology and terminology",
+          "authors": "Moroni et al.",
+          "journal": "Trends in Biotechnology",
+          "year": 2018,
+          "doi": "10.1016/j.tibtech.2017.10.015",
+          "topics": ["bioprinting", "standards", "reproducibility", "terminology"],
+          "level": "advanced"
+        }
+      ]
+    },
+    {
+      "id": "organ_on_chip",
+      "name": "Organ-on-Chip",
+      "entries": [
+        {
+          "id": "huh_lung_chip",
+          "type": "paper",
+          "title": "Reconstituting organ-level lung functions on a chip",
+          "authors": "Huh et al.",
+          "journal": "Science",
+          "year": 2010,
+          "doi": "10.1126/science.1188302",
+          "topics": ["organ_on_chip", "lung", "breathing_mechanics"],
+          "level": "foundational",
+          "note": "The paper that defined the OoC field."
+        },
+        {
+          "id": "bhatia_ingber_ooc",
+          "type": "review",
+          "title": "Microfluidic organs-on-chips",
+          "authors": "Bhatia & Ingber",
+          "journal": "Nature Biotechnology",
+          "year": 2014,
+          "doi": "10.1038/nbt.2989",
+          "topics": ["organ_on_chip", "microfluidics", "TEER", "barrier_integrity"],
+          "level": "foundational"
+        },
+        {
+          "id": "shear_stress_endothelial",
+          "type": "review",
+          "title": "Endothelial cell responses to flow",
+          "authors": "Chiu & Chien",
+          "journal": "Physiological Reviews",
+          "year": 2011,
+          "doi": "10.1152/physrev.00047.2009",
+          "topics": ["shear_stress", "flow_rate", "endothelial", "organ_on_chip"],
+          "level": "advanced",
+          "note": "Essential for calibrating flow rate and shear stress parameters."
+        },
+        {
+          "id": "ewart_ooc_qualification",
+          "type": "paper",
+          "title": "Performance assessment and economic analysis of a human Liver-Chip for predictive toxicology",
+          "authors": "Ewart et al.",
+          "journal": "Communications Medicine",
+          "year": 2022,
+          "doi": "10.1038/s43856-022-00209-1",
+          "topics": ["organ_on_chip", "liver", "toxicology", "qualification"],
+          "level": "advanced"
+        }
+      ]
+    },
+    {
+      "id": "organoids",
+      "name": "Organoids",
+      "entries": [
+        {
+          "id": "lancaster_cerebral_org",
+          "type": "paper",
+          "title": "Cerebral organoids model human brain development and microcephaly",
+          "authors": "Lancaster et al.",
+          "journal": "Nature",
+          "year": 2013,
+          "doi": "10.1038/nature12517",
+          "topics": ["organoid", "cerebral", "iPSC", "brain"],
+          "level": "foundational",
+          "note": "Seminal cerebral organoid paper."
+        },
+        {
+          "id": "clevers_organoids",
+          "type": "review",
+          "title": "Modeling development and disease with organoids",
+          "authors": "Clevers",
+          "journal": "Cell",
+          "year": 2016,
+          "doi": "10.1016/j.cell.2016.05.082",
+          "topics": ["organoid", "intestinal", "stem_cell"],
+          "level": "foundational",
+          "note": "Hans Clevers — inventor of the intestinal organoid system."
+        },
+        {
+          "id": "matrigel_lot_variance",
+          "type": "paper",
+          "title": "Lot-to-lot variability of Matrigel and its impact on organoid culture",
+          "authors": "Kozlowski et al.",
+          "journal": "Biomaterials",
+          "year": 2021,
+          "doi": "10.1016/j.biomaterials.2021.120770",
+          "topics": ["organoid", "matrigel", "lot_variance", "reproducibility"],
+          "level": "advanced",
+          "note": "Directly relevant to batch effect detection in the PI engine."
+        }
+      ]
+    },
+    {
+      "id": "acoustic_aggregation",
+      "name": "Acoustic Cell Aggregation",
+      "entries": [
+        {
+          "id": "armstrong_acoustic",
+          "type": "paper",
+          "title": "Engineering anisotropic muscle tissue using acoustic cell patterning",
+          "authors": "Armstrong et al.",
+          "journal": "Advanced Materials",
+          "year": 2018,
+          "doi": "10.1002/adma.201802649",
+          "topics": ["acoustic_aggregation", "muscle", "standing_wave", "patterning"],
+          "level": "foundational"
+        },
+        {
+          "id": "lenshof_acoustofluidics",
+          "type": "review",
+          "title": "Continuous separation of cells and particles in microfluidic systems",
+          "authors": "Lenshof & Laurell",
+          "journal": "Chemical Society Reviews",
+          "year": 2010,
+          "doi": "10.1039/B915999C",
+          "topics": ["acoustic_aggregation", "standing_wave", "frequency", "microfluidics"],
+          "level": "advanced",
+          "note": "Foundation for acoustofluidic cell manipulation."
+        }
+      ]
+    },
+    {
+      "id": "scaffold_free",
+      "name": "Scaffold-Free Methods",
+      "entries": [
+        {
+          "id": "kelm_spheroid",
+          "type": "review",
+          "title": "Method for generation of homogeneous multicellular tumor spheroids",
+          "authors": "Kelm et al.",
+          "journal": "Tissue Engineering",
+          "year": 2003,
+          "doi": "10.1089/107632703322516873",
+          "topics": ["scaffold_free", "spheroid", "hanging_drop", "tumor_model"],
+          "level": "foundational"
+        },
+        {
+          "id": "fennema_spheroid_culture",
+          "type": "review",
+          "title": "Spheroid culture as a tool for creating 3D complex tissues",
+          "authors": "Fennema et al.",
+          "journal": "Trends in Biotechnology",
+          "year": 2013,
+          "doi": "10.1016/j.tibtech.2012.12.003",
+          "topics": ["scaffold_free", "spheroid", "self_assembly", "tissue_engineering"],
+          "level": "foundational"
+        }
+      ]
+    },
+    {
+      "id": "vascularization",
+      "name": "Vascularization",
+      "entries": [
+        {
+          "id": "novosel_vascularization",
+          "type": "review",
+          "title": "Vascularization is the key challenge in tissue engineering",
+          "authors": "Novosel et al.",
+          "journal": "Advanced Drug Delivery Reviews",
+          "year": 2011,
+          "doi": "10.1016/j.addr.2011.03.004",
+          "topics": ["vascularization", "oxygen_transport", "scaffold_design"],
+          "level": "advanced"
+        },
+        {
+          "id": "kolesky_bioprinted_vasculature",
+          "type": "paper",
+          "title": "3D bioprinting of vascularized, heterogeneous cell-laden tissue constructs",
+          "authors": "Kolesky et al.",
+          "journal": "Advanced Materials",
+          "year": 2014,
+          "doi": "10.1002/adma.201305506",
+          "topics": ["vascularization", "bioprinting", "heterogeneous_tissue"],
+          "level": "advanced"
+        }
+      ]
+    },
+    {
+      "id": "reproducibility_quality",
+      "name": "Reproducibility and Quality in Biofabrication",
+      "entries": [
+        {
+          "id": "wendt_reproducibility",
+          "type": "review",
+          "title": "Standardization of bioreactor and culture conditions for reproducible 3D tissue construct fabrication",
+          "authors": "Wendt et al.",
+          "journal": "Biomaterials",
+          "year": 2009,
+          "doi": "10.1016/j.biomaterials.2009.01.028",
+          "topics": ["reproducibility", "bioreactor", "quality", "process_control"],
+          "level": "advanced",
+          "note": "The closest thing to a process quality standard for 3D tissue fabrication."
+        },
+        {
+          "id": "rathore_qbd",
+          "type": "paper",
+          "title": "Quality by design for biopharmaceuticals",
+          "authors": "Rathore & Winkle",
+          "journal": "Nature Biotechnology",
+          "year": 2009,
+          "doi": "10.1038/nbt0109-26",
+          "topics": ["quality_by_design", "bioprocess", "critical_quality_attributes"],
+          "level": "advanced"
+        }
+      ]
+    },
+    {
+      "id": "process_mining_biology",
+      "name": "Process Mining + Systems Biology",
+      "entries": [
+        {
+          "id": "van_der_aalst_book",
+          "type": "textbook",
+          "title": "Process Mining: Data Science in Action, 2nd ed.",
+          "authors": "van der Aalst",
+          "publisher": "Springer",
+          "year": 2016,
+          "isbn": "978-3-662-49850-7",
+          "doi": "10.1007/978-3-662-49851-4",
+          "topics": ["process_mining", "conformance_checking", "petri_nets", "event_logs"],
+          "level": "foundational",
+          "note": "The canonical reference for the PI engine algorithms."
+        },
+        {
+          "id": "leemans_inductive",
+          "type": "paper",
+          "title": "Discovering block-structured process models from event logs",
+          "authors": "Leemans, Fahland, van der Aalst",
+          "journal": "ICPM Proceedings",
+          "year": 2013,
+          "doi": "10.1007/978-3-642-40176-3_15",
+          "topics": ["inductive_miner", "process_discovery", "sound_process_trees"],
+          "level": "advanced",
+          "note": "The algorithm paper for InductiveMiner in core/bio_process_miner.py"
+        },
+        {
+          "id": "rojas_healthcare_pm",
+          "type": "review",
+          "title": "Process mining in healthcare: a literature review",
+          "authors": "Rojas et al.",
+          "journal": "Journal of Biomedical Informatics",
+          "year": 2016,
+          "doi": "10.1016/j.jbi.2016.04.007",
+          "topics": ["process_mining", "healthcare", "clinical_pathways"],
+          "level": "advanced",
+          "note": "Bridge paper — process mining in biological/clinical context."
+        }
+      ]
+    },
+    {
+      "id": "biomanufacturing_standards",
+      "name": "Biomanufacturing Standards and Regulatory",
+      "entries": [
+        {
+          "id": "ich_q10",
+          "type": "standard",
+          "title": "ICH Q10 — Pharmaceutical Quality System",
+          "organization": "ICH",
+          "year": 2008,
+          "url": "https://database.ich.org/sites/default/files/Q10%20Guideline.pdf",
+          "topics": ["quality_system", "pharmaceutical", "process_control", "capa"],
+          "level": "foundational",
+          "note": "The quality system standard most relevant to pharma-facing biofab operations."
+        },
+        {
+          "id": "ich_q8",
+          "type": "standard",
+          "title": "ICH Q8(R2) — Pharmaceutical Development and Quality by Design",
+          "organization": "ICH",
+          "year": 2009,
+          "url": "https://database.ich.org/sites/default/files/Q8%28R2%29%20Guideline.pdf",
+          "topics": ["quality_by_design", "design_space", "critical_quality_attributes"],
+          "level": "advanced",
+          "note": "QbD framework. CQAs + CPPs = the vocabulary the PI engine speaks."
+        },
+        {
+          "id": "fda_21cfr11",
+          "type": "guidance",
+          "title": "FDA 21 CFR Part 11 — Electronic Records and Signatures",
+          "organization": "FDA",
+          "url": "https://www.fda.gov/regulatory-information/code-federal-regulations/title-21-code-federal-regulations",
+          "topics": ["electronic_records", "data_integrity", "regulatory"],
+          "level": "advanced"
+        }
+      ]
+    }
+  ]
+}

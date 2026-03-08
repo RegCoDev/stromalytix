@@ -1,0 +1,316 @@
+{
+  "version": "7.0",
+  "source": "APQC Process Classification Framework — Cross-Industry",
+  "url": "https://www.apqc.org/process-frameworks",
+  "last_updated": "2026-03-08",
+  "categories": [
+    {
+      "category_id": "4.0",
+      "name": "Develop and Manage Products and Services",
+      "subcategories": [
+        {
+          "id": "4.1",
+          "name": "Design Products and Services",
+          "process_elements": [
+            {
+              "id": "4.1.1",
+              "name": "Develop product design specifications",
+              "stromalytix_mapping": "construct_design",
+              "pi_signals": ["parameter_out_of_range", "design_iteration"],
+              "best_practice_summary": "Design of Experiments (DoE) for systematic parameter exploration. For tissue constructs, key design inputs: stiffness, porosity, cell density, scaffold material. Define Critical Quality Attributes (CQAs) before fabrication. Use QbD framework (ICH Q8) for design space mapping.",
+              "key_metrics": ["design_iterations_to_target", "parameter_space_coverage", "cqa_met_rate"],
+              "reading": [
+                {
+                  "type": "standard",
+                  "title": "ICH Q8(R2) — Pharmaceutical Development and Quality by Design",
+                  "url": "https://database.ich.org/sites/default/files/Q8%28R2%29%20Guideline.pdf",
+                  "relevance_signal": "parameter_out_of_range"
+                }
+              ]
+            },
+            {
+              "id": "4.1.2",
+              "name": "Conduct product testing and validation",
+              "stromalytix_mapping": "construct_validation",
+              "pi_signals": ["validation_failure", "readout_variance"],
+              "best_practice_summary": "Validation protocol: minimum 3 independent batches, n>=3 per batch. Primary readout reproducibility (CV < 20%). Compare to published benchmarks for target tissue. Validation lot must differ from development lot.",
+              "key_metrics": ["validation_pass_rate", "inter_batch_cv", "benchmark_concordance"],
+              "reading": [
+                {
+                  "type": "paper",
+                  "title": "Standardization of bioreactor and culture conditions for reproducible 3D tissue construct fabrication",
+                  "authors": "Wendt et al.",
+                  "journal": "Biomaterials",
+                  "year": 2009,
+                  "doi": "10.1016/j.biomaterials.2009.01.028",
+                  "relevance_signal": "readout_variance"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category_id": "5.0",
+      "name": "Produce and Deliver Products and Services",
+      "subcategories": [
+        {
+          "id": "5.2",
+          "name": "Schedule Production",
+          "process_elements": [
+            {
+              "id": "5.2.1",
+              "name": "Generate production schedules",
+              "stromalytix_mapping": "protocol_scheduling",
+              "pi_signals": ["schedule_deviation", "throughput_variance"],
+              "best_practice_summary": "Rolling horizon scheduling with capacity buffers. Biological production requires minimum 48h lead time for cell preparation. Schedule adherence rate >90% correlates with batch success.",
+              "key_metrics": ["schedule_adherence_rate", "production_cycle_time", "capacity_utilization"],
+              "reading": [
+                {
+                  "type": "paper",
+                  "title": "Production planning in biopharmaceutical manufacturing",
+                  "authors": "Lakhdar et al.",
+                  "journal": "Biotechnology Progress",
+                  "year": 2005,
+                  "doi": "10.1021/bp049559e",
+                  "relevance_signal": "throughput_variance"
+                }
+              ]
+            },
+            {
+              "id": "5.2.2",
+              "name": "Schedule material requirements",
+              "stromalytix_mapping": "lot_procurement",
+              "pi_signals": ["lot_substitution", "material_shortage"],
+              "best_practice_summary": "Just-in-time biological material procurement is high risk. Maintain 2-week safety stock for critical cell culture components. Lot qualification testing mandatory before production use.",
+              "key_metrics": ["material_availability_rate", "lot_qualification_cycle_time"],
+              "reading": []
+            }
+          ]
+        },
+        {
+          "id": "5.4",
+          "name": "Produce Product",
+          "process_elements": [
+            {
+              "id": "5.4.1",
+              "name": "Manufacture and prepare product",
+              "stromalytix_mapping": "biofab_execution",
+              "pi_signals": ["protocol_deviation", "conformance_failure", "critical_control_point"],
+              "best_practice_summary": "Stage-gate execution with mandatory hold points. For biological systems, the seeding step is typically the highest-variance stage and should have dedicated QC verification before proceeding.",
+              "key_metrics": ["first_pass_yield", "batch_success_rate", "protocol_conformance_rate"],
+              "reading": [
+                {
+                  "type": "standard",
+                  "title": "ICH Q10 — Pharmaceutical Quality System",
+                  "url": "https://database.ich.org/sites/default/files/Q10%20Guideline.pdf",
+                  "relevance_signal": "protocol_deviation"
+                },
+                {
+                  "type": "paper",
+                  "title": "Quality by Design in bioprocess development",
+                  "authors": "Rathore & Winkle",
+                  "journal": "Nature Biotechnology",
+                  "year": 2009,
+                  "doi": "10.1038/nbt.1572",
+                  "relevance_signal": "conformance_failure"
+                }
+              ]
+            },
+            {
+              "id": "5.4.3",
+              "name": "Perform production process control",
+              "stromalytix_mapping": "process_monitoring",
+              "pi_signals": ["high_cv", "batch_effect", "operator_variance"],
+              "best_practice_summary": "Statistical Process Control (SPC) for key process parameters. Control charts (X-bar, R-chart) for viability, TEER, secretion. 3-sigma control limits standard; biological systems may require wider limits (4-sigma) due to inherent biological variance.",
+              "key_metrics": ["process_capability_index_cpk", "control_chart_violations", "operator_cv"],
+              "reading": [
+                {
+                  "type": "book",
+                  "title": "Statistical Process Control, 8th ed.",
+                  "authors": "Montgomery",
+                  "publisher": "Wiley",
+                  "year": 2020,
+                  "isbn": "978-1-119-39930-8",
+                  "relevance_signal": "high_cv"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "5.5",
+          "name": "Perform Quality Testing",
+          "process_elements": [
+            {
+              "id": "5.5.1",
+              "name": "Test in-process materials",
+              "stromalytix_mapping": "inline_qc",
+              "pi_signals": ["viability_below_threshold", "teer_failure", "secretion_outlier"],
+              "best_practice_summary": "Risk-based QC sampling. For 3D tissue constructs, minimum: viability (Day 1, Day 3, final), structural integrity (imaging), functional readout (assay-specific). Inline testing preferred over endpoint-only.",
+              "key_metrics": ["qc_coverage_rate", "false_positive_rate", "time_to_result"],
+              "reading": [
+                {
+                  "type": "standard",
+                  "title": "USP <1046> Cell and Gene Therapy Products",
+                  "url": "https://www.usp.org/",
+                  "relevance_signal": "viability_below_threshold"
+                },
+                {
+                  "type": "standard",
+                  "title": "ISO 13022 — Cell therapy products",
+                  "url": "https://www.iso.org/standard/52527.html",
+                  "relevance_signal": "conformance_failure"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "5.6",
+          "name": "Maintain Production Records",
+          "process_elements": [
+            {
+              "id": "5.6.1",
+              "name": "Document production activities",
+              "stromalytix_mapping": "eln_logging",
+              "pi_signals": ["missing_documentation", "late_entry", "incomplete_protocol"],
+              "best_practice_summary": "ALCOA+ principles for data integrity: Attributable, Legible, Contemporaneous, Original, Accurate, plus Complete, Consistent, Enduring, Available. FDA 21 CFR Part 11 for electronic records in regulated contexts.",
+              "key_metrics": ["documentation_completeness_rate", "on_time_entry_rate"],
+              "reading": [
+                {
+                  "type": "guidance",
+                  "title": "FDA 21 CFR Part 11 — Electronic Records and Signatures",
+                  "url": "https://www.fda.gov/regulatory-information/code-federal-regulations/title-21-code-federal-regulations",
+                  "relevance_signal": "missing_documentation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category_id": "6.0",
+      "name": "Manage Customer Service",
+      "subcategories": [
+        {
+          "id": "6.2",
+          "name": "Plan and Manage Customer Service Operations",
+          "process_elements": [
+            {
+              "id": "6.2.1",
+              "name": "Plan and manage customer service workforce",
+              "stromalytix_mapping": "client_delivery",
+              "pi_signals": ["delivery_delay", "client_complaint", "rerun_request"],
+              "best_practice_summary": "Service level agreements for construct delivery: define turnaround time, QC criteria, and rerun triggers. Track customer satisfaction by construct type. Correlate churn with specific lot/protocol combinations.",
+              "key_metrics": ["on_time_delivery_rate", "customer_satisfaction_score", "rerun_rate"],
+              "reading": [
+                {
+                  "type": "book",
+                  "title": "The Goal: A Process of Ongoing Improvement",
+                  "authors": "Goldratt & Cox",
+                  "publisher": "North River Press",
+                  "year": 2004,
+                  "isbn": "978-0884271956",
+                  "relevance_signal": "delivery_delay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category_id": "8.0",
+      "name": "Manage Financial Resources",
+      "subcategories": [
+        {
+          "id": "8.3",
+          "name": "Manage Cost and Profitability",
+          "process_elements": [
+            {
+              "id": "8.3.1",
+              "name": "Track and analyze cost of goods",
+              "stromalytix_mapping": "batch_costing",
+              "pi_signals": ["cost_overrun", "material_waste", "rework_cost"],
+              "best_practice_summary": "Activity-based costing for biofabrication: track cost per construct including materials, labor, QC, and overhead. Typical COGS breakdown: 40% materials (cells, media, scaffold), 30% labor, 20% QC/instruments, 10% overhead. Identify cost drivers per protocol step.",
+              "key_metrics": ["cogs_per_construct", "material_utilization_rate", "rework_cost_percent"],
+              "reading": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category_id": "11.0",
+      "name": "Manage External Relationships",
+      "subcategories": [
+        {
+          "id": "11.4",
+          "name": "Manage Supplier/Partner Relationships",
+          "process_elements": [
+            {
+              "id": "11.4.2",
+              "name": "Evaluate and select suppliers",
+              "stromalytix_mapping": "lot_qualification",
+              "pi_signals": ["lot_churn_correlation", "flagged_lot", "supplier_variance"],
+              "best_practice_summary": "Supplier qualification: technical audit + minimum 3 incoming lots tested before production approval. For biological raw materials, qualification includes bioassay, endotoxin, and mycoplasma testing. Approved Supplier List (ASL) with re-qualification triggers.",
+              "key_metrics": ["supplier_qualification_rate", "incoming_lot_acceptance_rate", "supplier_deviation_frequency"],
+              "reading": [
+                {
+                  "type": "standard",
+                  "title": "ICH Q7 — Good Manufacturing Practice for APIs",
+                  "url": "https://database.ich.org/sites/default/files/Q7%20Guideline.pdf",
+                  "relevance_signal": "lot_churn_correlation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category_id": "12.0",
+      "name": "Develop and Manage Business Capabilities",
+      "subcategories": [
+        {
+          "id": "12.4",
+          "name": "Manage Knowledge",
+          "process_elements": [
+            {
+              "id": "12.4.1",
+              "name": "Capture and apply process knowledge",
+              "stromalytix_mapping": "process_intelligence_platform",
+              "pi_signals": ["new_ccp_discovered", "model_updated", "prediction_validated"],
+              "best_practice_summary": "Process knowledge management: structured capture of deviation learnings, CAPA (Corrective and Preventive Action) integration, living protocol documentation that updates from real data. Knowledge half-life in bioprocess: ~18 months before key learnings are lost without systematic capture.",
+              "key_metrics": ["knowledge_capture_rate", "capa_closure_rate", "protocol_currency"],
+              "reading": [
+                {
+                  "type": "book",
+                  "title": "The Goal: A Process of Ongoing Improvement",
+                  "authors": "Goldratt & Cox",
+                  "publisher": "North River Press",
+                  "year": 2004,
+                  "isbn": "978-0884271956",
+                  "relevance_signal": "critical_control_point",
+                  "note": "Theory of Constraints — foundational for CCP thinking"
+                },
+                {
+                  "type": "paper",
+                  "title": "Process Mining: Data Science in Action",
+                  "authors": "van der Aalst",
+                  "publisher": "Springer",
+                  "year": 2016,
+                  "doi": "10.1007/978-3-662-49851-4",
+                  "relevance_signal": "process_mining_result"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
