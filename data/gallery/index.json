@@ -1,0 +1,40 @@
+{
+  "generated": "2026-03-08",
+  "constructs": [
+    {
+      "name": "cardiac_bioprint",
+      "title": "Cardiac \u2014 Bioprinted GelMA",
+      "tissue": "cardiac",
+      "method": "bioprinting",
+      "file": "cardiac_bioprint.png"
+    },
+    {
+      "name": "bbb_ooc",
+      "title": "BBB \u2014 Organ-on-Chip",
+      "tissue": "blood-brain barrier",
+      "method": "organ_on_chip",
+      "file": "bbb_ooc.png"
+    },
+    {
+      "name": "tumor_spheroid",
+      "title": "Tumor Spheroid \u2014 Scaffold-Free",
+      "tissue": "tumor",
+      "method": "scaffold_free",
+      "file": "tumor_spheroid.png"
+    },
+    {
+      "name": "liver_organoid",
+      "title": "Liver Organoid",
+      "tissue": "liver",
+      "method": "organoid",
+      "file": "liver_organoid.png"
+    },
+    {
+      "name": "muscle_acoustic",
+      "title": "Muscle \u2014 Acoustic Aggregation",
+      "tissue": "muscle",
+      "method": "acoustic_aggregation",
+      "file": "muscle_acoustic.png"
+    }
+  ]
+}
