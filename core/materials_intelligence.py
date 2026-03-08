@@ -196,6 +196,7 @@ def predict_printability(
     viscosity_pas_at_37c: Optional[float],
     gelation_time_s: Optional[float],
     loss_tangent: Optional[float] = None,
+    modality: str = "extrusion",
 ) -> tuple:
     """
     Predict printability score from rheological parameters.
@@ -207,8 +208,23 @@ def predict_printability(
 
     Source: Ouyang et al. Adv Mater 2016 doi:10.1002/adma.201604976
 
+    Args:
+        modality: Printing modality. Only "extrusion" is supported here.
+            Use core.dlp_physics for DLP, core.ooc_physics for OoC.
+
     Returns: (printability_score 0-1, uncertainty 0-1, limiting_factor str)
     """
+    if modality == "dlp":
+        raise ValueError(
+            "DLP printability uses photopolymerization physics, not extrusion rheology. "
+            "Use core.dlp_physics.predict_dlp_printability() instead."
+        )
+    if modality == "ooc":
+        raise ValueError(
+            "Organ-on-chip does not use printability scoring. "
+            "Use core.ooc_physics.predict_wall_shear_stress() for shear stress modeling."
+        )
+
     scores = []
     limiting = None
 
