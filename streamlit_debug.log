@@ -1,0 +1,40 @@
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://192.168.1.133:8501
+
+C:\dev\stromalytix\core\chat.py:46: LangChainDeprecationWarning: Please see the migration guide at: https://python.langchain.com/docs/versions/migrating_memory/
+  memory = ConversationBufferMemory(
+C:\dev\stromalytix\core\chat.py:52: LangChainDeprecationWarning: The class `ConversationChain` was deprecated in LangChain 0.2.7 and will be removed in 1.0. Use `langchain_core.runnables.history.RunnableWithMessageHistory` instead.
+  chain = ConversationChain(
+
+============================================================
+DEBUG: Phase Transition Check
+============================================================
+Message count: 3
+Min messages met (>= 8): False
++------------------------- Traceback (most recent call last) --------------------------+
+| C:\dev\stromalytix\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code. |
+| py:129 in exec_func_with_error_handling                                              |
+|                                                                                      |
+| C:\dev\stromalytix\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\script_run |
+| ner.py:689 in code_to_exec                                                           |
+|                                                                                      |
+| C:\dev\stromalytix\app.py:343 in <module>                                            |
+|                                                                                      |
+|   340             else:                                                              |
+|   341                 print("\n2026-03-07 01:41:27.280 Uncaught app execution
+Traceback (most recent call last):
+  File "C:\dev\stromalytix\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+  File "C:\dev\stromalytix\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\dev\stromalytix\app.py", line 343, in <module>
+    print(f"\n\u274c Need {8 - msg_count} more messages - staying in assessment")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u274c' in position 2: character maps to <undefined>

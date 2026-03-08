@@ -1,0 +1,174 @@
+"""
+Conversation Chain Logic for Stromalytix
+
+Handles interactive chat assessment to collect construct parameters.
+"""
+
+import json
+import os
+import re
+from typing import Optional
+
+from dotenv import load_dotenv
+from langchain_classic.chains import ConversationChain
+from langchain_classic.memory import ConversationBufferMemory
+from langchain_anthropic import ChatAnthropic
+
+from core.models import ConstructProfile
+
+# Load environment variables
+load_dotenv()
+
+# Verify Anthropic API key
+if not os.getenv("ANTHROPIC_API_KEY"):
+    raise ValueError("ANTHROPIC_API_KEY not found in .env file")
+
+# System prompt for construct assessment
+SYSTEM_PROMPT = """You are a Tissue Engineering Protocol Analyst for Stromalytix. Assess a researcher's 3D cell culture construct through a friendly expert conversation. Ask ONE question at a time. Collect: target tissue, cell types, scaffold material, stiffness (kPa), porosity (%), cell density, experimental goal, primary readout.
+
+IMPORTANT: When you have all parameters, output a JSON block wrapped in <construct_profile> tags. Use this EXACT format with SINGLE NUMERIC VALUES (not ranges):
+
+<construct_profile>
+{
+  "target_tissue": "string",
+  "cell_types": ["string1", "string2"],
+  "scaffold_material": "string",
+  "stiffness_kpa": 10.0,
+  "porosity_percent": 75.0,
+  "cell_density_per_ml": 5000000.0,
+  "experimental_goal": "string",
+  "primary_readout": "string"
+}
+</construct_profile>
+
+For numeric fields (stiffness_kpa, porosity_percent, cell_density_per_ml), output ONLY single numbers (e.g., 75.0, not "70-80%"). If given a range, output the midpoint."""
+
+
+def initialize_chat() -> ConversationChain:
+    """
+    Initialize a conversation chain with Haiku and buffer memory.
+
+    Returns:
+        ConversationChain configured for construct assessment
+    """
+    # Initialize Haiku model
+    llm = ChatAnthropic(
+        model="claude-haiku-4-5-20251001",
+        temperature=0.7,
+        max_tokens=2048,  # Increased to allow full JSON output + conversation
+        api_key=os.getenv("ANTHROPIC_API_KEY")
+    )
+
+    # Initialize conversation memory
+    memory = ConversationBufferMemory(
+        return_messages=True,
+        memory_key="history"
+    )
+
+    # Create conversation chain with system prompt
+    chain = ConversationChain(
+        llm=llm,
+        memory=memory,
+        verbose=False
+    )
+
+    # Inject system prompt via first exchange
+    chain.predict(input=f"SYSTEM: {SYSTEM_PROMPT}\n\nRespond with a friendly greeting and ask the first question to begin the construct assessment.")
+
+    return chain
+
+
+def send_message(chain: ConversationChain, user_input: str) -> str:
+    """
+    Send a user message to the conversation chain and get response.
+
+    Sanitizes input to prevent prompt injection before sending to LLM.
+
+    Args:
+        chain: ConversationChain instance
+        user_input: User's message
+
+    Returns:
+        AI assistant's response
+    """
+    # Import sanitization function
+    from core.rag import sanitize_input
+
+    # Sanitize user input
+    sanitized_input = sanitize_input(user_input)
+
+    # If sanitization detected malicious content, return safe response directly
+    if sanitized_input == "I can only help with tissue engineering protocol analysis.":
+        print("[SANITIZED] Blocked malicious input in send_message")
+        return sanitized_input
+
+    response = chain.predict(input=sanitized_input)
+    return response
+
+
+def clean_numeric_fields(profile_dict: dict) -> dict:
+    """
+    Clean numeric fields that might contain string ranges like '80-95%' or '5-10'.
+    Converts to midpoint float.
+    """
+    for field in ['stiffness_kpa', 'porosity_percent', 'cell_density_per_ml']:
+        if field in profile_dict and isinstance(profile_dict[field], str):
+            value_str = profile_dict[field].strip()
+            # Remove % symbol
+            value_str = value_str.replace('%', '').strip()
+
+            # Check if it's a range like "5-10" or "80-95"
+            if '-' in value_str:
+                try:
+                    parts = value_str.split('-')
+                    if len(parts) == 2:
+                        low = float(parts[0].strip())
+                        high = float(parts[1].strip())
+                        profile_dict[field] = (low + high) / 2  # Use midpoint
+                        print(f"[CLEAN] Converted {field} range '{value_str}' to midpoint: {profile_dict[field]}")
+                except ValueError:
+                    pass  # Leave as-is if can't parse
+            else:
+                # Try to convert single value
+                try:
+                    profile_dict[field] = float(value_str)
+                    print(f"[CLEAN] Converted {field} string '{value_str}' to float: {profile_dict[field]}")
+                except ValueError:
+                    pass  # Leave as-is if can't parse
+
+    return profile_dict
+
+
+def extract_construct_profile(conversation_history: str) -> Optional[ConstructProfile]:
+    """
+    Extract ConstructProfile from conversation history.
+
+    ONLY extracts when the <construct_profile> tag is explicitly present.
+    This ensures the assistant has completed the assessment before extraction.
+
+    Args:
+        conversation_history: Full conversation text
+
+    Returns:
+        ConstructProfile if <construct_profile> tag found and valid, None otherwise
+    """
+    # Try to find <construct_profile> tags - REQUIRED for extraction
+    pattern = r"<construct_profile>(.*?)</construct_profile>"
+    match = re.search(pattern, conversation_history, re.DOTALL)
+
+    if not match:
+        # No explicit completion signal - return None
+        return None
+
+    # Parse the tagged JSON
+    try:
+        json_str = match.group(1).strip()
+        profile_dict = json.loads(json_str)
+
+        # Clean numeric fields that might be string ranges
+        profile_dict = clean_numeric_fields(profile_dict)
+
+        return ConstructProfile(**profile_dict)
+    except (json.JSONDecodeError, ValueError) as e:
+        print(f"Warning: Failed to parse construct_profile JSON: {e}")
+        return None
