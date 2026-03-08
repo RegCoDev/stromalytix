@@ -1,0 +1,10 @@
+{
+  "nodes": [],
+  "edges": [],
+  "metadata": {
+    "version": "1.0",
+    "description": "Stromalytix PI Graph — Arc 1 (networkx)",
+    "arc2_migration": "Neo4j AsyncGraphDatabase v5.28+",
+    "neo4j_note": "Parameterized Cypher only"
+  }
+}
