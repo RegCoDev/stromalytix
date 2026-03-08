@@ -50,3 +50,29 @@ def test_bpi_readme_exists():
     assert p.exists()
     content = p.read_text()
     assert "BPI" in content
+
+
+def test_nmp_vittal_json_exists_and_valid():
+    p = Path("data/public/transplant/nmp_vittal_summary.json")
+    assert p.exists()
+    data = json.loads(p.read_text())
+    assert data["doi"] == "10.1038/s41586-018-0047-9"
+    assert "nmp_arm_summary" in data
+    assert data["nmp_arm_summary"]["ead_rate_nmp"] < data["nmp_arm_summary"]["ead_rate_cold_storage"]
+
+
+def test_nmp_pilot_criteria_json_exists_and_valid():
+    p = Path("data/public/transplant/nmp_pilot_criteria.json")
+    assert p.exists()
+    data = json.loads(p.read_text())
+    assert data["doi"] == "10.1038/s41591-020-1134-x"
+    assert "viability_criteria" in data
+    assert len(data["viability_criteria"]["mandatory"]) >= 3
+    assert len(data["viability_criteria"]["supporting"]) >= 2
+
+
+def test_transplant_datasets_readme_exists():
+    p = Path("data/public/transplant/DATASETS_README.txt")
+    assert p.exists()
+    content = p.read_text()
+    assert "UNOS" in content or "SRTR" in content

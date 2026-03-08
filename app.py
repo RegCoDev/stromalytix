@@ -1125,13 +1125,23 @@ def _render_materials_tab():
         )
         st.info(report.release_rationale)
 
-        # Key metrics
+        # Key metrics with uncertainty
         m1, m2, m3, m4 = st.columns(4)
-        m1.metric("Predicted Stiffness", f"{report.predicted_stiffness_kpa} kPa",
-                   delta=f"± {report.stiffness_uncertainty_kpa}")
-        m2.metric("Printability Score", f"{report.predicted_printability_score:.2f}")
-        m3.metric("Day-3 Viability", f"{report.predicted_cell_viability_day3_pct:.0f}%")
+        m1.metric(
+            "Stiffness [Flory-Rehner]",
+            f"{report.predicted_stiffness_kpa} kPa",
+            delta=f"+/- {report.stiffness_uncertainty_kpa} kPa",
+        )
+        m2.metric(
+            "Printability [Ouyang 2016]",
+            f"{report.predicted_printability_score:.2f}",
+            delta=f"+/- {report.printability_uncertainty:.2f}",
+        )
+        m3.metric("Day-3 Viability", f"{report.predicted_cell_viability_day3_pct:.0f}%",
+                   delta=f"SD {report.viability_sd_pct:.1f}%")
         m4.metric("Day-7 Viability", f"{report.predicted_cell_viability_day7_pct:.0f}%")
+
+        st.caption("E = 3G'Q^(-1/3) [Flory-Rehner affine network theory]")
 
         # Process recommendations
         st.subheader("Process Recommendations")
@@ -1151,14 +1161,154 @@ def _render_materials_tab():
         else:
             st.success("Full characterization data provided — high confidence predictions.")
 
+        # Calibration references
+        if report.references:
+            with st.expander("Calibration References"):
+                for ref in report.references:
+                    st.caption(ref)
+
+
+def _render_transplant_tab():
+    """Transplant Process Intelligence tab."""
+    st.header("Liver Transplant Process Intelligence")
+    st.caption(
+        "Conformance-based EAD risk assessment. "
+        "Process mining approach to transplant outcome prediction."
+    )
+
+    with st.expander("Methodology", expanded=False):
+        st.markdown("""
+        **Approach:** Treats the transplant workflow as a process.
+        Healthy graft recovery = reference model. EAD = conformance failure.
+        Each step deviation contributes to cumulative risk.
+
+        **EAD Definition (Olthoff 2010):** Bilirubin >=10 mg/dL day 7,
+        INR >=1.6 day 7, OR AST/ALT >2000 IU/L within 7 days.
+
+        **Key references:**
+        - Nasralla et al. Nature 2018 (NMP viability criteria)
+        - Mergental et al. Nat Med 2020 (PILOT criteria)
+        - Olthoff et al. Liver Transplantation 2010 (EAD definition)
+        - Feng et al. Am J Transplant 2006 (DRI)
+        """)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("**Donor Parameters**")
+        donor_age = st.number_input("Donor age (years)", 18, 90, 55,
+                                     key="tx_donor_age")
+        donor_type = st.selectbox("Donor type", ["dbd", "dcd"],
+                                   key="tx_donor_type")
+        steatosis = st.slider("Hepatic steatosis (%)", 0, 70, 10,
+                               key="tx_steatosis")
+
+        st.markdown("**Preservation**")
+        cia = st.number_input("Cold ischemia time (h)", 0.0, 30.0, 8.0,
+                               key="tx_cia")
+        wia = st.number_input("Warm ischemia time (min)", 0, 120, 35,
+                               key="tx_wia")
+
+    with col2:
+        st.markdown("**Recipient**")
+        meld = st.number_input("Recipient MELD score", 6, 40, 18,
+                                key="tx_meld")
+
+        st.markdown("**NMP (if used)**")
+        has_nmp = st.toggle("NMP perfusion data available", key="tx_has_nmp")
+
+        if has_nmp:
+            st.caption("Enter representative NMP measurements:")
+            lactate_2h = st.number_input("Lactate at 2h (mmol/L)", 0.0, 15.0, 2.1,
+                                          key="tx_lactate")
+            bile_ph = st.number_input("Bile pH", 6.5, 8.0, 7.3,
+                                       key="tx_bile_ph")
+            art_flow = st.number_input("Arterial flow (mL/min)", 0, 500, 180,
+                                        key="tx_art_flow")
+            o2_cons = st.number_input("O2 consumption (mmol/h)", 0, 80, 32,
+                                       key="tx_o2")
+
+    if st.button("Analyze Transplant Workflow", type="primary",
+                 key="run_transplant"):
+        from core.transplant_intelligence import (
+            TransplantWorkflowParameters,
+            NMPTimepoint,
+            compute_workflow_conformance,
+        )
+
+        nmp_trace = []
+        if has_nmp:
+            nmp_trace = [
+                NMPTimepoint(
+                    time_min=120,
+                    lactate_mmol_l=lactate_2h,
+                    bile_ph=bile_ph,
+                    arterial_flow_ml_min=art_flow,
+                    o2_consumption_mmol_h=o2_cons,
+                ),
+            ]
+
+        params = TransplantWorkflowParameters(
+            donor_age=donor_age,
+            donor_type=donor_type,
+            donor_steatosis_pct=steatosis,
+            cold_ischemia_time_h=cia,
+            warm_ischemia_time_min=wia,
+            recipient_meld_score=meld,
+            nmp_trace=nmp_trace,
+        )
+
+        report = compute_workflow_conformance(params)
+        st.session_state["transplant_report"] = report
+
+    if st.session_state.get("transplant_report"):
+        report = st.session_state["transplant_report"]
+
+        risk_methods = {"low": "success", "moderate": "warning", "high": "error"}
+        getattr(st, risk_methods[report.ead_risk_category])(
+            f"**{report.ead_risk_category.upper()} EAD RISK** — "
+            f"Predicted probability: {report.predicted_ead_probability:.0%} "
+            f"(confidence: {report.confidence})"
+        )
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Conformance Score",
+                  f"{report.overall_conformance_score:.2f}",
+                  help="1.0 = perfect workflow conformance")
+        c2.metric("EAD Risk Score", f"{report.ead_risk_score:.2f}")
+        c3.metric("P(EAD)", f"{report.predicted_ead_probability:.0%}")
+
+        if report.nmp_viability_assessment:
+            st.metric("NMP Viability",
+                      report.nmp_viability_assessment.upper().replace("_", " "))
+
+        st.markdown(f"**Clinical Recommendation:** {report.recommendation}")
+
+        if report.active_risk_factors:
+            with st.expander("Active Risk Factors"):
+                for r in report.active_risk_factors:
+                    st.markdown(f"- {r}")
+
+        if report.protective_factors:
+            with st.expander("Protective Factors"):
+                for p in report.protective_factors:
+                    st.markdown(f"- {p}")
+
+        with st.expander("References"):
+            for ref in report.references:
+                st.caption(ref)
+
 
 # ============================================================================
 # Render tabs
 # ============================================================================
 
-tab_biosim, tab_pi, tab_materials = st.tabs(
-    ["🔬 BioSim Copilot", "📊 Process Intelligence", "🧪 Materials Intelligence"]
-)
+tab_biosim, tab_pi, tab_materials, tab_transplant = st.tabs([
+    "🔬 BioSim Copilot",
+    "📊 Process Intelligence",
+    "🧪 Materials Intelligence",
+    "🫀 Transplant PI",
+])
 
 with tab_biosim:
     _render_biosim_tab()
@@ -1168,3 +1318,6 @@ with tab_pi:
 
 with tab_materials:
     _render_materials_tab()
+
+with tab_transplant:
+    _render_transplant_tab()

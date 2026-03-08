@@ -1,0 +1,21 @@
+{
+  "source": "Nasralla et al. Nature 2018",
+  "doi": "10.1038/s41586-018-0047-9",
+  "trial_name": "VITTAL",
+  "n": 101,
+  "nmp_arm_summary": {
+    "lactate_clearance_median_h": 1.4,
+    "lactate_clearance_iqr": [0.8, 2.2],
+    "bile_ph_median": 7.34,
+    "arterial_flow_median_ml_min": 195,
+    "portal_flow_median_ml_min": 680,
+    "o2_consumption_median_mmol_h": 34,
+    "ead_rate_nmp": 0.16,
+    "ead_rate_cold_storage": 0.27,
+    "discard_rate_nmp": 0.055,
+    "discard_rate_cold_storage": 0.121
+  },
+  "viability_criteria": "lactate_lt_2.5_at_2h",
+  "primary_outcome": "Peak AST within 7 days post-transplant",
+  "key_finding": "NMP reduced peak AST by 50% vs cold storage (p<0.001)"
+}

@@ -144,6 +144,7 @@ def _validate_script(script: str):
         "import os", "import sys", "subprocess",
         "eval(", "exec(", "__import__", "open(",
         "socket", "requests", "urllib",
+        "shutil", "pathlib", "glob",
     ]
     for pattern in forbidden:
         if pattern in script:

@@ -1,0 +1,27 @@
+{
+  "source": "Mergental et al. Nat Med 2020",
+  "doi": "10.1038/s41591-020-1134-x",
+  "trial_name": "PILOT",
+  "n": 31,
+  "viability_criteria": {
+    "mandatory": [
+      "lactate_lt_2.5_mmol_l_by_4h",
+      "arterial_flow_gt_150_ml_min",
+      "portal_flow_gt_500_ml_min"
+    ],
+    "supporting": [
+      "bile_ph_gt_7.2",
+      "bile_glucose_lt_3_mmol_l",
+      "o2_consumption_gt_28_mmol_h"
+    ],
+    "decision": "viable_if_all_mandatory_plus_2_supporting"
+  },
+  "outcomes": {
+    "grafts_assessed": 31,
+    "grafts_met_criteria": 22,
+    "grafts_transplanted": 22,
+    "one_year_graft_survival": 0.86,
+    "ead_rate": 0.136
+  },
+  "key_finding": "NMP viability assessment enabled transplantation of 22 declined livers with 86% 1-year survival"
+}
