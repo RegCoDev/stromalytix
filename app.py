@@ -709,72 +709,79 @@ elif st.session_state.phase == "results":
 
     # Generate simulation brief (cache in session state)
     if st.session_state.simulation_brief is None:
-        from core.rag import generate_simulation_brief
-        st.session_state.simulation_brief = generate_simulation_brief(profile, report)
+        try:
+            from core.rag import generate_simulation_brief
+            st.session_state.simulation_brief = generate_simulation_brief(profile, report)
+        except Exception as e:
+            st.error(f"Could not generate simulation brief: {e}")
+            st.session_state.simulation_brief = None
 
     sim_brief = st.session_state.simulation_brief
 
-    # Simulation question
-    st.markdown(f'<p style="font-size: 1.2em; font-weight: 500; margin: 1rem 0;">{sim_brief["simulation_question"]}</p>', unsafe_allow_html=True)
+    if sim_brief is not None:
+        # Simulation question
+        st.markdown(f'<p style="font-size: 1.2em; font-weight: 500; margin: 1rem 0;">{sim_brief["simulation_question"]}</p>', unsafe_allow_html=True)
 
-    # Key parameters as code block
-    st.markdown("**Key CC3D Parameters:**")
-    st.code(json.dumps(sim_brief["key_parameters"], indent=2), language="json")
+        # Key parameters as code block
+        st.markdown("**Key CC3D Parameters:**")
+        st.code(json.dumps(sim_brief["key_parameters"], indent=2), language="json")
 
-    # Parameter confidence note (subtle gray info box)
-    st.markdown(
-        '<div style="border: 1px solid #444444; padding: 0.8rem; border-radius: 0.5rem; background: #1a1a1a; margin: 1rem 0;">'
-        '<strong style="color: #888888;">⚗️ Parameter Confidence Note:</strong> '
-        '<span style="color: #aaaaaa;">CC3D parameters are estimated from published in vivo and in vitro models. '
-        'Absolute values should be treated as starting points requiring experimental calibration. '
-        'Qualitative predictions (cell organization patterns, failure modes, relative comparisons) are well-grounded in literature. '
-        'Quantitative predictions (exact timing, specific percentages) require validation against your specific bioink and cell line. '
-        'Join the waitlist to contribute calibration data to the Stromalytix parameter database.</span>'
-        '</div>',
-        unsafe_allow_html=True
-    )
-
-    # Predicted outcomes
-    st.markdown("**Predicted Observations:**")
-    for i, outcome in enumerate(sim_brief["predicted_outcomes"], 1):
-        st.markdown(f"{i}. {outcome}")
-
-    # Risk prediction (red border)
-    st.markdown(
-        f'<div style="border: 2px solid #ff4444; padding: 1rem; border-radius: 0.5rem; background: #1a0a0a; margin: 1rem 0;">'
-        f'<strong style="color: #ff4444;">⚠ Risk Prediction:</strong><br>{sim_brief["risk_prediction"]}'
-        f'</div>',
-        unsafe_allow_html=True
-    )
-
-    # Validation experiment (green border)
-    st.markdown(
-        f'<div style="border: 2px solid #00ff88; padding: 1rem; border-radius: 0.5rem; background: #0a1a0a; margin: 1rem 0;">'
-        f'<strong style="color: #00ff88;">✓ Validation Experiment:</strong><br>{sim_brief["validation_experiment"]}'
-        f'</div>',
-        unsafe_allow_html=True
-    )
-
-    # CC3D Live Execution
-    from core.cc3d_runner import verify_cc3d_installation, run_cc3d_simulation
-    cc3d_status = verify_cc3d_installation()
-    if cc3d_status["installed"]:
-        if st.button("⚡ Run CC3D Preview (Beta)", use_container_width=True):
-            with st.spinner("Running CC3D simulation..."):
-                cc3d_result = run_cc3d_simulation(sim_brief, timeout=120)
-                if cc3d_result["success"]:
-                    st.success(f"CC3D completed: {cc3d_result['mcs_completed']} MCS in {cc3d_result['duration_seconds']}s")
-                    if cc3d_result["output"]:
-                        st.code(cc3d_result["output"], language="text")
-                else:
-                    st.warning(f"CC3D: {cc3d_result.get('error', 'Unknown error')}")
-    else:
-        st.button(
-            "⚡ Run CC3D Preview (Beta)",
-            disabled=True,
-            use_container_width=True,
-            help="CC3D not configured — install at compucell3d.org to enable live simulation."
+        # Parameter confidence note (subtle gray info box)
+        st.markdown(
+            '<div style="border: 1px solid #444444; padding: 0.8rem; border-radius: 0.5rem; background: #1a1a1a; margin: 1rem 0;">'
+            '<strong style="color: #888888;">⚗️ Parameter Confidence Note:</strong> '
+            '<span style="color: #aaaaaa;">CC3D parameters are estimated from published in vivo and in vitro models. '
+            'Absolute values should be treated as starting points requiring experimental calibration. '
+            'Qualitative predictions (cell organization patterns, failure modes, relative comparisons) are well-grounded in literature. '
+            'Quantitative predictions (exact timing, specific percentages) require validation against your specific bioink and cell line. '
+            'Join the waitlist to contribute calibration data to the Stromalytix parameter database.</span>'
+            '</div>',
+            unsafe_allow_html=True
         )
+
+        # Predicted outcomes
+        st.markdown("**Predicted Observations:**")
+        for i, outcome in enumerate(sim_brief["predicted_outcomes"], 1):
+            st.markdown(f"{i}. {outcome}")
+
+        # Risk prediction (red border)
+        st.markdown(
+            f'<div style="border: 2px solid #ff4444; padding: 1rem; border-radius: 0.5rem; background: #1a0a0a; margin: 1rem 0;">'
+            f'<strong style="color: #ff4444;">⚠ Risk Prediction:</strong><br>{sim_brief["risk_prediction"]}'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+        # Validation experiment (green border)
+        st.markdown(
+            f'<div style="border: 2px solid #00ff88; padding: 1rem; border-radius: 0.5rem; background: #0a1a0a; margin: 1rem 0;">'
+            f'<strong style="color: #00ff88;">✓ Validation Experiment:</strong><br>{sim_brief["validation_experiment"]}'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+        # CC3D Live Execution
+        from core.cc3d_runner import verify_cc3d_installation, run_cc3d_simulation
+        cc3d_status = verify_cc3d_installation()
+        if cc3d_status["installed"]:
+            if st.button("⚡ Run CC3D Preview (Beta)", use_container_width=True):
+                with st.spinner("Running CC3D simulation..."):
+                    cc3d_result = run_cc3d_simulation(sim_brief, timeout=120)
+                    if cc3d_result["success"]:
+                        st.success(f"CC3D completed: {cc3d_result['mcs_completed']} MCS in {cc3d_result['duration_seconds']}s")
+                        if cc3d_result["output"]:
+                            st.code(cc3d_result["output"], language="text")
+                    else:
+                        st.warning(f"CC3D: {cc3d_result.get('error', 'Unknown error')}")
+        else:
+            st.button(
+                "⚡ Run CC3D Preview (Beta)",
+                disabled=True,
+                use_container_width=True,
+                help="CC3D not configured — install at compucell3d.org to enable live simulation."
+            )
+    else:
+        st.warning("Simulation brief could not be generated. Check your API key and try again.")
 
     # Row 5: Signup CTA
     st.divider()
