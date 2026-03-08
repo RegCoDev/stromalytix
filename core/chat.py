@@ -172,3 +172,61 @@ def extract_construct_profile(conversation_history: str) -> Optional[ConstructPr
     except (json.JSONDecodeError, ValueError) as e:
         print(f"Warning: Failed to parse construct_profile JSON: {e}")
         return None
+
+
+def extract_partial_profile(conversation_history: str) -> Optional[ConstructProfile]:
+    """
+    Extract partially confirmed parameters from chat history.
+    Scans conversation for confirmed parameter values before
+    the full profile is complete.
+
+    Used for live visualization preview during BioSim chat.
+    """
+    params = {}
+
+    # Tissue type patterns
+    tissue_patterns = [
+        "cardiac", "liver", "hepatic", "neural", "brain", "lung",
+        "kidney", "intestinal", "bone", "cartilage", "skin",
+        "tumor", "vascular", "pancreatic",
+    ]
+    text_lower = conversation_history.lower()
+    for tissue in tissue_patterns:
+        if tissue in text_lower:
+            params["target_tissue"] = tissue
+            break
+
+    # Scaffold material
+    materials = ["GelMA", "collagen", "alginate", "fibrin", "PEGDA",
+                 "hyaluronic acid", "Matrigel", "silk", "PDMS"]
+    for mat in materials:
+        if mat.lower() in text_lower:
+            params["scaffold_material"] = mat
+            break
+
+    # Stiffness
+    stiffness_match = re.search(r"(\d+\.?\d*)\s*kPa", conversation_history)
+    if stiffness_match:
+        params["stiffness_kpa"] = float(stiffness_match.group(1))
+
+    # Cell density
+    density_match = re.search(
+        r"(\d+\.?\d*)\s*(?:x\s*10\^?6|million|M)\s*(?:cells?)?(?:/mL|/ml)?",
+        conversation_history, re.IGNORECASE
+    )
+    if density_match:
+        params["cell_density_per_ml"] = float(density_match.group(1)) * 1e6
+
+    # Cell types
+    cell_patterns = [
+        "cardiomyocytes", "fibroblasts", "HUVEC", "HepG2", "MCF-7",
+        "iPSC", "neurons", "astrocytes", "Caco-2", "A549",
+    ]
+    found_cells = [c for c in cell_patterns if c.lower() in text_lower]
+    if found_cells:
+        params["cell_types"] = found_cells
+
+    if not params:
+        return None
+
+    return ConstructProfile(**params)
