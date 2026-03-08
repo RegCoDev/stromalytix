@@ -1,0 +1,60 @@
+{
+  "company_id": "centara_demo",
+  "company_name": "Centara (Demo)",
+  "created": "2026-03-08T04:20:28.809252",
+  "last_updated": "2026-03-08T04:20:28.809433",
+  "biofab_methods": [
+    "bioprinting",
+    "ooc",
+    "organoid",
+    "acoustic",
+    "scaffold_free"
+  ],
+  "primary_tissue_models": [
+    "cardiac",
+    "liver",
+    "tumor"
+  ],
+  "industry_segment": "cloud_lab",
+  "process_models": {},
+  "conformance_baselines": {},
+  "active_ccps": [],
+  "flagged_lots": [
+    {
+      "lot_id": "LOT-2024-B2",
+      "issue": "Low viability",
+      "affected_runs": 12,
+      "business_impact": "2 churned customers"
+    },
+    {
+      "lot_id": "LOT-2025-B1",
+      "issue": "High CV in stiffness",
+      "affected_runs": 5,
+      "business_impact": "1 delayed deal"
+    }
+  ],
+  "last_analysis_summary": "197 experiments analyzed across 5 methods. LOT-2024-B2 flagged for viability issues. Cell seeding step shows highest deviation in bioprinting.",
+  "active_predictions": [],
+  "validated_predictions": [],
+  "simulation_calibration": {},
+  "parameter_win_rates": {},
+  "churn_signals": [],
+  "total_deal_value_analyzed": 0.0,
+  "hypotheses": [
+    {
+      "hypothesis_id": "hyp_centara_01",
+      "created": "2026-01-15T10:00:00",
+      "statement": "LOT-2024-B2 cell sourcing change is the root cause of viability failures in Q3 2024",
+      "evidence_for": [
+        "B2 lot introduced new supplier in July 2024",
+        "Viability drop correlates with B2 usage start date"
+      ],
+      "evidence_against": [
+        "Temperature excursion also occurred in same period"
+      ],
+      "status": "open",
+      "last_updated": "2026-02-01T14:00:00"
+    }
+  ],
+  "pi_chat_history": []
+}
