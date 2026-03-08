@@ -447,6 +447,99 @@ def render_simulation_stack_section():
         )
 
 
+def render_pi_chat_section():
+    """PI Chat — context-grounded conversational analyst."""
+    st.markdown("### 💬 Process Intelligence Chat")
+
+    from core.pi_chat import get_available_companies, build_pi_system_prompt
+
+    # Company selector
+    companies = get_available_companies()
+    if not companies:
+        # Create centara demo if nothing exists
+        from core.company_context import create_centara_demo_context
+        create_centara_demo_context()
+        companies = get_available_companies()
+
+    selected = st.selectbox(
+        "Company Context",
+        companies,
+        key="pi_company_select",
+    )
+
+    if not selected:
+        st.info("No company context available.")
+        return
+
+    # Load context
+    from core.company_context import CompanyContext
+    try:
+        ctx = CompanyContext.load(selected)
+    except Exception as e:
+        st.error(f"Failed to load context: {e}")
+        return
+
+    # Show context summary
+    with st.expander("Current Context", expanded=False):
+        st.text(ctx.to_chat_context_string())
+
+    # Chat history in session state
+    history_key = f"pi_chat_{selected}"
+    if history_key not in st.session_state:
+        st.session_state[history_key] = []
+
+    # Display chat history
+    for msg in st.session_state[history_key]:
+        role = msg["role"]
+        with st.chat_message(role):
+            st.markdown(msg["content"])
+
+    # Chat input
+    user_input = st.chat_input(
+        "Ask about process data, lot issues, hypotheses...",
+        key="pi_chat_input",
+    )
+
+    if user_input:
+        # Display user message
+        st.session_state[history_key].append({"role": "user", "content": user_input})
+        with st.chat_message("user"):
+            st.markdown(user_input)
+
+        # Get PI response
+        try:
+            import os
+            api_key = None
+            try:
+                api_key = st.secrets.get("ANTHROPIC_API_KEY")
+            except Exception:
+                api_key = os.getenv("ANTHROPIC_API_KEY")
+
+            from core.pi_chat import send_pi_message
+            result = send_pi_message(
+                context=ctx,
+                user_message=user_input,
+                chat_history=st.session_state[history_key][:-1],
+                api_key=api_key,
+            )
+
+            response = result["response"]
+            st.session_state[history_key].append({"role": "assistant", "content": response})
+            with st.chat_message("assistant"):
+                st.markdown(response)
+
+            # Show hypothesis/evidence notifications
+            if result["new_hypotheses"]:
+                for h in result["new_hypotheses"]:
+                    st.toast(f"New hypothesis created: {h[:60]}...")
+            if result["evidence_updates"]:
+                for ev in result["evidence_updates"]:
+                    st.toast(f"Evidence logged ({ev['direction']}): {ev['evidence'][:60]}...")
+
+        except Exception as e:
+            st.error(f"PI Chat error: {e}")
+
+
 def render_pi_dashboard():
     """Main PI dashboard — all sections connected."""
     st.markdown("## 📊 Process Intelligence Platform")
@@ -456,6 +549,8 @@ def render_pi_dashboard():
         "and correlate protocol parameters with business results."
     )
 
+    render_pi_chat_section()
+    st.divider()
     render_connector_section()
     st.divider()
     render_process_mining_section()
