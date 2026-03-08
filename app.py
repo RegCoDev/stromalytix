@@ -709,7 +709,34 @@ def _render_biosim_tab():
             use_container_width=True
         )
 
-        # Row 3.5: Scaffold Mechanics (FEA)
+        # Row 3.5: 3D Construct Visualization
+        st.markdown("### 🧬 Construct Visualization")
+        st.caption("Parameter-driven 3D cell arrangement. Reflects your confirmed profile.")
+
+        viz_col1, viz_col2 = st.columns([3, 1])
+        with viz_col2:
+            show_scaffold = st.toggle("Show scaffold", value=True, key="viz_scaffold")
+
+        try:
+            from core.tissue_viz import render_construct_3d
+            viz_title = f"{profile.target_tissue or 'Construct'}"
+            fig_3d = render_construct_3d(
+                profile=profile,
+                title=viz_title,
+                show_scaffold=show_scaffold,
+            )
+            st.plotly_chart(fig_3d, use_container_width=True)
+
+            stat_cols = st.columns(4)
+            stat_cols[0].metric("Cell Types", len(profile.cell_types or []))
+            density = profile.cell_density_per_ml or 0
+            stat_cols[1].metric("Density", f"{density/1e6:.1f}M/mL" if density else "—")
+            stat_cols[2].metric("Stiffness", f"{profile.stiffness_kpa} kPa" if profile.stiffness_kpa else "—")
+            stat_cols[3].metric("Scaffold", profile.scaffold_material or "—")
+        except Exception as e:
+            st.warning(f"Visualization error: {e}")
+
+        # Row 3.75: Scaffold Mechanics (FEA)
         if profile.stiffness_kpa and profile.cell_density_per_ml:
             from core.fem_solver import predict_scaffold_deformation, predict_stress_distribution
 
