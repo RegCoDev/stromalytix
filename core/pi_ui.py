@@ -447,6 +447,102 @@ def render_simulation_stack_section():
         )
 
 
+def render_algorithm_router_section():
+    """Algorithm Router — data quality report and routing decision."""
+    st.markdown("### 🧭 Algorithm Router")
+
+    events = st.session_state.get("pi_events", [])
+    if not events:
+        st.info("Upload data above to see algorithm routing analysis.")
+        return
+
+    from core.bio_process_miner import BiologicalProcessMiner
+
+    miner = BiologicalProcessMiner()
+    miner.add_event_log(events, "uploaded")
+
+    try:
+        report = miner.get_data_quality_report("uploaded")
+    except Exception as e:
+        st.warning(f"Could not generate data quality report: {e}")
+        return
+
+    char = report.get("characterization", {})
+    routing = report.get("routing", {})
+
+    # Data quality metrics
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Cases", char.get("case_count", 0))
+    with col2:
+        st.metric("Variants", char.get("variant_count", 0))
+    with col3:
+        vr = char.get("variant_ratio", 0)
+        st.metric("Variant Ratio", f"{vr:.2f}" if isinstance(vr, float) else str(vr))
+    with col4:
+        st.metric("Precision", char.get("timestamp_precision", "unknown"))
+
+    # Algorithm selection
+    algo = routing.get("algorithm", "unknown")
+    rationale = routing.get("rationale", "")
+    st.markdown(f"**Selected algorithm:** `{algo}` — {rationale}")
+
+    # Warnings
+    warnings = char.get("warnings", [])
+    if warnings:
+        st.markdown("**Data Quality Warnings:**")
+        for w in warnings:
+            st.markdown(f"- ⚠️ {w}")
+
+    # Characteristics
+    with st.expander("Full characterization"):
+        st.json(char)
+
+
+def render_convergent_signals_section():
+    """Convergent signals — simulation x empirical overlap."""
+    st.markdown("### 🎯 Convergent Signals")
+
+    # Load active company context
+    company = st.session_state.get("pi_company_select")
+    if not company:
+        st.info("Select a company context above to see convergent signals.")
+        return
+
+    from core.company_context import CompanyContext
+    from core.sim_process_bridge import detect_convergent_signals, get_p1_alerts
+
+    try:
+        ctx = CompanyContext.load(company)
+    except Exception:
+        st.info("No company context loaded.")
+        return
+
+    signals = detect_convergent_signals(ctx)
+    p1_alerts = get_p1_alerts(ctx)
+
+    if p1_alerts:
+        for alert in p1_alerts:
+            st.error(f"🚨 **P1 ALERT:** {alert['summary']}")
+            for ev in alert.get("evidence", []):
+                st.markdown(f"  - {ev}")
+
+    if signals:
+        for sig in signals:
+            if sig in p1_alerts:
+                continue  # already shown
+            color = {"high": "#ff4444", "medium": "#ffd700", "low": "#888888"}.get(
+                sig["confidence"], "#888888"
+            )
+            st.markdown(
+                f'<p style="color: {color};">● {sig["signal_type"]}: '
+                f'{sig["summary"]}</p>',
+                unsafe_allow_html=True,
+            )
+    else:
+        st.info("No convergent signals detected yet. Add predictions and outcomes to generate.")
+
+
 def render_pi_chat_section():
     """PI Chat — context-grounded conversational analyst."""
     st.markdown("### 💬 Process Intelligence Chat")
@@ -553,7 +649,11 @@ def render_pi_dashboard():
     st.divider()
     render_connector_section()
     st.divider()
+    render_algorithm_router_section()
+    st.divider()
     render_process_mining_section()
+    st.divider()
+    render_convergent_signals_section()
     st.divider()
     render_cross_layer_section()
     st.divider()
