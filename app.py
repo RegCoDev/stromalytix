@@ -859,6 +859,105 @@ def _render_biosim_tab():
         else:
             st.warning("Simulation brief could not be generated. Check your API key and try again.")
 
+        # Row 4.5: Further Reading (context-driven)
+        st.divider()
+        st.markdown("### 📚 Further Reading")
+        st.caption("Context-driven recommendations based on your construct profile.")
+
+        try:
+            from core.reading_engine import ReadingEngine
+            _reading_engine = ReadingEngine()
+
+            reading_tab_biz, reading_tab_sci, reading_tab_search = st.tabs(
+                ["Business Best Practices", "Scientific Literature", "Search"]
+            )
+
+            with reading_tab_biz:
+                # Use PI signals from variance report if available
+                pi_signals = []
+                if report and report.risk_flags:
+                    signal_map = {
+                        "stiffness": "parameter_out_of_range",
+                        "porosity": "parameter_out_of_range",
+                        "density": "parameter_out_of_range",
+                        "viability": "viability_below_threshold",
+                        "variance": "high_cv",
+                        "batch": "batch_effect",
+                    }
+                    for flag in report.risk_flags:
+                        flag_lower = flag.get("parameter", "").lower() if isinstance(flag, dict) else str(flag).lower()
+                        for kw, signal in signal_map.items():
+                            if kw in flag_lower and signal not in pi_signals:
+                                pi_signals.append(signal)
+                if not pi_signals:
+                    pi_signals = ["parameter_out_of_range"]
+
+                biz_results = _reading_engine.get_business_reading(pi_signals)
+                if biz_results:
+                    for item in biz_results:
+                        with st.expander(f"**{item['pcf_id']}** — {item['pcf_name']}", expanded=False):
+                            st.markdown(f"**Category:** {item['pcf_category']} > {item['pcf_subcategory']}")
+                            st.markdown(f"**Triggered by:** {', '.join(item['triggered_by'])}")
+                            st.markdown(item["best_practice_summary"])
+                            if item.get("key_metrics"):
+                                st.markdown("**Key Metrics:** " + ", ".join(item["key_metrics"]))
+                            if item.get("reading"):
+                                st.markdown("**References:**")
+                                for ref in item["reading"]:
+                                    title = ref.get("title", "Untitled")
+                                    doi = ref.get("doi")
+                                    if doi:
+                                        st.markdown(f"- [{title}](https://doi.org/{doi})")
+                                    else:
+                                        st.markdown(f"- {title}")
+                else:
+                    st.info("No business track matches for current signals.")
+
+            with reading_tab_sci:
+                sci_results = _reading_engine.get_scientific_reading(profile=profile)
+                if sci_results:
+                    for item in sci_results:
+                        entry = item["entry"]
+                        with st.expander(f"**{entry['title']}**", expanded=False):
+                            st.markdown(f"**Collection:** {item['collection']}")
+                            if entry.get("authors"):
+                                st.markdown(f"**Authors:** {entry['authors']}")
+                            if entry.get("journal"):
+                                st.markdown(f"**Journal:** {entry['journal']} ({entry.get('year', '')})")
+                            if entry.get("doi"):
+                                st.markdown(f"**DOI:** [https://doi.org/{entry['doi']}](https://doi.org/{entry['doi']})")
+                            if entry.get("note"):
+                                st.markdown(f"*{entry['note']}*")
+                            st.markdown(f"**Match reasons:** {', '.join(item['match_reasons'])}")
+                            st.markdown(f"**Level:** {entry.get('level', 'N/A')}")
+                else:
+                    st.info("No scientific reading matches for current profile.")
+
+            with reading_tab_search:
+                search_query = st.text_input(
+                    "Search reading databases",
+                    placeholder="e.g. bioprinting, GelMA, process control...",
+                    key="reading_search"
+                )
+                if search_query:
+                    search_results = _reading_engine.search(search_query)
+                    if search_results:
+                        for item in search_results:
+                            if item["track"] == "scientific":
+                                entry = item["entry"]
+                                st.markdown(
+                                    f"**[SCI]** {entry['title']} "
+                                    f"({item['collection']})"
+                                )
+                            else:
+                                st.markdown(
+                                    f"**[BIZ]** {item.get('pcf_id', '')} — {item.get('name', '')}"
+                                )
+                    else:
+                        st.info("No results found.")
+        except Exception as e:
+            st.warning(f"Further reading unavailable: {e}")
+
         # Row 5: Signup CTA
         st.divider()
         st.markdown("### 💾 Save this analysis + get early access to the full platform")
