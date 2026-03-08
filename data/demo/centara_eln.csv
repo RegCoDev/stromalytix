@@ -1,0 +1,48 @@
+experiment_id,step,timestamp,batch_id,operator,biofab_method,viability,stiffness_kpa,notes
+EXP-001,cell_seeding,2024-06-15T09:00:00,LOT-2024-A1,Dr. Chen,bioprinting,92,10.5,Standard protocol
+EXP-001,bioprinting,2024-06-15T10:30:00,LOT-2024-A1,Dr. Chen,bioprinting,90,10.2,Layer-by-layer
+EXP-001,crosslinking,2024-06-15T11:00:00,LOT-2024-A1,Dr. Chen,bioprinting,89,10.0,UV 30s
+EXP-001,incubation,2024-06-15T12:00:00,LOT-2024-A1,Dr. Chen,bioprinting,88,9.8,37C 5% CO2
+EXP-001,measurement,2024-06-16T09:00:00,LOT-2024-A1,Dr. Chen,bioprinting,87,9.5,Day 1 readout
+EXP-002,cell_seeding,2024-06-16T09:00:00,LOT-2024-A1,Dr. Park,bioprinting,91,10.3,Standard protocol
+EXP-002,bioprinting,2024-06-16T10:30:00,LOT-2024-A1,Dr. Park,bioprinting,89,10.1,
+EXP-002,crosslinking,2024-06-16T11:00:00,LOT-2024-A1,Dr. Park,bioprinting,88,10.0,
+EXP-002,incubation,2024-06-16T12:00:00,LOT-2024-A1,Dr. Park,bioprinting,87,9.9,
+EXP-002,measurement,2024-06-17T09:00:00,LOT-2024-A1,Dr. Park,bioprinting,86,9.6,
+EXP-003,cell_seeding,2024-07-01T09:00:00,LOT-2024-B2,Dr. Chen,bioprinting,78,10.4,New supplier lot
+EXP-003,bioprinting,2024-07-01T10:30:00,LOT-2024-B2,Dr. Chen,bioprinting,72,10.0,Nozzle clog at layer 3
+EXP-003,crosslinking,2024-07-01T11:00:00,LOT-2024-B2,Dr. Chen,bioprinting,68,9.5,
+EXP-003,incubation,2024-07-01T12:00:00,LOT-2024-B2,Dr. Chen,bioprinting,65,9.0,
+EXP-003,measurement,2024-07-02T09:00:00,LOT-2024-B2,Dr. Chen,bioprinting,58,8.2,Low viability flagged
+EXP-004,cell_seeding,2024-07-02T09:00:00,LOT-2024-B2,Dr. Park,bioprinting,76,10.2,
+EXP-004,bioprinting,2024-07-02T10:30:00,LOT-2024-B2,Dr. Park,bioprinting,70,9.8,
+EXP-004,crosslinking,2024-07-02T11:00:00,LOT-2024-B2,Dr. Park,bioprinting,66,9.2,
+EXP-004,incubation,2024-07-02T12:00:00,LOT-2024-B2,Dr. Park,bioprinting,62,8.8,
+EXP-004,measurement,2024-07-03T09:00:00,LOT-2024-B2,Dr. Park,bioprinting,55,7.9,Viability critical
+EXP-005,cell_seeding,2024-07-05T09:00:00,LOT-2024-B2,Dr. Chen,bioprinting,74,10.1,
+EXP-005,bioprinting,2024-07-05T10:30:00,LOT-2024-B2,Dr. Chen,bioprinting,68,9.6,
+EXP-005,crosslinking,2024-07-05T11:00:00,LOT-2024-B2,Dr. Chen,bioprinting,64,9.0,
+EXP-005,incubation,2024-07-05T12:00:00,LOT-2024-B2,Dr. Chen,bioprinting,60,8.5,
+EXP-005,measurement,2024-07-06T09:00:00,LOT-2024-B2,Dr. Chen,bioprinting,52,7.5,Worst result
+EXP-006,cell_seeding,2024-08-01T09:00:00,LOT-2024-A1,Dr. Park,ooc,93,NA,OoC fabrication
+EXP-006,channel_seeding,2024-08-01T10:00:00,LOT-2024-A1,Dr. Park,ooc,91,,
+EXP-006,flow_initiation,2024-08-01T11:00:00,LOT-2024-A1,Dr. Park,ooc,90,,5 uL/min
+EXP-006,measurement,2024-08-02T09:00:00,LOT-2024-A1,Dr. Park,ooc,89,,TEER OK
+EXP-007,cell_seeding,2024-08-05T09:00:00,LOT-2024-A1,Dr. Chen,organoid,95,,Matrigel dome
+EXP-007,embedding,2024-08-05T10:00:00,LOT-2024-A1,Dr. Chen,organoid,94,,
+EXP-007,differentiation,2024-08-08T09:00:00,LOT-2024-A1,Dr. Chen,organoid,88,,Day 3
+EXP-007,measurement,2024-08-12T09:00:00,LOT-2024-A1,Dr. Chen,organoid,85,,Day 7
+EXP-008,cell_seeding,2024-09-01T09:00:00,LOT-2025-B1,Dr. Park,bioprinting,88,12.5,New lot high CV
+EXP-008,bioprinting,2024-09-01T10:30:00,LOT-2025-B1,Dr. Park,bioprinting,85,14.2,Stiffness high
+EXP-008,crosslinking,2024-09-01T11:00:00,LOT-2025-B1,Dr. Park,bioprinting,83,15.0,
+EXP-008,incubation,2024-09-01T12:00:00,LOT-2025-B1,Dr. Park,bioprinting,82,13.8,
+EXP-008,measurement,2024-09-02T09:00:00,LOT-2025-B1,Dr. Park,bioprinting,80,11.5,High CV in stiffness
+EXP-009,cell_seeding,2024-09-05T09:00:00,LOT-2025-B1,Dr. Chen,bioprinting,87,11.0,
+EXP-009,bioprinting,2024-09-05T10:30:00,LOT-2025-B1,Dr. Chen,bioprinting,84,13.5,
+EXP-009,crosslinking,2024-09-05T11:00:00,LOT-2025-B1,Dr. Chen,bioprinting,82,14.8,
+EXP-009,incubation,2024-09-05T12:00:00,LOT-2025-B1,Dr. Chen,bioprinting,81,13.2,
+EXP-009,measurement,2024-09-06T09:00:00,LOT-2025-B1,Dr. Chen,bioprinting,79,10.8,
+EXP-010,cell_seeding,2024-10-01T09:00:00,LOT-2024-A1,Dr. Chen,scaffold_free,90,,Hanging drop
+EXP-010,aggregation,2024-10-02T09:00:00,LOT-2024-A1,Dr. Chen,scaffold_free,88,,24h
+EXP-010,fusion,2024-10-03T09:00:00,LOT-2024-A1,Dr. Chen,scaffold_free,85,,48h
+EXP-010,measurement,2024-10-04T09:00:00,LOT-2024-A1,Dr. Chen,scaffold_free,83,,72h readout
