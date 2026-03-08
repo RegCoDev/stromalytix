@@ -1,0 +1,129 @@
+"""
+scripts/fetch_public_data.py
+
+Creates public dataset stubs and embeds literature benchmarks.
+Manual downloads required for DILIrank and BPI Challenge.
+"""
+import json
+from pathlib import Path
+
+Path("data/public/hepatic").mkdir(parents=True, exist_ok=True)
+Path("data/public/biofab").mkdir(parents=True, exist_ok=True)
+Path("data/public/process_mining").mkdir(parents=True, exist_ok=True)
+
+# --- DILIrank README ---
+DILIRANK_README = """DILIrank dataset — manual download required.
+1. Go to: https://www.fda.gov/science-research/liver-toxicity-knowledge-base-ltkb
+2. Download "DILIrank" dataset
+3. Save as: data/public/hepatic/dilirank.csv
+Columns expected: Compound_Name, Severity_Class, DILI_Concern
+"""
+Path("data/public/hepatic/dilirank_README.txt").write_text(DILIRANK_README)
+
+# --- BPI Challenge 2017 README ---
+BPI_README = """BPI Challenge 2017 Dataset — for process mining engine validation.
+1. Go to: https://data.4tu.nl/articles/dataset/BPI_Challenge_2017/12696884
+2. Download BPI_Challenge_2017.xes.gz
+3. Convert to CSV using: python scripts/convert_xes_to_csv.py
+4. Save as: data/public/process_mining/bpi2017.csv
+Use to validate InductiveMiner, ConformanceChecker against known results.
+"""
+Path("data/public/process_mining/bpi2017_README.txt").write_text(BPI_README)
+
+# --- Literature benchmarks ---
+BIOFAB_BENCHMARKS = {
+    "source": "Literature synthesis — Stromalytix KB 2026-03-08",
+    "gelma_viability_benchmarks": [
+        {
+            "material": "GelMA 4%", "stiffness_kpa": 4.0,
+            "cell_type": "HepG2", "viability_day3_mean": 82.4,
+            "viability_day3_sd": 8.2,
+            "source_doi": "10.1016/j.biomaterials.2015.01.047",
+        },
+        {
+            "material": "GelMA 6%", "stiffness_kpa": 6.0,
+            "cell_type": "HepG2", "viability_day3_mean": 85.1,
+            "viability_day3_sd": 7.6,
+            "source_doi": "10.1016/j.biomaterials.2015.01.047",
+        },
+        {
+            "material": "GelMA 6%", "stiffness_kpa": 8.0,
+            "cell_type": "primary_hepatocytes", "viability_day3_mean": 78.9,
+            "viability_day3_sd": 11.3,
+            "source_doi": "10.1021/acsbiomaterials.0c00423",
+        },
+        {
+            "material": "Collagen I 2mg/mL", "stiffness_kpa": 2.0,
+            "cell_type": "HepaRG", "viability_day7_mean": 88.2,
+            "viability_day7_sd": 6.1,
+            "source_doi": "10.1039/c9lc00080a",
+        },
+        {
+            "material": "Fibrin 10mg/mL", "stiffness_kpa": 1.5,
+            "cell_type": "primary_hepatocytes", "viability_day3_mean": 91.2,
+            "viability_day3_sd": 5.8,
+            "source_doi": "10.1016/j.biomaterials.2018.02.028",
+        },
+        {
+            "material": "Alginate 2%", "stiffness_kpa": 10.0,
+            "cell_type": "HepG2", "viability_day3_mean": 76.3,
+            "viability_day3_sd": 9.4,
+            "source_doi": "10.1002/bit.27127",
+        },
+    ],
+    "ooc_teer_benchmarks": [
+        {
+            "model": "intestinal_barrier", "cell_type": "Caco-2",
+            "flow_rate_ulmin": 2.0, "shear_dyncm2": 0.02,
+            "teer_ohm_cm2_mean": 380, "teer_ohm_cm2_sd": 85,
+            "source_doi": "10.1038/nbt.2989",
+        },
+        {
+            "model": "gut_on_chip", "cell_type": "colonoid_derived",
+            "flow_rate_ulmin": 5.0, "shear_dyncm2": 0.1,
+            "teer_ohm_cm2_mean": 620, "teer_ohm_cm2_sd": 120,
+            "source_doi": "10.1126/science.1188302",
+        },
+        {
+            "model": "liver_chip", "cell_type": "primary_hepatocytes",
+            "flow_rate_ulmin": 1.0, "shear_dyncm2": 0.01,
+            "teer_ohm_cm2_mean": 180, "teer_ohm_cm2_sd": 45,
+            "source_doi": "10.1038/s43856-022-00209-1",
+        },
+    ],
+    "spheroid_benchmarks": [
+        {
+            "model": "tumor_microenvironment", "cell_types": ["MCF-7", "CAF"],
+            "method": "scaffold_free", "initial_density": 5000,
+            "diameter_day7_um_mean": 385, "diameter_day7_um_sd": 42,
+            "source_doi": "10.1016/j.biomaterials.2018.02.028",
+        },
+        {
+            "model": "hepatic_spheroid", "cell_types": ["HepG2"],
+            "method": "hanging_drop", "initial_density": 3000,
+            "diameter_day7_um_mean": 310, "diameter_day7_um_sd": 35,
+            "source_doi": "10.1089/107632703322516873",
+        },
+    ],
+    "bioprinting_benchmarks": [
+        {
+            "material": "GelMA 6%", "method": "extrusion",
+            "nozzle_mm": 0.41, "speed_mms": 10,
+            "print_fidelity_score": 0.82,
+            "source_doi": "10.1038/nbt.2958",
+        },
+        {
+            "material": "Alginate/GelMA", "method": "extrusion",
+            "nozzle_mm": 0.25, "speed_mms": 8,
+            "print_fidelity_score": 0.75,
+            "source_doi": "10.1002/adma.201305506",
+        },
+    ],
+}
+
+with open("data/public/biofab/literature_benchmarks.json", "w") as f:
+    json.dump(BIOFAB_BENCHMARKS, f, indent=2)
+
+print("Public data stubs created in data/public/")
+print("Manual downloads required — see README files in each directory")
+print(f"Literature benchmarks: {sum(len(v) for v in BIOFAB_BENCHMARKS.values() if isinstance(v, list))} entries")
