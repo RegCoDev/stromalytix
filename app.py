@@ -565,11 +565,16 @@ elif st.session_state.phase == "analyzing":
             from langchain_anthropic import ChatAnthropic
             import os
 
+            try:
+                _api_key = st.secrets.get("ANTHROPIC_API_KEY", os.getenv("ANTHROPIC_API_KEY"))
+            except Exception:
+                _api_key = os.getenv("ANTHROPIC_API_KEY")
+
             llm = ChatAnthropic(
                 model="claude-haiku-4-5-20251001",
                 temperature=0,
                 max_tokens=1024,
-                api_key=os.getenv("ANTHROPIC_API_KEY")
+                api_key=_api_key
             )
 
             conversation_text = "\n".join([
