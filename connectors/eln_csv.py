@@ -27,6 +27,12 @@ COLUMN_MAPPINGS = {
 
 BIOFAB_METHODS = {"bioprinting", "ooc", "organoid", "acoustic", "scaffold_free"}
 
+OUTCOME_COLUMNS = {
+    "viability", "cell_viability", "stiffness_kpa", "stiffness",
+    "porosity", "porosity_percent", "cell_count", "cell_density",
+    "gene_expression", "teer", "metabolic_activity",
+}
+
 
 def _find_column(headers: List[str], candidates: List[str]) -> Optional[str]:
     """Find first matching column name (case-insensitive)."""
@@ -112,10 +118,17 @@ class ELNCSVConnector(BaseConnector):
 
                 # Extract parameter values from all value-like columns
                 param_values = {}
+                outcome_values = {}
                 for key, val in row.items():
                     if val:
                         extracted = extract_parameters(val)
                         param_values.update(extracted)
+                    # Extract direct numeric columns as outcomes
+                    if key.lower() in OUTCOME_COLUMNS and val:
+                        try:
+                            outcome_values[key.lower()] = float(val)
+                        except (ValueError, TypeError):
+                            pass
 
                 operator_col = self._column_map.get("operator")
                 deviation_col = self._column_map.get("deviation_note")
@@ -131,6 +144,7 @@ class ELNCSVConnector(BaseConnector):
                     source_type=DataSourceType.ELN,
                     source_name=self.source_name,
                     parameter_values=param_values or None,
+                    outcome_values=outcome_values or None,
                     operator=row.get(operator_col) if operator_col else None,
                     deviation_note=row.get(deviation_col) if deviation_col else None,
                     protocol_version=row.get(protocol_col) if protocol_col else None,

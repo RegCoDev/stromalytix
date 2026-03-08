@@ -1,0 +1,7 @@
+deal_id,stage,customer_id,amount,timestamp,notes
+DEAL-001,deal_closed_won,CUST-Alpha,250000,2024-06-20T14:00:00,Cardiac patch program - LOT-A1 results excellent
+DEAL-002,deal_closed_won,CUST-Beta,180000,2024-06-25T10:00:00,Liver OoC validation
+DEAL-003,deal_closed_lost,CUST-Gamma,320000,2024-07-15T16:00:00,Viability too low - LOT-B2 results unacceptable
+DEAL-004,deal_closed_lost,CUST-Delta,150000,2024-08-01T09:00:00,Switched to competitor after B2 failures
+DEAL-005,deal_closed_won,CUST-Epsilon,200000,2024-09-10T11:00:00,Organoid platform - impressed with reproducibility
+DEAL-006,deal_in_progress,CUST-Zeta,400000,2024-10-15T14:00:00,Large pharma - waiting on stiffness CV data
