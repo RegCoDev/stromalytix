@@ -22,7 +22,8 @@
       "Bash(echo *)",
       "Bash(which *)",
       "Bash(where *)",
-      "Agent"
+      "Agent",
+      "Bash(git:*)"
     ],
     "deny": [
       "Bash(rm -rf /)",
