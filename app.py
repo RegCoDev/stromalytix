@@ -1054,14 +1054,117 @@ def _render_biosim_tab():
                     st.error("Please enter a valid email address.")
 
 
+def _render_materials_tab():
+    """Materials Intelligence tab — bioink lot QC predictions."""
+    st.header("Materials Intelligence")
+    st.caption("Predict customer outcomes from bioink lot characterization data")
+
+    with st.form("lot_characterization"):
+        col1, col2 = st.columns(2)
+        with col1:
+            lot_id = st.text_input("Lot ID", value="LOT-2024-001")
+            material_name = st.selectbox(
+                "Material",
+                ["GelMA 6%", "GelMA 4%", "Fibrin 10mg/mL", "Collagen I",
+                 "Alginate 2%", "PEGDA", "Other"],
+            )
+            storage_modulus = st.number_input(
+                "Storage Modulus G' (Pa)", min_value=0.0, value=0.0, step=100.0,
+                help="Leave 0 to use material defaults",
+            )
+            loss_modulus = st.number_input(
+                "Loss Modulus G'' (Pa)", min_value=0.0, value=0.0, step=100.0,
+            )
+            viscosity = st.number_input(
+                "Viscosity at 37°C (Pa·s)", min_value=0.0, value=0.0, step=10.0,
+            )
+        with col2:
+            gelation_time = st.number_input(
+                "Gelation Time (s)", min_value=0.0, value=0.0, step=5.0,
+            )
+            swelling_ratio = st.number_input(
+                "Swelling Ratio", min_value=0.0, value=0.0, step=0.1,
+            )
+            degradation_rate = st.number_input(
+                "Degradation Rate (day⁻¹)", min_value=0.0, value=0.0, step=0.5,
+            )
+            uv_dose = st.number_input(
+                "UV Dose (mW/cm²·s)", min_value=0.0, value=0.0, step=5.0,
+            )
+            crosslink_density = st.number_input(
+                "Crosslink Density", min_value=0.0, value=0.0, step=0.01,
+            )
+        submitted = st.form_submit_button("Predict Lot Performance")
+
+    if submitted:
+        from core.materials_intelligence import (
+            BioinkLotCharacterization,
+            predict_lot_performance,
+        )
+
+        char = BioinkLotCharacterization(
+            lot_id=lot_id,
+            material_name=material_name,
+            storage_modulus_pa=storage_modulus or None,
+            loss_modulus_pa=loss_modulus or None,
+            viscosity_pas_at_37c=viscosity or None,
+            gelation_time_s=gelation_time or None,
+            swelling_ratio=swelling_ratio or None,
+            degradation_rate_day=degradation_rate or None,
+            uv_dose_mwcm2_s=uv_dose or None,
+            crosslink_density=crosslink_density or None,
+        )
+        report = predict_lot_performance(char)
+
+        # Release decision banner
+        color_map = {"RELEASE": "green", "CONDITIONAL": "orange", "HOLD": "red"}
+        icon_map = {"RELEASE": "✅", "CONDITIONAL": "⚠️", "HOLD": "🛑"}
+        st.markdown(
+            f"### {icon_map[report.release_recommendation]} "
+            f"Lot {report.lot_id}: **{report.release_recommendation}**"
+        )
+        st.info(report.release_rationale)
+
+        # Key metrics
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Predicted Stiffness", f"{report.predicted_stiffness_kpa} kPa",
+                   delta=f"± {report.stiffness_uncertainty_kpa}")
+        m2.metric("Printability Score", f"{report.predicted_printability_score:.2f}")
+        m3.metric("Day-3 Viability", f"{report.predicted_cell_viability_day3_pct:.0f}%")
+        m4.metric("Day-7 Viability", f"{report.predicted_cell_viability_day7_pct:.0f}%")
+
+        # Process recommendations
+        st.subheader("Process Recommendations")
+        r1, r2, r3, r4 = st.columns(4)
+        r1.metric("Nozzle Diameter", f"{report.recommended_nozzle_diameter_mm} mm")
+        r2.metric("Print Speed", f"{report.recommended_print_speed_mms} mm/s")
+        r3.metric("Crosslink Time", f"{report.recommended_crosslink_time_s:.0f} s")
+        r4.metric("Cell Density", f"{report.recommended_cell_density_per_ml:,.0f} /mL")
+
+        # Confidence and data gaps
+        st.subheader("Confidence Assessment")
+        st.write(f"**Confidence:** {report.confidence.upper()}")
+        if report.data_gaps:
+            st.warning("**Data gaps:**")
+            for gap in report.data_gaps:
+                st.write(f"- {gap}")
+        else:
+            st.success("Full characterization data provided — high confidence predictions.")
+
+
 # ============================================================================
 # Render tabs
 # ============================================================================
 
-tab_biosim, tab_pi = st.tabs(["🔬 BioSim Copilot", "📊 Process Intelligence"])
+tab_biosim, tab_pi, tab_materials = st.tabs(
+    ["🔬 BioSim Copilot", "📊 Process Intelligence", "🧪 Materials Intelligence"]
+)
 
 with tab_biosim:
     _render_biosim_tab()
 
 with tab_pi:
     render_pi_dashboard()
+
+with tab_materials:
+    _render_materials_tab()
