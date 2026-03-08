@@ -389,6 +389,36 @@ if st.session_state.phase == "onboarding":
 
     st.divider()
 
+    # Protocol Upload (optional)
+    st.markdown("### 📄 Upload Your Protocol (Optional)")
+    uploaded_file = st.file_uploader(
+        "Upload your protocol (optional)",
+        type=["pdf", "docx"],
+        help="We'll extract construct parameters automatically.",
+    )
+    if uploaded_file is not None:
+        try:
+            from core.ingest import extract_text_from_pdf, extract_text_from_docx, parse_protocol_to_profile
+            file_bytes = uploaded_file.read()
+            if uploaded_file.name.lower().endswith(".pdf"):
+                text = extract_text_from_pdf(file_bytes)
+            else:
+                text = extract_text_from_docx(file_bytes)
+            detected = parse_protocol_to_profile(text)
+            st.success("Detected from protocol:")
+            cols = st.columns(2)
+            for i, (k, v) in enumerate(detected.items()):
+                if v is not None:
+                    cols[i % 2].markdown(f"**{k}**: {v}")
+            # Pre-populate session state
+            for k, v in detected.items():
+                if v is not None and k in ConstructProfile.model_fields:
+                    setattr(st.session_state.construct_profile, k, v)
+        except Exception as e:
+            st.warning(f"Could not parse protocol: {e}")
+
+    st.divider()
+
     # Persona Selection
     st.markdown("### 👤 Select Your Role")
     st.markdown("Help us tailor the experience to your workflow:")
