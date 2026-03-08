@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(__NEW_LINE__ echo \"=== FILE STATISTICS ===\")",
+      "Bash(uv run streamlit:*)",
+      "Bash(tee:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

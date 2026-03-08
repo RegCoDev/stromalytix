@@ -1,0 +1,27 @@
+[project]
+name = "stromalytix"
+version = "0.1.0"
+description = "BioSim Copilot - Tissue engineering decision intelligence platform"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "streamlit",
+    "langchain",
+    "langchain-anthropic",
+    "langchain-openai",
+    "langchain-community",
+    "chromadb",
+    "biopython",
+    "plotly",
+    "pandas",
+    "pydantic",
+    "python-dotenv",
+    "openai",
+    "tiktoken",
+    "anthropic>=0.84.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
