@@ -636,6 +636,68 @@ def render_pi_chat_section():
             st.error(f"PI Chat error: {e}")
 
 
+def render_pi_further_reading_section():
+    """Further Reading in PI context — APQC signals from loaded data."""
+    st.markdown("### 📚 Further Reading")
+
+    from core.reading_engine import ReadingEngine
+
+    engine = ReadingEngine()
+
+    # Collect PI signals from loaded events
+    events = st.session_state.get("pi_events", [])
+    pi_signals = set()
+
+    if events:
+        from core.process_mining import BiologicalProcessMiner
+        miner = BiologicalProcessMiner()
+        miner.add_event_log(events, "uploaded")
+        kpis = miner.get_kpis("uploaded")
+
+        # Map KPIs to signals
+        if kpis.get("critical_deviation_rate", 0) > 0.1:
+            pi_signals.add("protocol_deviation")
+            pi_signals.add("conformance_failure")
+        if kpis.get("batch_success_rate", 1) < 0.8:
+            pi_signals.add("batch_effect")
+            pi_signals.add("high_cv")
+        if kpis.get("protocol_conformance_rate", 1) < 0.9:
+            pi_signals.add("conformance_failure")
+
+        # Check for batch effects
+        try:
+            batch_results = miner.detect_batch_effects(events, "batch_id", "viability")
+            flagged = {k: v for k, v in batch_results.items() if isinstance(v, dict) and v.get("flagged")}
+            if flagged:
+                pi_signals.add("batch_effect")
+                pi_signals.add("high_cv")
+        except Exception:
+            pass
+
+    if not pi_signals:
+        pi_signals = {"parameter_out_of_range"}
+
+    biz_results = engine.get_business_reading(list(pi_signals))
+
+    if biz_results:
+        for item in biz_results:
+            with st.expander(f"**{item['pcf_id']}** — {item['pcf_name']}", expanded=False):
+                st.markdown(f"**Signals:** {', '.join(item['triggered_by'])}")
+                st.markdown(item["best_practice_summary"])
+                if item.get("key_metrics"):
+                    st.markdown("**Key Metrics:** " + ", ".join(item["key_metrics"]))
+                if item.get("reading"):
+                    for ref in item["reading"]:
+                        title = ref.get("title", "Untitled")
+                        doi = ref.get("doi")
+                        if doi:
+                            st.markdown(f"  - [{title}](https://doi.org/{doi})")
+                        else:
+                            st.markdown(f"  - {title}")
+    else:
+        st.info("Upload process data above to get signal-driven reading recommendations.")
+
+
 def render_pi_dashboard():
     """Main PI dashboard — all sections connected."""
     st.markdown("## 📊 Process Intelligence Platform")
@@ -654,6 +716,8 @@ def render_pi_dashboard():
     render_process_mining_section()
     st.divider()
     render_convergent_signals_section()
+    st.divider()
+    render_pi_further_reading_section()
     st.divider()
     render_cross_layer_section()
     st.divider()
