@@ -21,11 +21,21 @@ from core.models import ConstructProfile, VarianceReport
 # Load environment variables
 load_dotenv()
 
-# Verify API keys
-if not os.getenv("OPENAI_API_KEY"):
-    raise ValueError("OPENAI_API_KEY not found in .env file")
-if not os.getenv("ANTHROPIC_API_KEY"):
-    raise ValueError("ANTHROPIC_API_KEY not found in .env file")
+# Verify API keys — check env vars, then Streamlit secrets
+def _ensure_api_keys():
+    for key in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY"):
+        if not os.getenv(key):
+            try:
+                import streamlit as st
+                val = st.secrets.get(key)
+                if val:
+                    os.environ[key] = val
+            except Exception:
+                pass
+        if not os.getenv(key):
+            raise ValueError(f"{key} not found in environment or Streamlit secrets")
+
+_ensure_api_keys()
 
 # Paths
 CHROMA_DIR = Path("data/chroma_db")
