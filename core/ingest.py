@@ -26,12 +26,25 @@ def extract_text_from_pdf(file_bytes: bytes) -> str:
 
 
 def extract_text_from_docx(file_bytes: bytes) -> str:
-    """Extract text from DOCX bytes using python-docx."""
+    """Extract text from DOCX bytes using python-docx (includes tables)."""
     import io
     from docx import Document
     doc = Document(io.BytesIO(file_bytes))
     paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
+
+    # Also extract table contents (protocols often have parameter tables)
+    for table in doc.tables:
+        for row in table.rows:
+            cells = [cell.text.strip() for cell in row.cells if cell.text.strip()]
+            if cells:
+                paragraphs.append(" | ".join(cells))
+
     return "\n".join(paragraphs)
+
+
+def extract_text_from_txt(file_bytes: bytes) -> str:
+    """Extract text from plain text files."""
+    return file_bytes.decode("utf-8", errors="replace")
 
 
 def parse_protocol_to_profile(text: str) -> dict:
@@ -73,7 +86,7 @@ Return ONLY a JSON object with these exact keys (use null for missing values):
 }}
 
 Protocol text:
-{text[:3000]}
+{text[:12000]}
 
 Return ONLY the JSON, no other text."""
 
