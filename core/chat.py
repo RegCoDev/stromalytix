@@ -19,9 +19,18 @@ from core.models import ConstructProfile
 # Load environment variables
 load_dotenv()
 
-# Verify Anthropic API key
-if not os.getenv("ANTHROPIC_API_KEY"):
-    raise ValueError("ANTHROPIC_API_KEY not found in .env file")
+# Verify Anthropic API key — check env vars and Streamlit secrets
+_api_key = os.getenv("ANTHROPIC_API_KEY")
+if not _api_key:
+    try:
+        import streamlit as st
+        _api_key = st.secrets.get("ANTHROPIC_API_KEY")
+        if _api_key:
+            os.environ["ANTHROPIC_API_KEY"] = _api_key
+    except Exception:
+        pass
+if not _api_key:
+    raise ValueError("ANTHROPIC_API_KEY not found in environment or Streamlit secrets")
 
 # System prompt for construct assessment
 SYSTEM_PROMPT = """You are a Tissue Engineering Protocol Analyst for Stromalytix. Assess a researcher's 3D cell culture construct through a friendly expert conversation. Ask ONE question at a time. Collect: target tissue, cell types, scaffold material, stiffness (kPa), porosity (%), cell density, experimental goal, primary readout.
