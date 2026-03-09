@@ -407,30 +407,49 @@ def _render_biosim_tab():
         st.divider()
 
         # Protocol Upload (optional)
-        st.markdown("### 📄 Upload Your Protocol (Optional)")
+        st.markdown("### Upload Your Protocol (Optional)")
         uploaded_file = st.file_uploader(
-            "Upload your protocol (optional)",
-            type=["pdf", "docx"],
-            help="We'll extract construct parameters automatically.",
+            "Upload your protocol document",
+            type=["pdf", "docx", "txt"],
+            help="We'll extract construct parameters automatically from your protocol.",
         )
         if uploaded_file is not None:
             try:
-                from core.ingest import extract_text_from_pdf, extract_text_from_docx, parse_protocol_to_profile
+                from core.ingest import (
+                    extract_text_from_pdf, extract_text_from_docx,
+                    extract_text_from_txt, parse_protocol_to_profile,
+                )
                 file_bytes = uploaded_file.read()
-                if uploaded_file.name.lower().endswith(".pdf"):
+                fname = uploaded_file.name.lower()
+                if fname.endswith(".pdf"):
                     text = extract_text_from_pdf(file_bytes)
+                elif fname.endswith(".txt"):
+                    text = extract_text_from_txt(file_bytes)
                 else:
                     text = extract_text_from_docx(file_bytes)
-                detected = parse_protocol_to_profile(text)
-                st.success("Detected from protocol:")
-                cols = st.columns(2)
-                for i, (k, v) in enumerate(detected.items()):
-                    if v is not None:
-                        cols[i % 2].markdown(f"**{k}**: {v}")
-                # Pre-populate session state
-                for k, v in detected.items():
-                    if v is not None and k in ConstructProfile.model_fields:
-                        setattr(st.session_state.construct_profile, k, v)
+
+                with st.spinner("Extracting parameters..."):
+                    detected = parse_protocol_to_profile(text)
+
+                # Show extracted parameters
+                non_null = {k: v for k, v in detected.items() if v is not None}
+                if non_null:
+                    st.success(f"Extracted {len(non_null)} parameters from protocol:")
+                    cols = st.columns(2)
+                    for i, (k, v) in enumerate(non_null.items()):
+                        label = k.replace("_", " ").title()
+                        cols[i % 2].markdown(f"**{label}**: {v}")
+                    # Pre-populate session state
+                    for k, v in detected.items():
+                        if v is not None and k in ConstructProfile.model_fields:
+                            setattr(st.session_state.construct_profile, k, v)
+                else:
+                    st.info("No construct parameters detected. The chat will help collect them.")
+
+                # Show extracted text in expander
+                with st.expander("View extracted text"):
+                    st.text(text[:3000] + ("..." if len(text) > 3000 else ""))
+
             except Exception as e:
                 st.warning(f"Could not parse protocol: {e}")
 
