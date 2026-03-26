@@ -1,7 +1,7 @@
 """
-Comprehensive Test Suite for Stromalytix MVP — Overnight Run Validation
+Stromalytix Overnight Test Suite
 
-This test suite validates all critical functionality before overnight runs:
+Validates core cell-ECM interaction modeling functionality:
 - Onboarding phase initialization
 - RAG pipeline (vectorstore, retrieval, benchmarks)
 - Simulation brief confidence tagging

@@ -1,17 +1,20 @@
-# Stromalytix
+﻿# Stromalytix
 
-Biological Process Intelligence platform for precision medicine. Connects business operations, experimental workflows, and biophysical simulation to predict outcomes before experiments run.
+Cell-ECM interaction modeling for predicting cell adhesion and proliferation on extracellular matrix and scaffold substrates. Literature-grounded simulation for tissue engineering and cellular agriculture.
 
 ## What It Does
 
-Four integrated modules in a single Streamlit app:
+Chat-driven construct assessment backed by PubMed RAG, CC3D simulation, FEA scaffold mechanics, and 3D visualization. Describe your 3D cell culture protocol through a guided conversation. Stromalytix queries ~8,100 PubMed abstracts, synthesizes a variance report with PMID-cited risk analysis, and generates a CC3D simulation brief for your construct.
 
-| Tab | Purpose |
-|-----|---------|
-| **BioSim Copilot** | Chat-driven construct assessment, PubMed RAG variance analysis, CC3D simulation briefs, FEA scaffold mechanics, 3D tissue visualization |
-| **Process Intelligence** | Proprietary process mining engine (no pm4py), conformance checking, batch effect detection, cross-layer signal detection, company context |
-| **Materials Intelligence** | Bioink lot QC — Flory-Rehner stiffness, Herschel-Bulkley printability, calibrated mechanotransduction viability curves. RELEASE/CONDITIONAL/HOLD decisions |
-| **Transplant PI** | Liver transplant EAD risk from NMP perfusion traces + donor/recipient parameters. Conformance-based scoring with VITTAL/PILOT trial calibration |
+**You get:**
+- Radar chart showing protocol deviation across key parameters
+- Risk scorecard with color-coded risk flags
+- AI narrative citing specific PMIDs from the literature
+- Parameter scatter plot comparing your construct to published ranges
+- CC3D simulation brief predicting cell organization and failure modes
+- FEA scaffold mechanics (deformation, strain, failure risk)
+- Scaffold geometry preview and CC3D VTK output (when cloud sidecar is configured)
+- PDF variance report
 
 ## Quick Start
 
@@ -31,8 +34,7 @@ cp .env.example .env
 # Build knowledge base
 uv run python scripts/scrape_pubmed.py
 uv run python scripts/embed_and_index.py
-uv run python scripts/embed_public_data.py    # transplant + calibration benchmarks
-uv run python scripts/fetch_public_data.py     # literature benchmarks + data stubs
+uv run python scripts/embed_public_data.py    # calibration benchmarks
 
 # Run the app
 uv run streamlit run app.py
@@ -42,21 +44,18 @@ uv run streamlit run app.py
 
 ```bash
 uv run pytest tests/ -v --tb=short
-# 251 tests as of 2026-03-08
 ```
 
 ## Architecture
 
 ```
-Layer 3 — Prediction
-  scikit-fem (FEA)  |  CC3D (cell simulation)  |  Flory-Rehner / Herschel-Bulkley
+Layer 2 — Simulation & Prediction
+  CC3D (cell-ECM interaction simulation)  |  scikit-fem (FEA scaffold mechanics)
+  Simulation brief generation  |  Scaffold preview + CC3D visualization
 
-Layer 2 — Process Intelligence
-  Proprietary process mining engine (InductiveMiner, ConformanceChecker)
-  Process graph (NetworkX)  |  Company context  |  Cross-layer signals
-
-Layer 1 — Data Ingestion
-  CRM / ERP / ELN / LIMS / Instruments → ProcessEvent schema
+Layer 1 — Knowledge & Data
+  PubMed RAG (~8,100 abstracts)  |  ChromaDB vector search
+  Protocol ingestion (PDF/DOCX/TXT)  |  Literature benchmarks
 ```
 
 ## ChromaDB Collections
@@ -64,7 +63,6 @@ Layer 1 — Data Ingestion
 | Collection | Docs | Content |
 |-----------|------|---------|
 | `stromalytix_kb` | ~8,100 | PubMed abstracts for RAG |
-| `transplant_intelligence` | 16 | NMP trial criteria (VITTAL + PILOT) |
 | `calibration_benchmarks` | 13 | Literature benchmarks with DOIs |
 
 Rebuilt by running `scripts/embed_and_index.py` and `scripts/embed_public_data.py`.
@@ -86,7 +84,7 @@ CC3D_API_URL=http://YOUR_VPS_IP:8001
 CC3D_API_KEY=your-secret-key
 ```
 
-Without these, CC3D falls back to local installation or returns simulation briefs only.
+Without `CC3D_API_URL` / `CC3D_API_KEY`, the app still generates simulation briefs; the **Run CC3D** button stays disabled until the sidecar is configured.
 
 ## Deploy to Streamlit Cloud
 
@@ -102,13 +100,11 @@ Without these, CC3D falls back to local installation or returns simulation brief
    CC3D_API_KEY = "your-secret-key"
    ```
 
-## Key References
+## Archive
 
-- Nichol et al. Biomaterials 2010 — GelMA stiffness calibration (Flory-Rehner)
-- Ouyang et al. Adv Mater 2016 — printability window (Herschel-Bulkley)
-- Nasralla et al. Nature 2018 — VITTAL NMP trial
-- Mergental et al. Nat Med 2020 — PILOT viability criteria
-- Olthoff et al. Liver Transplantation 2010 — EAD definition
+Previous modules (Process Intelligence, Materials Intelligence, Transplant PI,
+partner white-label, and supporting modules) are preserved in `archive/v0.1.0-pre-pivot/`.
+See `CHANGELOG.md` for the full history.
 
 ## Stack
 
@@ -116,3 +112,7 @@ Without these, CC3D falls back to local installation or returns simulation brief
 - Streamlit (UI), LangChain + Anthropic (chat/RAG), ChromaDB (vectors)
 - OpenAI text-embedding-3-small (embeddings)
 - scikit-fem (FEA), Plotly (charts), kaleido (export)
+
+## Full deployment guide
+
+See [DEPLOY.md](DEPLOY.md) for Hostinger VPS, Docker, firewall, and TLS.

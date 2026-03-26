@@ -222,136 +222,141 @@ def build_risk_scorecard(report: VarianceReport) -> go.Figure:
 
 def build_parameter_scatter(report: VarianceReport) -> go.Figure:
     """
-    Build a scatter plot showing users construct vs. published benchmarks.
+    Build a horizontal bullet/range chart comparing the user's protocol
+    values against published literature ranges for each parameter.
 
-    Args:
-        report: VarianceReport containing benchmark ranges and construct values
-
-    Returns:
-        Plotly Figure with scatter plot of parameters and ranges
+    Each row is one parameter.  The shaded band is the literature range
+    (min-max), a vertical rule marks the optimal/centre value, and a
+    diamond marker shows the user's value.  Colour coding comes from
+    the risk_flags in the report (green / yellow / red).
     """
-    parameters = []
-    min_values = []
-    max_values = []
-    user_values = []
-    x_positions = []
+    from plotly.subplots import make_subplots
 
-    x_pos = 0
-    for param, benchmark_data in report.benchmark_ranges.items():
-        if isinstance(benchmark_data, dict) and "min" in benchmark_data and "max" in benchmark_data:
-            parameters.append(param)
-            min_values.append(benchmark_data["min"])
-            max_values.append(benchmark_data["max"])
+    rows = []
+    for param, bench in report.benchmark_ranges.items():
+        if not isinstance(bench, dict) or "min" not in bench or "max" not in bench:
+            continue
+        user_val = getattr(report.construct_profile, param, None)
+        unit = bench.get("unit", "")
+        optimal = bench.get("optimal", (bench["min"] + bench["max"]) / 2)
+        risk = report.risk_flags.get(param, "green")
+        rows.append(dict(
+            param=param, bmin=bench["min"], bmax=bench["max"],
+            optimal=optimal, user=user_val, unit=unit, risk=risk,
+        ))
 
-            # Get users value from construct profile
-            user_val = getattr(report.construct_profile, param, None)
-            if user_val is not None:
-                user_values.append(user_val)
-            else:
-                user_values.append(None)
+    if not rows:
+        fig = go.Figure()
+        fig.update_layout(
+            paper_bgcolor=DARK_THEME["paper"],
+            plot_bgcolor=DARK_THEME["background"],
+            annotations=[dict(
+                text="No benchmark data available",
+                xref="paper", yref="paper", x=0.5, y=0.5,
+                showarrow=False,
+                font=dict(color=DARK_THEME["text"], size=16),
+            )],
+        )
+        return fig
 
-            x_positions.append(x_pos)
-            x_pos += 1
+    n = len(rows)
+    fig = make_subplots(
+        rows=n, cols=1, shared_xaxes=False,
+        vertical_spacing=0.04,
+        row_heights=[1] * n,
+    )
 
-    # Create figure
-    fig = go.Figure()
+    risk_color = {
+        "green": DARK_THEME["accent_green"],
+        "yellow": DARK_THEME["accent_yellow"],
+        "red": DARK_THEME["accent_red"],
+    }
 
-    # Add benchmark range bands (min to max)
-    fig.add_trace(
-        go.Scatter(
-            x=x_positions,
-            y=min_values,
-            mode="lines",
+    for i, r in enumerate(rows, start=1):
+        bmin, bmax = r["bmin"], r["bmax"]
+        span = bmax - bmin if bmax != bmin else 1.0
+        pad = span * 0.25
+        lo = bmin - pad
+        hi = bmax + pad
+
+        if r["user"] is not None:
+            lo = min(lo, r["user"] - pad)
+            hi = max(hi, r["user"] + pad)
+
+        fig.add_shape(
+            type="rect",
+            x0=bmin, x1=bmax, y0=-0.4, y1=0.4,
+            fillcolor="rgba(74, 158, 255, 0.25)",
             line=dict(width=0),
-            showlegend=False,
-            hoverinfo="skip",
+            row=i, col=1,
         )
-    )
 
-    fig.add_trace(
-        go.Scatter(
-            x=x_positions,
-            y=max_values,
-            mode="lines",
-            line=dict(width=0),
-            fillcolor=f"rgba(74, 158, 255, 0.2)",
-            fill="tonexty",
-            name="Published Range",
-            hovertemplate="<b>%{text}</b><br>Range: %{y:.2f}<extra></extra>",
-            text=parameters,
-        )
-    )
-
-    # Add user construct points as large stars
-    fig.add_trace(
-        go.Scatter(
-            x=x_positions,
-            y=user_values,
-            mode="markers",
-            marker=dict(
-                size=15,
-                symbol="star",
-                color=DARK_THEME["accent_green"],
-                line=dict(color=DARK_THEME["text"], width=2),
-            ),
-            name="Your Construct",
-            hovertemplate="<b>%{text}</b><br>Your Value: %{y:.2f}<extra></extra>",
-            text=parameters,
-        )
-    )
-
-    # Add benchmark center line (average of min and max)
-    center_values = [(min_val + max_val) / 2 for min_val, max_val in zip(min_values, max_values)]
-    fig.add_trace(
-        go.Scatter(
-            x=x_positions,
-            y=center_values,
-            mode="lines",
+        fig.add_shape(
+            type="line",
+            x0=r["optimal"], x1=r["optimal"], y0=-0.45, y1=0.45,
             line=dict(color=DARK_THEME["accent_blue"], width=2, dash="dot"),
-            name="Benchmark Center",
-            hovertemplate="<b>%{text}</b><br>Center: %{y:.2f}<extra></extra>",
-            text=parameters,
+            row=i, col=1,
         )
-    )
 
-    # Update layout with dark theme
+        color = risk_color.get(r["risk"], DARK_THEME["accent_blue"])
+        if r["user"] is not None:
+            fig.add_trace(
+                go.Scatter(
+                    x=[r["user"]], y=[0],
+                    mode="markers+text",
+                    marker=dict(
+                        size=14, symbol="diamond",
+                        color=color,
+                        line=dict(color=DARK_THEME["text"], width=1.5),
+                    ),
+                    text=[f'{r["user"]:.4g}'],
+                    textposition="top center",
+                    textfont=dict(color=color, size=11),
+                    hovertemplate=(
+                        f'<b>{r["param"]}</b><br>'
+                        f'Your value: {r["user"]:.4g} {r["unit"]}<br>'
+                        f'Range: {bmin:.4g} – {bmax:.4g} {r["unit"]}'
+                        '<extra></extra>'
+                    ),
+                    showlegend=False,
+                ),
+                row=i, col=1,
+            )
+
+        label = r["param"].replace("_", " ").title()
+        fig.update_yaxes(
+            visible=False, range=[-0.6, 0.8], row=i, col=1,
+        )
+        fig.update_xaxes(
+            range=[lo, hi],
+            showgrid=False,
+            tickfont=dict(color=DARK_THEME["text"], size=9),
+            gridcolor=DARK_THEME["grid"],
+            row=i, col=1,
+        )
+
+        fig.add_annotation(
+            x=0, y=0.5,
+            xref=f"x{i} domain" if i > 1 else "x domain",
+            yref=f"y{i} domain" if i > 1 else "y domain",
+            text=f"<b>{label}</b>  <i>({r['unit']})</i>",
+            showarrow=False,
+            xanchor="left", yanchor="bottom",
+            font=dict(color=DARK_THEME["text"], size=12),
+        )
+
     fig.update_layout(
         title={
             "text": "Your Protocol vs. Published Benchmarks",
             "font": {"size": 20, "color": DARK_THEME["text"]},
-            "x": 0.5,
-            "xanchor": "center",
+            "x": 0.5, "xanchor": "center",
         },
-        xaxis=dict(
-            title="Parameter",
-            title_font=dict(color=DARK_THEME["text"], size=12),
-            tickfont=dict(color=DARK_THEME["text"], size=10),
-            ticktext=parameters,
-            tickvals=x_positions,
-            gridcolor=DARK_THEME["grid"],
-            showgrid=True,
-        ),
-        yaxis=dict(
-            title="Normalized Values",
-            title_font=dict(color=DARK_THEME["text"], size=12),
-            tickfont=dict(color=DARK_THEME["text"], size=10),
-            gridcolor=DARK_THEME["grid"],
-            showgrid=True,
-        ),
         paper_bgcolor=DARK_THEME["paper"],
         plot_bgcolor=DARK_THEME["background"],
         font=dict(color=DARK_THEME["text"], family="Arial, sans-serif"),
-        hovermode="x unified",
-        legend=dict(
-            x=0.98,
-            y=0.98,
-            bgcolor="rgba(17, 17, 17, 0.8)",
-            bordercolor=DARK_THEME["grid"],
-            borderwidth=1,
-            font=dict(color=DARK_THEME["text"], size=11),
-        ),
-        margin=dict(l=100, r=50, t=100, b=100),
-        height=500,
+        showlegend=False,
+        height=max(300, 110 * n),
+        margin=dict(l=30, r=30, t=80, b=30),
     )
 
     return fig

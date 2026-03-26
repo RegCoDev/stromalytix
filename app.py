@@ -4,9 +4,11 @@ Stromalytix — BioSim Copilot
 Main Streamlit application for 3D cell culture variance analysis.
 """
 
+import base64
 import csv
 import json
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -127,6 +129,9 @@ if "phase" not in st.session_state:
 if "persona" not in st.session_state:
     st.session_state.persona = None
 
+if "application_domain" not in st.session_state:
+    st.session_state.application_domain = None
+
 
 def reset_analysis():
     """Reset all session state and start over."""
@@ -138,6 +143,7 @@ def reset_analysis():
     st.session_state.docs = []
     st.session_state.phase = "onboarding"
     st.session_state.persona = None
+    st.session_state.application_domain = None
     st.rerun()
 
 
@@ -242,17 +248,23 @@ def analyze_conversation_progress() -> dict:
 
 with st.sidebar:
     st.markdown('<h1 class="brand-text">🧬 Stromalytix</h1>', unsafe_allow_html=True)
-    st.markdown("**The Operating System for Human Tissue Engineering**")
+    st.markdown("**Cell-ECM Interaction Modeling**")
     st.divider()
 
-    # Show selected persona if available
+    # Show selected domain & persona if available
+    domain = st.session_state.get("application_domain")
+    if domain:
+        domain_label = "🥩 Cellular Agriculture" if domain == "cellular_agriculture" else "🧬 Tissue Engineering"
+        st.markdown(f'<p style="color: #4a9eff; font-size: 0.9em;"><strong>Domain:</strong> {domain_label}</p>', unsafe_allow_html=True)
     if st.session_state.persona:
         persona_labels = {
-            "academic": "🎓 Academic Researcher",
+            "academic": "🎓 Academic / Research",
             "pharma_biotech": "💊 Pharma / Biotech",
-            "hardware_service": "🔬 Hardware / Service Provider"
+            "hardware_service": "🔬 Hardware / Service Provider",
+            "cellag_startup": "🏭 Cell Ag Startup",
         }
         st.markdown(f'<p style="color: #00ff88; font-size: 0.9em;"><strong>Role:</strong> {persona_labels.get(st.session_state.persona, "Unknown")}</p>', unsafe_allow_html=True)
+    if domain or st.session_state.persona:
         st.divider()
 
     # Progress Checklist (Task 4)
@@ -319,6 +331,60 @@ with st.sidebar:
 
         st.divider()
 
+        # Culture protocol inputs
+        with st.expander("Culture Protocol", expanded=False):
+            format_options = ["wellplate", "transwell", "bioreactor", "bioprinter", "microfluidic", "other"]
+            fmt_idx = format_options.index(profile.culture_format) if profile.culture_format in format_options else 0
+            profile.culture_format = st.selectbox(
+                "Culture format", options=format_options,
+                index=fmt_idx, key="sb_culture_format",
+            )
+
+            st.markdown("**Construct dimensions (mm)**")
+            dim_cols = st.columns(3)
+            dims = profile.scaffold_dimensions_mm or [4.0, 4.0, 2.0]
+            with dim_cols[0]:
+                dx = st.number_input("X", min_value=0.1, max_value=100.0, value=float(dims[0]), step=0.5, key="sb_dim_x")
+            with dim_cols[1]:
+                dy = st.number_input("Y", min_value=0.1, max_value=100.0, value=float(dims[1]), step=0.5, key="sb_dim_y")
+            with dim_cols[2]:
+                dz = st.number_input("Z", min_value=0.1, max_value=100.0, value=float(dims[2]), step=0.5, key="sb_dim_z")
+            profile.scaffold_dimensions_mm = [dx, dy, dz]
+
+            profile.culture_duration_days = st.number_input(
+                "Culture duration (days)", min_value=1, max_value=90,
+                value=profile.culture_duration_days or 14,
+                key="sb_culture_days",
+            )
+            profile.media_change_interval_hours = st.number_input(
+                "Media change interval (hours)", min_value=0.0, max_value=168.0,
+                value=profile.media_change_interval_hours or 48.0,
+                step=12.0, key="sb_media_interval",
+            )
+            profile.medium_volume_ml = st.number_input(
+                "Medium volume (mL)", min_value=0.1, max_value=50.0,
+                value=profile.medium_volume_ml or 2.0,
+                step=0.5, key="sb_medium_vol",
+            )
+            profile.oxygen_tension_percent = st.number_input(
+                "O2 tension (%)", min_value=0.1, max_value=100.0,
+                value=profile.oxygen_tension_percent or 20.0,
+                step=1.0, key="sb_o2_tension",
+            )
+            profile.perfusion_rate_ul_min = st.number_input(
+                "Perfusion rate (uL/min, 0=static)", min_value=0.0, max_value=1000.0,
+                value=profile.perfusion_rate_ul_min or 0.0,
+                step=10.0, key="sb_perfusion",
+            )
+            media_options = ["DMEM", "RPMI", "MEM", "DMEM/F12", "Custom"]
+            idx = media_options.index(profile.media_type) if profile.media_type in media_options else 0
+            profile.media_type = st.selectbox(
+                "Media type", options=media_options,
+                index=idx, key="sb_media_type",
+            )
+
+        st.divider()
+
     # Reset button
     if st.button("🔄 Reset Analysis", use_container_width=True):
         reset_analysis()
@@ -356,21 +422,17 @@ with st.sidebar:
     with st.expander("ℹ️ About"):
         st.markdown(
             """
-            **Stromalytix** is a decision intelligence platform for tissue engineers.
+            **Stromalytix** predicts how cells adhere and proliferate on
+            extracellular matrix and scaffold substrates.
 
-            We help you de-risk 3D cell culture protocols by benchmarking your
-            construct parameters against published literature.
-
-            Think Palantir Foundry for bioengineering.
+            Literature-grounded simulation for cell-ECM interactions.
             """
         )
 
 
 # ============================================================================
-# MAIN AREA — Two-tab layout
+# MAIN AREA
 # ============================================================================
-
-from core.pi_ui import render_pi_dashboard
 
 
 def _render_biosim_tab():
@@ -381,11 +443,11 @@ def _render_biosim_tab():
         # ========================================================================
 
         st.title("Welcome to Stromalytix")
-        st.markdown("### The Operating System for Human Tissue Engineering")
+        st.markdown("### Cell-ECM Interaction Modeling")
 
         st.markdown("""
-        **Stromalytix** is a decision intelligence platform that helps tissue engineers de-risk
-        3D cell culture protocols by benchmarking against published literature.
+        **Stromalytix** predicts how cells adhere and proliferate on extracellular matrix
+        and scaffold substrates, grounded in published literature.
 
         #### How It Works
 
@@ -455,32 +517,74 @@ def _render_biosim_tab():
 
         st.divider()
 
+        # Application Domain
+        st.markdown("### What are you building?")
+
+        domain_col1, domain_col2 = st.columns(2)
+        with domain_col1:
+            if st.button("🧬 Tissue Engineering", use_container_width=True, type="secondary"):
+                st.session_state.application_domain = "tissue_engineering"
+                if st.session_state.construct_profile:
+                    st.session_state.construct_profile.application_domain = "tissue_engineering"
+                st.rerun()
+            st.caption("Regenerative medicine, disease models, drug screening")
+        with domain_col2:
+            if st.button("🥩 Cellular Agriculture", use_container_width=True, type="secondary"):
+                st.session_state.application_domain = "cellular_agriculture"
+                if st.session_state.construct_profile:
+                    st.session_state.construct_profile.application_domain = "cellular_agriculture"
+                st.rerun()
+            st.caption("Cultivated meat, structured protein, fat tissue")
+
+        if not st.session_state.get("application_domain"):
+            st.stop()
+
+        st.divider()
+
         # Persona Selection
         st.markdown("### 👤 Select Your Role")
         st.markdown("Help us tailor the experience to your workflow:")
 
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            if st.button("🎓 Academic Researcher", use_container_width=True, type="secondary"):
-                st.session_state.persona = "academic"
-                st.session_state.phase = "assessment"
-                st.rerun()
-            st.caption("University labs, research institutes")
-
-        with col2:
-            if st.button("💊 Pharma / Biotech", use_container_width=True, type="secondary"):
-                st.session_state.persona = "pharma_biotech"
-                st.session_state.phase = "assessment"
-                st.rerun()
-            st.caption("Drug discovery, therapeutic development")
-
-        with col3:
-            if st.button("🔬 Hardware / Service Provider", use_container_width=True, type="secondary"):
-                st.session_state.persona = "hardware_service"
-                st.session_state.phase = "assessment"
-                st.rerun()
-            st.caption("Equipment, bioinks, CRO services")
+        if st.session_state.application_domain == "cellular_agriculture":
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                if st.button("🎓 Academic / Research", use_container_width=True, type="secondary"):
+                    st.session_state.persona = "academic"
+                    st.session_state.phase = "assessment"
+                    st.rerun()
+                st.caption("University labs, food science research")
+            with col2:
+                if st.button("🏭 Cell Ag Startup", use_container_width=True, type="secondary"):
+                    st.session_state.persona = "cellag_startup"
+                    st.session_state.phase = "assessment"
+                    st.rerun()
+                st.caption("Cultivated meat, scale-up, product development")
+            with col3:
+                if st.button("🔬 Ingredient / Equipment", use_container_width=True, type="secondary"):
+                    st.session_state.persona = "hardware_service"
+                    st.session_state.phase = "assessment"
+                    st.rerun()
+                st.caption("Media, scaffolds, bioreactors for cell ag")
+        else:
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                if st.button("🎓 Academic Researcher", use_container_width=True, type="secondary"):
+                    st.session_state.persona = "academic"
+                    st.session_state.phase = "assessment"
+                    st.rerun()
+                st.caption("University labs, research institutes")
+            with col2:
+                if st.button("💊 Pharma / Biotech", use_container_width=True, type="secondary"):
+                    st.session_state.persona = "pharma_biotech"
+                    st.session_state.phase = "assessment"
+                    st.rerun()
+                st.caption("Drug discovery, therapeutic development")
+            with col3:
+                if st.button("🔬 Hardware / Service Provider", use_container_width=True, type="secondary"):
+                    st.session_state.persona = "hardware_service"
+                    st.session_state.phase = "assessment"
+                    st.rerun()
+                st.caption("Equipment, bioinks, CRO services")
 
     elif st.session_state.phase == "assessment":
         # ========================================================================
@@ -493,14 +597,15 @@ def _render_biosim_tab():
         # Initialize chat chain on first load
         if st.session_state.chain is None:
             with st.spinner("Initializing BioSim Copilot..."):
-                st.session_state.chain = initialize_chat()
+                st.session_state.chain = initialize_chat(
+                    domain=st.session_state.get("application_domain", "tissue_engineering")
+                )
                 # Get the initial greeting
                 if len(st.session_state.messages) == 0:
-                    # The chain already has the first exchange, get it from memory
+                    from core.chat import _clean_response
                     memory_vars = st.session_state.chain.memory.load_memory_variables({})
                     if "history" in memory_vars and len(memory_vars["history"]) > 0:
-                        # Get the assistant's greeting
-                        initial_response = memory_vars["history"][-1].content
+                        initial_response = _clean_response(memory_vars["history"][-1])
                         st.session_state.messages.append({
                             "role": "assistant",
                             "content": initial_response
@@ -509,7 +614,10 @@ def _render_biosim_tab():
         # Render chat history
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+                _chat_text = message["content"]
+                # Strip markdown heading markers so LLM responses don't render as giant titles
+                _chat_text = re.sub(r"^#{1,4}\s+", "**", _chat_text, flags=re.MULTILINE)
+                st.markdown(_chat_text)
 
         # Chat input
         if user_input := st.chat_input("Describe your construct or answer the question..."):
@@ -522,7 +630,8 @@ def _render_biosim_tab():
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
                     assistant_response = send_message(st.session_state.chain, user_input)
-                    st.markdown(assistant_response)
+                    _display = re.sub(r"^#{1,4}\s+", "**", assistant_response, flags=re.MULTILINE)
+                    st.markdown(_display)
 
             st.session_state.messages.append({
                 "role": "assistant",
@@ -599,7 +708,6 @@ def _render_biosim_tab():
                 print("[ANALYZING] No construct_profile found - creating minimal profile from chat")
                 # Create minimal profile using Haiku to extract from messages
                 from langchain_anthropic import ChatAnthropic
-                import os
 
                 try:
                     _api_key = st.secrets.get("ANTHROPIC_API_KEY", os.getenv("ANTHROPIC_API_KEY"))
@@ -623,18 +731,29 @@ def _render_biosim_tab():
       "target_tissue": "string or null",
       "cell_types": ["list"] or null,
       "scaffold_material": "string or null",
-      "experimental_goal": "disease_modeling | drug_screening | basic_research or null"
+      "stiffness_kpa": "number or null",
+      "porosity_percent": "number or null",
+      "cell_density_per_ml": "number or null",
+      "experimental_goal": "string or null",
+      "primary_readout": "string or null",
+      "scaffold_type": "degradable | rigid | hybrid or null",
+      "biofab_method": "string or null",
+      "scaffold_dimensions_mm": "[x, y, z] or null",
+      "pore_size_um": "number or null",
+      "culture_format": "wellplate | bioreactor | transwell | bioprinter | microfluidic or null",
+      "culture_duration_days": "number or null",
+      "media_change_interval_hours": "number or null",
+      "medium_volume_ml": "number or null",
+      "oxygen_tension_percent": "number or null"
     }}
 
     Conversation:
-    {conversation_text[:1000]}
+    {conversation_text[:2000]}
 
     Return ONLY the JSON, no other text."""
 
                 try:
                     response = llm.invoke(extraction_prompt)
-                    import json
-                    import re
                     json_str = response.content.strip()
                     json_str = re.sub(r"^```json\s*", "", json_str)
                     json_str = re.sub(r"\s*```$", "", json_str)
@@ -678,6 +797,114 @@ def _render_biosim_tab():
 
         # Header
         st.title(f"Analysis: {profile.target_tissue or 'Your Construct'}")
+
+        # ── Feasibility Analysis (top of results) ──
+        st.markdown("### Feasibility Analysis")
+        st.caption("Cross-referencing your protocol against the literature parameter library.")
+        try:
+            from core.feasibility import analyse as feasibility_analyse
+            feas = feasibility_analyse(profile, report)
+
+            tier_color = {
+                "feasible": "#00ff88",
+                "marginal": "#ffd700",
+                "aspirational": "#ff4444",
+            }
+
+            overall_color = tier_color.get(feas.overall, "#888")
+            st.markdown(
+                f'<p style="font-size:1.1em;">Overall assessment: '
+                f'<strong style="color:{overall_color};">{feas.overall.upper()}</strong></p>',
+                unsafe_allow_html=True,
+            )
+
+            for tier_name, items, color in [
+                ("Feasible — literature-backed", feas.feasible, tier_color["feasible"]),
+                ("Marginal — partial data", feas.marginal, tier_color["marginal"]),
+                ("Aspirational — limited / no data", feas.aspirational, tier_color["aspirational"]),
+            ]:
+                if not items:
+                    continue
+                st.markdown(
+                    f'<p style="color:{color}; font-weight:600; margin-top:0.8rem;">{tier_name} '
+                    f'({len(items)})</p>',
+                    unsafe_allow_html=True,
+                )
+                for it in items:
+                    detail_html = f'<span style="color:#e0e0e0;">{it.detail}</span>'
+                    if it.suggestion:
+                        detail_html += (
+                            f'<br><span style="color:#aaa; font-style:italic;">'
+                            f'Suggestion: {it.suggestion}</span>'
+                        )
+                    st.markdown(
+                        f'<div style="border-left:3px solid {color}; padding:0.4rem 0.8rem; '
+                        f'margin:0.3rem 0; background:#111;">'
+                        f'<strong style="color:{color};">{it.axis}</strong><br>'
+                        f'{detail_html}</div>',
+                        unsafe_allow_html=True,
+                    )
+        except Exception as e:
+            st.warning(f"Feasibility analysis unavailable: {e}")
+
+        # ── Migration & Gradient Insights ──
+        st.markdown("### Migration & Gradient Hypotheses")
+        st.caption(
+            "How fabricated and spontaneous gradients are expected to "
+            "influence cell migration in this construct."
+        )
+        try:
+            from core.migration_insights import analyse as migration_analyse
+            mig_rpt = migration_analyse(profile)
+
+            category_icons = {
+                "Spontaneous O2 Gradient": "🫁",
+                "Nutrient / Waste Gradients": "🧪",
+                "Fabricated / Emergent Stiffness Gradient": "🔧",
+                "Contact Guidance (Geometric)": "📐",
+                "Migration Kinetics": "🏃",
+                "Degradation-Driven Migration": "♻️",
+            }
+            conf_badge = {
+                "high": ("🟢", "#00ff88"),
+                "medium": ("🟡", "#ffd700"),
+                "low": ("🔴", "#ff4444"),
+            }
+
+            for cat, insights in mig_rpt.by_category.items():
+                icon = category_icons.get(cat, "🔬")
+                st.markdown(
+                    f'<p style="font-weight:600; font-size:1.05em; margin-top:1rem;">'
+                    f'{icon} {cat}</p>',
+                    unsafe_allow_html=True,
+                )
+                for ins in insights:
+                    badge_char, badge_color = conf_badge.get(ins.confidence, ("⚪", "#888"))
+                    source_html = ""
+                    if ins.sources:
+                        links = ", ".join(
+                            f'<a href="https://doi.org/{d}" style="color:#4a9eff;">{d}</a>'
+                            for d in ins.sources if d
+                        )
+                        if links:
+                            source_html = f'<br><span style="color:#666; font-size:0.85em;">Sources: {links}</span>'
+                    st.markdown(
+                        f'<div style="border-left:3px solid #333; padding:0.5rem 0.8rem; '
+                        f'margin:0.3rem 0; background:#0d0d0d;">'
+                        f'<strong style="color:#e0e0e0;">{ins.headline}</strong> '
+                        f'<span style="color:{badge_color}; font-size:0.85em;">{badge_char} {ins.confidence}</span>'
+                        f'<br><span style="color:#aaa; font-size:0.92em;">{ins.detail}</span>'
+                        f'{source_html}</div>',
+                        unsafe_allow_html=True,
+                    )
+
+            if not mig_rpt.insights:
+                st.info("Insufficient data to generate migration hypotheses. "
+                        "Specify cell types, scaffold material, and dimensions.")
+        except Exception as e:
+            st.warning(f"Migration analysis unavailable: {e}")
+
+        st.divider()
 
         # Row 1: Radar chart + Risk scorecard
         col1, col2 = st.columns([60, 40])
@@ -728,32 +955,64 @@ def _render_biosim_tab():
             use_container_width=True
         )
 
-        # Row 3.5: 3D Construct Visualization
-        st.markdown("### 🧬 Construct Visualization")
-        st.caption("Parameter-driven 3D cell arrangement. Reflects your confirmed profile.")
+        # Scaffold Geometry Preview
+        st.markdown("### 🏗️ Scaffold Geometry")
 
-        viz_col1, viz_col2 = st.columns([3, 1])
-        with viz_col2:
-            show_scaffold = st.toggle("Show scaffold", value=True, key="viz_scaffold")
-
-        try:
-            from core.tissue_viz import render_construct_3d
-            viz_title = f"{profile.target_tissue or 'Construct'}"
-            fig_3d = render_construct_3d(
-                profile=profile,
-                title=viz_title,
-                show_scaffold=show_scaffold,
+        scaf_col1, scaf_col2 = st.columns([2, 1])
+        with scaf_col2:
+            scaffold_arch = st.selectbox(
+                "Architecture",
+                ["gyroid", "schwarz_p", "diamond", "lidinoid", "woodpile", "grid", "custom_stl"],
+                index=0,
+                key="scaf_arch",
             )
-            st.plotly_chart(fig_3d, use_container_width=True)
+            scaf_pore = st.slider("Pore size (um)", 100, 800, 300, key="scaf_pore")
+            scaf_porosity = st.slider("Porosity (%)", 30, 90, 70, key="scaf_porosity")
 
-            stat_cols = st.columns(4)
-            stat_cols[0].metric("Cell Types", len(profile.cell_types or []))
-            density = profile.cell_density_per_ml or 0
-            stat_cols[1].metric("Density", f"{density/1e6:.1f}M/mL" if density else "—")
-            stat_cols[2].metric("Stiffness", f"{profile.stiffness_kpa} kPa" if profile.stiffness_kpa else "—")
-            stat_cols[3].metric("Scaffold", profile.scaffold_material or "—")
-        except Exception as e:
-            st.warning(f"Visualization error: {e}")
+            stl_file = st.file_uploader("Upload STL", type=["stl", "obj"], key="stl_upload")
+
+            if scaffold_arch != "custom_stl" or stl_file is not None:
+                generate_scaffold = st.button("Generate Preview", key="gen_scaffold", use_container_width=True)
+            else:
+                generate_scaffold = False
+
+        with scaf_col1:
+            if generate_scaffold:
+                try:
+                    from core.scaffold_geometry import (
+                        generate_tpms, generate_filament_lattice,
+                        import_stl, preview_scaffold,
+                    )
+                    if stl_file is not None:
+                        mesh = import_stl(stl_file.read())
+                    elif scaffold_arch in ("woodpile", "grid"):
+                        mesh = generate_filament_lattice(
+                            strand_diameter_um=scaf_pore * 0.5,
+                            strand_spacing_um=scaf_pore,
+                            pattern=scaffold_arch,
+                        )
+                    else:
+                        mesh = generate_tpms(
+                            topology=scaffold_arch,
+                            pore_size_um=scaf_pore,
+                            porosity_pct=scaf_porosity,
+                        )
+                    st.session_state["scaffold_mesh"] = mesh
+                    fig_scaf = preview_scaffold(mesh)
+                    st.plotly_chart(fig_scaf, use_container_width=True)
+
+                    # Update profile
+                    profile.scaffold_architecture = scaffold_arch
+                    profile.pore_size_um = scaf_pore
+                    profile.porosity_percent = scaf_porosity
+                except Exception as e:
+                    st.warning(f"Scaffold generation error: {e}")
+            elif "scaffold_mesh" in st.session_state:
+                from core.scaffold_geometry import preview_scaffold
+                fig_scaf = preview_scaffold(st.session_state["scaffold_mesh"])
+                st.plotly_chart(fig_scaf, use_container_width=True)
+            else:
+                st.info("Select scaffold parameters and click Generate Preview.")
 
         # Row 3.75: Scaffold Mechanics (FEA)
         if profile.stiffness_kpa and profile.cell_density_per_ml:
@@ -799,44 +1058,6 @@ def _render_biosim_tab():
                     unsafe_allow_html=True,
                 )
 
-        # Row 3.8: Hepatic DILI Detection Intelligence (if hepatic tissue)
-        tissue_lower = (profile.target_tissue or "").lower()
-        cell_str_lower = " ".join(profile.cell_types or []).lower()
-        hepatic_keywords = ["hepat", "liver", "hepg", "hepar", "heparg", "albumin"]
-        if any(kw in tissue_lower or kw in cell_str_lower for kw in hepatic_keywords):
-            try:
-                from core.hepatic_intelligence import predict_hepatic_quality
-                st.markdown("### 🫀 Hepatic DILI Detection Intelligence")
-                hq = predict_hepatic_quality(profile)
-
-                h1, h2, h3 = st.columns(3)
-                h1.metric(
-                    "DILI Sensitivity",
-                    f"{hq.predicted_dilirank_sensitivity:.0%}",
-                    help="Predicted % of DILIrank high-concern compounds detected",
-                )
-                h2.metric("Specificity", f"{hq.predicted_specificity:.0%}")
-                h3.metric(
-                    "F1 Score", f"{hq.f1_score:.2f}",
-                    help="Balanced DILI detection performance",
-                )
-
-                st.caption(hq.benchmark_comparison)
-
-                if hq.optimization_recommendations:
-                    with st.expander("Optimization Recommendations"):
-                        for rec in hq.optimization_recommendations:
-                            st.markdown(f"- {rec}")
-
-                if hq.key_drivers:
-                    with st.expander("Performance Drivers"):
-                        for d in hq.key_drivers:
-                            st.markdown(f"- {d}")
-
-                st.session_state["hepatic_quality_score"] = hq
-            except Exception as e:
-                st.warning(f"Hepatic intelligence unavailable: {e}")
-
         # Row 4: CC3D Simulation Brief (Task 6)
         st.markdown("### 🔬 Simulation Brief — What CC3D Would Predict")
 
@@ -859,18 +1080,34 @@ def _render_biosim_tab():
             st.markdown("**Key CC3D Parameters:**")
             st.code(json.dumps(sim_brief["key_parameters"], indent=2), language="json")
 
-            # Parameter confidence note (subtle gray info box)
-            st.markdown(
-                '<div style="border: 1px solid #444444; padding: 0.8rem; border-radius: 0.5rem; background: #1a1a1a; margin: 1rem 0;">'
-                '<strong style="color: #888888;">⚗️ Parameter Confidence Note:</strong> '
-                '<span style="color: #aaaaaa;">CC3D parameters are estimated from published in vivo and in vitro models. '
-                'Absolute values should be treated as starting points requiring experimental calibration. '
-                'Qualitative predictions (cell organization patterns, failure modes, relative comparisons) are well-grounded in literature. '
-                'Quantitative predictions (exact timing, specific percentages) require validation against your specific bioink and cell line. '
-                'Join the waitlist to contribute calibration data to the Stromalytix parameter database.</span>'
-                '</div>',
-                unsafe_allow_html=True
-            )
+            # Parameter source table
+            param_sources = sim_brief.get("parameter_sources", {})
+            if param_sources:
+                st.markdown("**Parameter Provenance:**")
+                source_rows = []
+                for pname, info in param_sources.items():
+                    src = info.get("source", "unknown")
+                    conf = info.get("confidence", "?")
+                    doi = info.get("doi") or ""
+                    if conf == "high":
+                        conf_display = "🟢 high"
+                    elif conf == "medium":
+                        conf_display = "🟡 medium"
+                    else:
+                        conf_display = "🔴 low"
+                    source_rows.append({
+                        "Parameter": pname.replace("_", " ").title(),
+                        "Source": src,
+                        "Confidence": conf_display,
+                        "DOI": doi,
+                    })
+                if source_rows:
+                    import pandas as pd
+                    st.dataframe(
+                        pd.DataFrame(source_rows),
+                        use_container_width=True,
+                        hide_index=True,
+                    )
 
             # Predicted outcomes
             st.markdown("**Predicted Observations:**")
@@ -893,127 +1130,75 @@ def _render_biosim_tab():
                 unsafe_allow_html=True
             )
 
-            # CC3D Live Execution
-            from core.cc3d_runner import verify_cc3d_installation, run_cc3d_simulation
-            cc3d_status = verify_cc3d_installation()
-            if cc3d_status["installed"]:
-                if st.button("⚡ Run CC3D Preview (Beta)", use_container_width=True):
-                    with st.spinner("Running CC3D simulation..."):
-                        cc3d_result = run_cc3d_simulation(sim_brief, timeout=120)
+            # CC3D Cloud Execution
+            from core.cc3d_runner import run_simulation, CC3D_API_URL
+
+            if CC3D_API_URL:
+                if st.button("⚡ Run CC3D Simulation (Cloud)", use_container_width=True):
+                    with st.spinner("Running CC3D simulation on cloud..."):
+                        cc3d_result = run_simulation(sim_brief)
                         if cc3d_result["success"]:
                             st.success(f"CC3D completed: {cc3d_result['mcs_completed']} MCS in {cc3d_result['duration_seconds']}s")
-                            if cc3d_result["output"]:
+                            if cc3d_result.get("output"):
                                 st.code(cc3d_result["output"], language="text")
+
+                            vtk_frames = cc3d_result.get("vtk_frames", [])
+                            if vtk_frames:
+                                from core.cc3d_viz import (
+                                    parse_vtk_from_bytes, parse_vtk_scalar_field,
+                                    get_default_type_map, render_unified_scene,
+                                )
+
+                                type_map = get_default_type_map(sim_brief.get("key_parameters", sim_brief))
+
+                                cell_frames = [f for f in vtk_frames if f.get("field_type") == "cell"]
+                                o2_frames = [f for f in vtk_frames if f.get("field_type") == "o2"]
+
+                                display_frames = cell_frames if cell_frames else vtk_frames
+                                frame_idx = len(display_frames) - 1
+                                if len(display_frames) > 1:
+                                    frame_idx = st.slider(
+                                        "Simulation frame",
+                                        0, len(display_frames) - 1,
+                                        value=len(display_frames) - 1,
+                                        key="cc3d_frame_slider",
+                                    )
+
+                                frame = display_frames[frame_idx]
+                                vtk_bytes = base64.b64decode(frame["data_b64"])
+                                lattice = parse_vtk_from_bytes(vtk_bytes)
+
+                                # Find matching O2 frame
+                                o2_field = None
+                                if o2_frames and frame_idx < len(o2_frames):
+                                    o2_bytes = base64.b64decode(o2_frames[frame_idx]["data_b64"])
+                                    o2_field = parse_vtk_scalar_field(o2_bytes)
+
+                                scaffold_mesh = st.session_state.get("scaffold_mesh")
+
+                                fig_cc3d = render_unified_scene(
+                                    cell_lattice=lattice,
+                                    type_map=type_map,
+                                    o2_field=o2_field,
+                                    scaffold_mesh=scaffold_mesh,
+                                    title="CC3D Simulation Result",
+                                    timestep=frame_idx,
+                                )
+                                st.plotly_chart(fig_cc3d, use_container_width=True)
+
+                                if o2_field is not None:
+                                    st.caption("Red markers indicate hypoxic zones (O2 < 5%)")
                         else:
                             st.warning(f"CC3D: {cc3d_result.get('error', 'Unknown error')}")
             else:
                 st.button(
-                    "⚡ Run CC3D Preview (Beta)",
+                    "⚡ Run CC3D Simulation (Cloud)",
                     disabled=True,
                     use_container_width=True,
-                    help="CC3D not configured — install at compucell3d.org to enable live simulation."
+                    help="Set CC3D_API_URL environment variable to your VPS sidecar address.",
                 )
         else:
             st.warning("Simulation brief could not be generated. Check your API key and try again.")
-
-        # Row 4.5: Further Reading (context-driven)
-        st.divider()
-        st.markdown("### 📚 Further Reading")
-        st.caption("Context-driven recommendations based on your construct profile.")
-
-        try:
-            from core.reading_engine import ReadingEngine
-            _reading_engine = ReadingEngine()
-
-            reading_tab_biz, reading_tab_sci, reading_tab_search = st.tabs(
-                ["Business Best Practices", "Scientific Literature", "Search"]
-            )
-
-            with reading_tab_biz:
-                # Use PI signals from variance report if available
-                pi_signals = []
-                if report and report.risk_flags:
-                    signal_map = {
-                        "stiffness": "parameter_out_of_range",
-                        "porosity": "parameter_out_of_range",
-                        "density": "parameter_out_of_range",
-                        "viability": "viability_below_threshold",
-                        "variance": "high_cv",
-                        "batch": "batch_effect",
-                    }
-                    for flag in report.risk_flags:
-                        flag_lower = flag.get("parameter", "").lower() if isinstance(flag, dict) else str(flag).lower()
-                        for kw, signal in signal_map.items():
-                            if kw in flag_lower and signal not in pi_signals:
-                                pi_signals.append(signal)
-                if not pi_signals:
-                    pi_signals = ["parameter_out_of_range"]
-
-                biz_results = _reading_engine.get_business_reading(pi_signals)
-                if biz_results:
-                    for item in biz_results:
-                        with st.expander(f"**{item['pcf_id']}** — {item['pcf_name']}", expanded=False):
-                            st.markdown(f"**Category:** {item['pcf_category']} > {item['pcf_subcategory']}")
-                            st.markdown(f"**Triggered by:** {', '.join(item['triggered_by'])}")
-                            st.markdown(item["best_practice_summary"])
-                            if item.get("key_metrics"):
-                                st.markdown("**Key Metrics:** " + ", ".join(item["key_metrics"]))
-                            if item.get("reading"):
-                                st.markdown("**References:**")
-                                for ref in item["reading"]:
-                                    title = ref.get("title", "Untitled")
-                                    doi = ref.get("doi")
-                                    if doi:
-                                        st.markdown(f"- [{title}](https://doi.org/{doi})")
-                                    else:
-                                        st.markdown(f"- {title}")
-                else:
-                    st.info("No business track matches for current signals.")
-
-            with reading_tab_sci:
-                sci_results = _reading_engine.get_scientific_reading(profile=profile)
-                if sci_results:
-                    for item in sci_results:
-                        entry = item["entry"]
-                        with st.expander(f"**{entry['title']}**", expanded=False):
-                            st.markdown(f"**Collection:** {item['collection']}")
-                            if entry.get("authors"):
-                                st.markdown(f"**Authors:** {entry['authors']}")
-                            if entry.get("journal"):
-                                st.markdown(f"**Journal:** {entry['journal']} ({entry.get('year', '')})")
-                            if entry.get("doi"):
-                                st.markdown(f"**DOI:** [https://doi.org/{entry['doi']}](https://doi.org/{entry['doi']})")
-                            if entry.get("note"):
-                                st.markdown(f"*{entry['note']}*")
-                            st.markdown(f"**Match reasons:** {', '.join(item['match_reasons'])}")
-                            st.markdown(f"**Level:** {entry.get('level', 'N/A')}")
-                else:
-                    st.info("No scientific reading matches for current profile.")
-
-            with reading_tab_search:
-                search_query = st.text_input(
-                    "Search reading databases",
-                    placeholder="e.g. bioprinting, GelMA, process control...",
-                    key="reading_search"
-                )
-                if search_query:
-                    search_results = _reading_engine.search(search_query)
-                    if search_results:
-                        for item in search_results:
-                            if item["track"] == "scientific":
-                                entry = item["entry"]
-                                st.markdown(
-                                    f"**[SCI]** {entry['title']} "
-                                    f"({item['collection']})"
-                                )
-                            else:
-                                st.markdown(
-                                    f"**[BIZ]** {item.get('pcf_id', '')} — {item.get('name', '')}"
-                                )
-                    else:
-                        st.info("No results found.")
-        except Exception as e:
-            st.warning(f"Further reading unavailable: {e}")
 
         # Row 5: Export & Download
         st.divider()
@@ -1036,19 +1221,24 @@ def _render_biosim_tab():
 
         with export_col2:
             try:
-                from core.export import export_figure_png
-                from core.tissue_viz import render_construct_3d
-                viz_fig = render_construct_3d(profile=profile, title=profile.target_tissue or "Construct")
-                png_bytes = export_figure_png(viz_fig)
-                st.download_button(
-                    "Download 3D Visualization (PNG)",
-                    data=png_bytes,
-                    file_name=f"stromalytix_{profile.target_tissue or 'construct'}_3d.png",
-                    mime="image/png",
-                    use_container_width=True,
-                )
+                scaffold_mesh = st.session_state.get("scaffold_mesh")
+                if scaffold_mesh:
+                    from core.export import export_figure_png
+                    from core.scaffold_geometry import preview_scaffold
+                    viz_fig = preview_scaffold(scaffold_mesh)
+                    png_bytes = export_figure_png(viz_fig)
+                    st.download_button(
+                        "Download Scaffold Preview (PNG)",
+                        data=png_bytes,
+                        file_name=f"stromalytix_{profile.target_tissue or 'construct'}_scaffold.png",
+                        mime="image/png",
+                        use_container_width=True,
+                    )
+                else:
+                    st.button("Download Scaffold Preview (PNG)", disabled=True,
+                              use_container_width=True, help="Generate a scaffold preview first.")
             except Exception as e:
-                st.button("Download 3D Viz (PNG)", disabled=True, use_container_width=True,
+                st.button("Download Scaffold (PNG)", disabled=True, use_container_width=True,
                           help=f"PNG export unavailable: {e}")
 
         # Row 6: Signup CTA
@@ -1073,270 +1263,8 @@ def _render_biosim_tab():
                     st.error("Please enter a valid email address.")
 
 
-def _render_materials_tab():
-    """Materials Intelligence tab — bioink lot QC predictions."""
-    st.header("Materials Intelligence")
-    st.caption("Predict customer outcomes from bioink lot characterization data")
-
-    with st.form("lot_characterization"):
-        col1, col2 = st.columns(2)
-        with col1:
-            lot_id = st.text_input("Lot ID", value="LOT-2024-001")
-            material_name = st.selectbox(
-                "Material",
-                ["GelMA 6%", "GelMA 4%", "Fibrin 10mg/mL", "Collagen I",
-                 "Alginate 2%", "PEGDA", "Other"],
-            )
-            storage_modulus = st.number_input(
-                "Storage Modulus G' (Pa)", min_value=0.0, value=0.0, step=100.0,
-                help="Leave 0 to use material defaults",
-            )
-            loss_modulus = st.number_input(
-                "Loss Modulus G'' (Pa)", min_value=0.0, value=0.0, step=100.0,
-            )
-            viscosity = st.number_input(
-                "Viscosity at 37°C (Pa·s)", min_value=0.0, value=0.0, step=10.0,
-            )
-        with col2:
-            gelation_time = st.number_input(
-                "Gelation Time (s)", min_value=0.0, value=0.0, step=5.0,
-            )
-            swelling_ratio = st.number_input(
-                "Swelling Ratio", min_value=0.0, value=0.0, step=0.1,
-            )
-            degradation_rate = st.number_input(
-                "Degradation Rate (day⁻¹)", min_value=0.0, value=0.0, step=0.5,
-            )
-            uv_dose = st.number_input(
-                "UV Dose (mW/cm²·s)", min_value=0.0, value=0.0, step=5.0,
-            )
-            crosslink_density = st.number_input(
-                "Crosslink Density", min_value=0.0, value=0.0, step=0.01,
-            )
-        submitted = st.form_submit_button("Predict Lot Performance")
-
-    if submitted:
-        from core.materials_intelligence import (
-            BioinkLotCharacterization,
-            predict_lot_performance,
-        )
-
-        char = BioinkLotCharacterization(
-            lot_id=lot_id,
-            material_name=material_name,
-            storage_modulus_pa=storage_modulus or None,
-            loss_modulus_pa=loss_modulus or None,
-            viscosity_pas_at_37c=viscosity or None,
-            gelation_time_s=gelation_time or None,
-            swelling_ratio=swelling_ratio or None,
-            degradation_rate_day=degradation_rate or None,
-            uv_dose_mwcm2_s=uv_dose or None,
-            crosslink_density=crosslink_density or None,
-        )
-        report = predict_lot_performance(char)
-
-        # Release decision banner
-        color_map = {"RELEASE": "green", "CONDITIONAL": "orange", "HOLD": "red"}
-        icon_map = {"RELEASE": "✅", "CONDITIONAL": "⚠️", "HOLD": "🛑"}
-        st.markdown(
-            f"### {icon_map[report.release_recommendation]} "
-            f"Lot {report.lot_id}: **{report.release_recommendation}**"
-        )
-        st.info(report.release_rationale)
-
-        # Key metrics with uncertainty
-        m1, m2, m3, m4 = st.columns(4)
-        m1.metric(
-            "Stiffness [Flory-Rehner]",
-            f"{report.predicted_stiffness_kpa} kPa",
-            delta=f"+/- {report.stiffness_uncertainty_kpa} kPa",
-        )
-        m2.metric(
-            "Printability [Ouyang 2016]",
-            f"{report.predicted_printability_score:.2f}",
-            delta=f"+/- {report.printability_uncertainty:.2f}",
-        )
-        m3.metric("Day-3 Viability", f"{report.predicted_cell_viability_day3_pct:.0f}%",
-                   delta=f"SD {report.viability_sd_pct:.1f}%")
-        m4.metric("Day-7 Viability", f"{report.predicted_cell_viability_day7_pct:.0f}%")
-
-        st.caption("E = 3G'Q^(-1/3) [Flory-Rehner affine network theory]")
-
-        # Process recommendations
-        st.subheader("Process Recommendations")
-        r1, r2, r3, r4 = st.columns(4)
-        r1.metric("Nozzle Diameter", f"{report.recommended_nozzle_diameter_mm} mm")
-        r2.metric("Print Speed", f"{report.recommended_print_speed_mms} mm/s")
-        r3.metric("Crosslink Time", f"{report.recommended_crosslink_time_s:.0f} s")
-        r4.metric("Cell Density", f"{report.recommended_cell_density_per_ml:,.0f} /mL")
-
-        # Confidence and data gaps
-        st.subheader("Confidence Assessment")
-        st.write(f"**Confidence:** {report.confidence.upper()}")
-        if report.data_gaps:
-            st.warning("**Data gaps:**")
-            for gap in report.data_gaps:
-                st.write(f"- {gap}")
-        else:
-            st.success("Full characterization data provided — high confidence predictions.")
-
-        # Calibration references
-        if report.references:
-            with st.expander("Calibration References"):
-                for ref in report.references:
-                    st.caption(ref)
-
-
-def _render_transplant_tab():
-    """Transplant Process Intelligence tab."""
-    st.header("Liver Transplant Process Intelligence")
-    st.caption(
-        "Conformance-based EAD risk assessment. "
-        "Process mining approach to transplant outcome prediction."
-    )
-
-    with st.expander("Methodology", expanded=False):
-        st.markdown("""
-        **Approach:** Treats the transplant workflow as a process.
-        Healthy graft recovery = reference model. EAD = conformance failure.
-        Each step deviation contributes to cumulative risk.
-
-        **EAD Definition (Olthoff 2010):** Bilirubin >=10 mg/dL day 7,
-        INR >=1.6 day 7, OR AST/ALT >2000 IU/L within 7 days.
-
-        **Key references:**
-        - Nasralla et al. Nature 2018 (NMP viability criteria)
-        - Mergental et al. Nat Med 2020 (PILOT criteria)
-        - Olthoff et al. Liver Transplantation 2010 (EAD definition)
-        - Feng et al. Am J Transplant 2006 (DRI)
-        """)
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.markdown("**Donor Parameters**")
-        donor_age = st.number_input("Donor age (years)", 18, 90, 55,
-                                     key="tx_donor_age")
-        donor_type = st.selectbox("Donor type", ["dbd", "dcd"],
-                                   key="tx_donor_type")
-        steatosis = st.slider("Hepatic steatosis (%)", 0, 70, 10,
-                               key="tx_steatosis")
-
-        st.markdown("**Preservation**")
-        cia = st.number_input("Cold ischemia time (h)", 0.0, 30.0, 8.0,
-                               key="tx_cia")
-        wia = st.number_input("Warm ischemia time (min)", 0, 120, 35,
-                               key="tx_wia")
-
-    with col2:
-        st.markdown("**Recipient**")
-        meld = st.number_input("Recipient MELD score", 6, 40, 18,
-                                key="tx_meld")
-
-        st.markdown("**NMP (if used)**")
-        has_nmp = st.toggle("NMP perfusion data available", key="tx_has_nmp")
-
-        if has_nmp:
-            st.caption("Enter representative NMP measurements:")
-            lactate_2h = st.number_input("Lactate at 2h (mmol/L)", 0.0, 15.0, 2.1,
-                                          key="tx_lactate")
-            bile_ph = st.number_input("Bile pH", 6.5, 8.0, 7.3,
-                                       key="tx_bile_ph")
-            art_flow = st.number_input("Arterial flow (mL/min)", 0, 500, 180,
-                                        key="tx_art_flow")
-            o2_cons = st.number_input("O2 consumption (mmol/h)", 0, 80, 32,
-                                       key="tx_o2")
-
-    if st.button("Analyze Transplant Workflow", type="primary",
-                 key="run_transplant"):
-        from core.transplant_intelligence import (
-            TransplantWorkflowParameters,
-            NMPTimepoint,
-            compute_workflow_conformance,
-        )
-
-        nmp_trace = []
-        if has_nmp:
-            nmp_trace = [
-                NMPTimepoint(
-                    time_min=120,
-                    lactate_mmol_l=lactate_2h,
-                    bile_ph=bile_ph,
-                    arterial_flow_ml_min=art_flow,
-                    o2_consumption_mmol_h=o2_cons,
-                ),
-            ]
-
-        params = TransplantWorkflowParameters(
-            donor_age=donor_age,
-            donor_type=donor_type,
-            donor_steatosis_pct=steatosis,
-            cold_ischemia_time_h=cia,
-            warm_ischemia_time_min=wia,
-            recipient_meld_score=meld,
-            nmp_trace=nmp_trace,
-        )
-
-        report = compute_workflow_conformance(params)
-        st.session_state["transplant_report"] = report
-
-    if st.session_state.get("transplant_report"):
-        report = st.session_state["transplant_report"]
-
-        risk_methods = {"low": "success", "moderate": "warning", "high": "error"}
-        getattr(st, risk_methods[report.ead_risk_category])(
-            f"**{report.ead_risk_category.upper()} EAD RISK** — "
-            f"Predicted probability: {report.predicted_ead_probability:.0%} "
-            f"(confidence: {report.confidence})"
-        )
-
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Conformance Score",
-                  f"{report.overall_conformance_score:.2f}",
-                  help="1.0 = perfect workflow conformance")
-        c2.metric("EAD Risk Score", f"{report.ead_risk_score:.2f}")
-        c3.metric("P(EAD)", f"{report.predicted_ead_probability:.0%}")
-
-        if report.nmp_viability_assessment:
-            st.metric("NMP Viability",
-                      report.nmp_viability_assessment.upper().replace("_", " "))
-
-        st.markdown(f"**Clinical Recommendation:** {report.recommendation}")
-
-        if report.active_risk_factors:
-            with st.expander("Active Risk Factors"):
-                for r in report.active_risk_factors:
-                    st.markdown(f"- {r}")
-
-        if report.protective_factors:
-            with st.expander("Protective Factors"):
-                for p in report.protective_factors:
-                    st.markdown(f"- {p}")
-
-        with st.expander("References"):
-            for ref in report.references:
-                st.caption(ref)
-
-
 # ============================================================================
-# Render tabs
+# Render
 # ============================================================================
 
-tab_biosim, tab_pi, tab_materials, tab_transplant = st.tabs([
-    "🔬 BioSim Copilot",
-    "📊 Process Intelligence",
-    "🧪 Materials Intelligence",
-    "🫀 Transplant PI",
-])
-
-with tab_biosim:
-    _render_biosim_tab()
-
-with tab_pi:
-    render_pi_dashboard()
-
-with tab_materials:
-    _render_materials_tab()
-
-with tab_transplant:
-    _render_transplant_tab()
+_render_biosim_tab()

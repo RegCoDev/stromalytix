@@ -22,6 +22,9 @@ from core.models import ConstructProfile, VarianceReport
 load_dotenv()
 
 # Verify API keys — check env vars, then Streamlit secrets
+_MISSING_KEYS: list[str] = []
+
+
 def _ensure_api_keys():
     for key in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY"):
         if not os.getenv(key):
@@ -33,7 +36,10 @@ def _ensure_api_keys():
             except Exception:
                 pass
         if not os.getenv(key):
-            raise ValueError(f"{key} not found in environment or Streamlit secrets")
+            _MISSING_KEYS.append(key)
+            import warnings
+            warnings.warn(f"{key} not set — RAG features will be unavailable")
+
 
 _ensure_api_keys()
 
@@ -313,28 +319,88 @@ Include ALL numeric parameters from the construct profile in your analysis."""
         )
 
 
+def _parse_json_lenient(text: str) -> dict:
+    """Parse JSON from LLM output, repairing common defects."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    repaired = text
+    # Remove trailing commas before } or ]
+    repaired = re.sub(r",\s*([}\]])", r"\1", repaired)
+    # Balance braces/brackets
+    open_braces = repaired.count("{") - repaired.count("}")
+    open_brackets = repaired.count("[") - repaired.count("]")
+    if open_braces > 0 or open_brackets > 0:
+        # Truncate to last complete key-value pair
+        last_good = max(repaired.rfind('",'), repaired.rfind("],"), repaired.rfind("},"))
+        if last_good > 0:
+            repaired = repaired[:last_good + 1]
+        repaired += "]" * max(0, open_brackets) + "}" * max(0, open_braces)
+    try:
+        return json.loads(repaired)
+    except json.JSONDecodeError:
+        pass
+
+    # Last resort: find the largest parseable JSON object
+    for end_pos in range(len(text), 0, -1):
+        candidate = text[:end_pos]
+        open_b = candidate.count("{") - candidate.count("}")
+        open_k = candidate.count("[") - candidate.count("]")
+        candidate += "]" * max(0, open_k) + "}" * max(0, open_b)
+        candidate = re.sub(r",\s*([}\]])", r"\1", candidate)
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+
+    raise ValueError(f"Could not parse JSON from LLM response ({len(text)} chars)")
+
+
 def generate_simulation_brief(profile: ConstructProfile, report: VarianceReport) -> Dict:
     """
     Generate CC3D simulation brief based on construct profile and variance report.
 
-    Args:
-        profile: ConstructProfile with construct parameters
-        report: VarianceReport with analysis results
-
-    Returns:
-        Dict with simulation brief data
+    Queries the parameter library first to ground values in literature, then
+    asks the LLM to fill gaps. The returned brief includes a parameter_sources
+    section mapping each value to its provenance.
     """
-    # Initialize Sonnet
+    from core.parameter_library import gap_report as _gap_report
+
+    # Query parameter library for grounded values
+    library_matches = _gap_report(profile)
+
+    grounded_values: Dict[str, dict] = {}
+    gaps: list[str] = []
+    for param_name, match in library_matches.items():
+        if match is not None:
+            grounded_values[param_name] = match
+        else:
+            gaps.append(param_name)
+
+    grounded_section = ""
+    if grounded_values:
+        grounded_section = "\nGROUNDED PARAMETER VALUES (from curated literature library — use these, do NOT override):\n"
+        for param_name, info in grounded_values.items():
+            doi_str = f" (DOI: {info['doi']})" if info.get("doi") else ""
+            grounded_section += f"  - {param_name}: {info['value']} {info.get('unit', '')} [confidence: {info.get('confidence', '?')}]{doi_str}\n"
+
+    gaps_section = ""
+    if gaps:
+        gaps_section = "\nPARAMETERS NEEDING ESTIMATION (no library match — tag these as confidence: 'low'):\n"
+        for g in gaps:
+            gaps_section += f"  - {g}\n"
+
     llm = ChatAnthropic(
         model="claude-sonnet-4-6",
         temperature=0.3,
-        max_tokens=2048,
+        max_tokens=3000,
         api_key=os.getenv("ANTHROPIC_API_KEY")
     )
 
     profile_json = profile.model_dump_json(indent=2)
     narrative = report.ai_narrative
-
     supporting_pmids_str = json.dumps(report.supporting_pmids)
 
     prompt = f"""Based on this construct profile and variance report, generate a CC3D simulation brief.
@@ -347,7 +413,7 @@ VARIANCE ANALYSIS:
 
 SUPPORTING PMIDs FROM LITERATURE:
 {supporting_pmids_str}
-
+{grounded_section}{gaps_section}
 Generate a CC3D (CompuCell3D) simulation brief. Output JSON with:
 
 {{
@@ -355,30 +421,66 @@ Generate a CC3D (CompuCell3D) simulation brief. Output JSON with:
   "key_parameters": {{
     "cell_types": ["list", "of", "cell types"],
     "adhesion_energies": {{
-      "cell1-cell1": {{"value": 10, "confidence": "high", "source_pmids": ["12345678"]}},
-      "cell1-medium": {{"value": 15, "confidence": "medium", "source_pmids": []}},
-      "cell1-ecm": {{"value": 8, "confidence": "low", "source_pmids": []}}
+      "cell1_cell1": {{"value": 10, "confidence": "high", "source_pmids": ["12345678"]}},
+      "cell1_Medium": {{"value": 15, "confidence": "medium", "source_pmids": []}},
+      "cell1_Scaffold": {{"value": 8, "confidence": "low", "source_pmids": []}}
     }},
     "volume_constraints": {{"target_volume": 100, "lambda_volume": 2}},
+    "surface_constraints": {{"target_surface": 80, "lambda_surface": 1}},
     "scaffold_stiffness": "value in Pa or qualitative",
-    "simulation_steps": 10000
+    "simulation_steps": 10000,
+    "lattice_dimensions": [100, 100, 100],
+    "diffusion_parameters": {{
+      "o2": {{
+        "D": 2e-5,
+        "decay": 0.0,
+        "consumption_rate": 0.01,
+        "boundary_concentration": 0.2
+      }}
+    }},
+    "proliferation_parameters": {{
+      "doubling_time_hours": 24,
+      "contact_inhibition_neighbors": 8
+    }},
+    "scaffold_parameters": {{
+      "type": "rigid | degradable | hybrid",
+      "ecm_degradation_rate": 0.0
+    }},
+    "culture_protocol": {{
+      "media_change_interval_hours": 48
+    }},
+    "culture_duration_hours": 168,
+    "boundary_conditions": {{
+      "periodic_x": false,
+      "periodic_y": false,
+      "periodic_z": false,
+      "all_periodic": false
+    }}
   }},
   "predicted_outcomes": [
-    "Specific predicted observation 1 if CC3D were run",
+    "Specific predicted observation 1",
     "Specific predicted observation 2",
     "Specific predicted observation 3"
   ],
-  "risk_prediction": "What failure mode CC3D would most likely reveal for this specific construct (1-2 sentences)",
-  "validation_experiment": "The single wet lab experiment that would validate the simulation prediction (1 sentence)"
+  "risk_prediction": "What failure mode CC3D would most likely reveal (1-2 sentences)",
+  "validation_experiment": "The single wet lab experiment that would validate the simulation prediction (1 sentence)",
+  "parameter_sources": {{
+    "param_name": {{"source": "library", "doi": "10.xxx/...", "confidence": "high"}},
+    "another_param": {{"source": "LLM estimate", "doi": null, "confidence": "low"}}
+  }}
 }}
 
 CONFIDENCE TAGGING RULES for adhesion_energies:
 - Each adhesion energy MUST be an object with "value", "confidence", and "source_pmids" keys.
 - "confidence" MUST be exactly one of: "high", "medium", or "low"
-  - "high": Parameter value directly cited in the supporting PMIDs listed above
+  - "high": Parameter value directly from the GROUNDED PARAMETER VALUES above
   - "medium": Parameter inferred from similar tissue types in literature
   - "low": Parameter estimated from general biophysics principles
 - "source_pmids": List of PMIDs that support this value (can be empty for "low" confidence)
+
+CRITICAL: For any parameter listed under GROUNDED PARAMETER VALUES, you MUST
+use the provided value and mark it as confidence "high" in parameter_sources.
+Only estimate values for parameters listed under PARAMETERS NEEDING ESTIMATION.
 
 Return ONLY the JSON, no other text."""
 
@@ -386,11 +488,22 @@ Return ONLY the JSON, no other text."""
         response = llm.invoke(prompt)
         json_str = response.content.strip()
 
-        # Clean up markdown code blocks
         json_str = re.sub(r"^```json\s*", "", json_str)
         json_str = re.sub(r"\s*```$", "", json_str)
 
-        brief = json.loads(json_str)
+        brief = _parse_json_lenient(json_str)
+
+        # Merge library provenance into parameter_sources
+        if "parameter_sources" not in brief:
+            brief["parameter_sources"] = {}
+        for param_name, info in grounded_values.items():
+            brief["parameter_sources"][param_name] = {
+                "source": "library",
+                "doi": info.get("doi"),
+                "confidence": info.get("confidence", "medium"),
+                "library_id": info.get("id"),
+            }
+
         return brief
 
     except Exception as e:
@@ -400,5 +513,6 @@ Return ONLY the JSON, no other text."""
             "key_parameters": {},
             "predicted_outcomes": ["Error generating predictions"],
             "risk_prediction": "Unable to assess risks",
-            "validation_experiment": "Unable to suggest validation"
+            "validation_experiment": "Unable to suggest validation",
+            "parameter_sources": {},
         }
