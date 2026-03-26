@@ -1,10 +1,10 @@
 ﻿# Stromalytix
 
-Cell-ECM interaction modeling for predicting cell adhesion and proliferation on extracellular matrix and scaffold substrates. Literature-grounded simulation for tissue engineering and cellular agriculture.
+Cell-ECM modeling for **biofabrication**: how cells adhere, migrate, and proliferate on bioinks, scaffolds, and engineered matrices. Literature-grounded benchmarks, optional CompuCell3D cloud runs, and scaffold geometry preview. Covers tissue engineering and cellular agriculture use cases.
 
 ## What It Does
 
-Chat-driven construct assessment backed by PubMed RAG, CC3D simulation, FEA scaffold mechanics, and 3D visualization. Describe your 3D cell culture protocol through a guided conversation. Stromalytix queries ~8,100 PubMed abstracts, synthesizes a variance report with PMID-cited risk analysis, and generates a CC3D simulation brief for your construct.
+Chat-driven construct assessment for biofabrication workflows: PubMed RAG, FEA scaffold mechanics, optional CC3D cloud simulation, and scaffold preview. Describe your 3D cell culture protocol through a guided conversation. Stromalytix queries ~8,100 PubMed abstracts, synthesizes a variance report with PMID-cited risk analysis, and generates a CC3D simulation brief for your construct.
 
 **You get:**
 - Radar chart showing protocol deviation across key parameters
