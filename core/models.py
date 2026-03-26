@@ -16,15 +16,32 @@ class ConstructProfile(BaseModel):
     Represents the parameters of a 3D cell culture construct that will be
     benchmarked against literature.
     """
+    application_domain: Optional[str] = None  # "tissue_engineering" | "cellular_agriculture"
     target_tissue: Optional[str] = None
     cell_types: Optional[List[str]] = None
     scaffold_material: Optional[str] = None
     stiffness_kpa: Optional[float] = None
     porosity_percent: Optional[float] = None
     cell_density_per_ml: Optional[float] = None
-    experimental_goal: Optional[str] = None  # disease_modeling | drug_screening | basic_research
-    primary_readout: Optional[str] = None  # viability | contractility | metabolic_activity | gene_expression
+    experimental_goal: Optional[str] = None
+    primary_readout: Optional[str] = None
     raw_responses: Optional[Dict[str, str]] = None
+
+    # Scaffold geometry
+    scaffold_architecture: Optional[str] = None
+    pore_size_um: Optional[float] = None
+    scaffold_dimensions_mm: Optional[List[float]] = None
+    scaffold_type: Optional[str] = None
+    biofab_method: Optional[str] = None
+
+    # Culture protocol
+    culture_format: Optional[str] = None
+    culture_duration_days: Optional[int] = None
+    media_change_interval_hours: Optional[float] = None
+    medium_volume_ml: Optional[float] = None
+    media_type: Optional[str] = None
+    perfusion_rate_ul_min: Optional[float] = None
+    oxygen_tension_percent: Optional[float] = None
 
     class Config:
         json_schema_extra = {
@@ -37,10 +54,18 @@ class ConstructProfile(BaseModel):
                 "cell_density_per_ml": 1e6,
                 "experimental_goal": "disease_modeling",
                 "primary_readout": "contractility",
-                "raw_responses": {
-                    "tissue": "I'm working on heart tissue",
-                    "cells": "cardiomyocytes and fibroblasts"
-                }
+                "scaffold_architecture": "gyroid",
+                "pore_size_um": 300.0,
+                "scaffold_dimensions_mm": [4.0, 4.0, 4.0],
+                "scaffold_type": "degradable",
+                "biofab_method": "bioprinting",
+                "culture_format": "wellplate",
+                "culture_duration_days": 14,
+                "media_change_interval_hours": 48.0,
+                "medium_volume_ml": 2.0,
+                "media_type": "DMEM",
+                "perfusion_rate_ul_min": 0.0,
+                "oxygen_tension_percent": 20.0,
             }
         }
 

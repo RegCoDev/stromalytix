@@ -21,9 +21,10 @@ def test_gitignore_has_secrets():
     assert "secrets.toml" in text
 
 
-def test_pi_ui_importable():
-    from core.pi_ui import render_pi_dashboard
-    assert callable(render_pi_dashboard)
+def test_rag_importable():
+    from core.rag import load_vectorstore, retrieve_benchmarks
+    assert callable(load_vectorstore)
+    assert callable(retrieve_benchmarks)
 
 
 def test_fem_solver_importable():

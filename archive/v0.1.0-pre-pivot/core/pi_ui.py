@@ -462,13 +462,11 @@ def render_algorithm_router_section():
     miner.add_event_log(events, "uploaded")
 
     try:
-        report = miner.get_data_quality_report("uploaded")
+        char = miner.get_data_quality_report("uploaded")
+        routing = miner.router.select_algorithm(char)
     except Exception as e:
         st.warning(f"Could not generate data quality report: {e}")
         return
-
-    char = report.get("characterization", {})
-    routing = report.get("routing", {})
 
     # Data quality metrics
     col1, col2, col3, col4 = st.columns(4)

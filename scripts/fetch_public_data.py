@@ -1,34 +1,12 @@
 """
 scripts/fetch_public_data.py
 
-Creates public dataset stubs and embeds literature benchmarks.
-Manual downloads required for DILIrank and BPI Challenge.
+Creates literature benchmark data for calibration.
 """
 import json
 from pathlib import Path
 
-Path("data/public/hepatic").mkdir(parents=True, exist_ok=True)
 Path("data/public/biofab").mkdir(parents=True, exist_ok=True)
-Path("data/public/process_mining").mkdir(parents=True, exist_ok=True)
-
-# --- DILIrank README ---
-DILIRANK_README = """DILIrank dataset — manual download required.
-1. Go to: https://www.fda.gov/science-research/liver-toxicity-knowledge-base-ltkb
-2. Download "DILIrank" dataset
-3. Save as: data/public/hepatic/dilirank.csv
-Columns expected: Compound_Name, Severity_Class, DILI_Concern
-"""
-Path("data/public/hepatic/dilirank_README.txt").write_text(DILIRANK_README)
-
-# --- BPI Challenge 2017 README ---
-BPI_README = """BPI Challenge 2017 Dataset — for process mining engine validation.
-1. Go to: https://data.4tu.nl/articles/dataset/BPI_Challenge_2017/12696884
-2. Download BPI_Challenge_2017.xes.gz
-3. Convert to CSV using: python scripts/convert_xes_to_csv.py
-4. Save as: data/public/process_mining/bpi2017.csv
-Use to validate InductiveMiner, ConformanceChecker against known results.
-"""
-Path("data/public/process_mining/bpi2017_README.txt").write_text(BPI_README)
 
 # --- Literature benchmarks ---
 BIOFAB_BENCHMARKS = {
@@ -124,6 +102,5 @@ BIOFAB_BENCHMARKS = {
 with open("data/public/biofab/literature_benchmarks.json", "w") as f:
     json.dump(BIOFAB_BENCHMARKS, f, indent=2)
 
-print("Public data stubs created in data/public/")
-print("Manual downloads required — see README files in each directory")
-print(f"Literature benchmarks: {sum(len(v) for v in BIOFAB_BENCHMARKS.values() if isinstance(v, list))} entries")
+print("Literature benchmarks written to data/public/biofab/")
+print(f"Entries: {sum(len(v) for v in BIOFAB_BENCHMARKS.values() if isinstance(v, list))}")
