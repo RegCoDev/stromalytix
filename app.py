@@ -30,7 +30,7 @@ from core.viz import build_parameter_scatter, build_radar_chart, build_risk_scor
 
 # Page configuration
 st.set_page_config(
-    page_title="Stromalytix | BioSim Copilot",
+    page_title="Stromalytix | Biofabrication Cell-ECM",
     page_icon="🧬",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -132,6 +132,9 @@ if "persona" not in st.session_state:
 if "application_domain" not in st.session_state:
     st.session_state.application_domain = None
 
+if "onboarding_slide" not in st.session_state:
+    st.session_state.onboarding_slide = 0
+
 
 def reset_analysis():
     """Reset all session state and start over."""
@@ -144,6 +147,7 @@ def reset_analysis():
     st.session_state.phase = "onboarding"
     st.session_state.persona = None
     st.session_state.application_domain = None
+    st.session_state.onboarding_slide = 0
     st.rerun()
 
 
@@ -248,7 +252,7 @@ def analyze_conversation_progress() -> dict:
 
 with st.sidebar:
     st.markdown('<h1 class="brand-text">🧬 Stromalytix</h1>', unsafe_allow_html=True)
-    st.markdown("**Cell-ECM Interaction Modeling**")
+    st.markdown("**Cell-ECM for biofabrication**")
     st.divider()
 
     # Show selected domain & persona if available
@@ -422,10 +426,9 @@ with st.sidebar:
     with st.expander("ℹ️ About"):
         st.markdown(
             """
-            **Stromalytix** predicts how cells adhere and proliferate on
-            extracellular matrix and scaffold substrates.
-
-            Literature-grounded simulation for cell-ECM interactions.
+            **Stromalytix** models cell-ECM behavior for **biofabrication**:
+            bioinks, scaffolds, and culture protocols. Literature-grounded benchmarks,
+            optional CompuCell3D cloud runs, and scaffold geometry preview.
             """
         )
 
@@ -442,79 +445,109 @@ def _render_biosim_tab():
         # PHASE: ONBOARDING (Welcome Screen + Persona Selection)
         # ========================================================================
 
-        st.title("Welcome to Stromalytix")
-        st.markdown("### Cell-ECM Interaction Modeling")
+        st.title("Stromalytix")
+        st.caption("Cell-ECM modeling for biofabrication")
+        st.markdown(
+            '<p style="font-size:1.2rem; line-height:1.5; color:#d4d4d4; margin:0 0 1rem 0;">'
+            "Short chat. Literature-backed benchmarks. Optional cloud simulation."
+            "</p>",
+            unsafe_allow_html=True,
+        )
 
-        st.markdown("""
-        **Stromalytix** predicts how cells adhere and proliferate on extracellular matrix
-        and scaffold substrates, grounded in published literature.
+        _slides = [
+            {
+                "title": "Built for biofabrication",
+                "body": (
+                    "Relate **bioinks, scaffolds, porosity, and culture setup** to how cells "
+                    "**adhere**, **migrate**, and **proliferate** in engineered matrices."
+                ),
+            },
+            {
+                "title": "How it works",
+                "body": (
+                    "**1.** Describe your construct in chat. **2.** We search thousands of "
+                    "PubMed-indexed abstracts. **3.** You get benchmarks, feasibility, and "
+                    "migration or gradient hypotheses. **4.** Optional CC3D run on your sidecar."
+                ),
+            },
+            {
+                "title": "What you get",
+                "body": (
+                    "Charts vs. literature, risk flags, parameter provenance, scaffold geometry "
+                    "preview, and a simulation brief you can execute in the cloud when configured."
+                ),
+            },
+        ]
+        _n = len(_slides)
+        _idx = max(0, min(int(st.session_state.onboarding_slide), _n - 1))
+        st.session_state.onboarding_slide = _idx
 
-        #### How It Works
+        st.markdown("##### Explainer")
+        _cur = _slides[_idx]
+        st.markdown(f"**{_cur['title']}**")
+        st.markdown(_cur["body"])
 
-        1. **Chat Assessment** - Answer questions about your construct parameters
-        2. **Literature Query** - We search 798 PubMed abstracts in our knowledge base
-        3. **Variance Analysis** - Get AI-powered insights with PMID citations
-        4. **Risk Scoring** - See how your protocol compares to published benchmarks
-        5. **Simulation Preview** - Preview what CC3D simulation would predict
-
-        #### What You'll Get
-
-        - **Radar Chart** showing protocol deviation across key parameters
-        - **Risk Scorecard** with color-coded risk flags (green/yellow/red)
-        - **AI Narrative** citing specific PMIDs from the literature
-        - **Parameter Scatter Plot** comparing your construct to published ranges
-        - **CC3D Simulation Brief** (preview - full integration coming Q3 2026)
-        """)
+        _c1, _c2, _c3 = st.columns([1, 2, 1])
+        with _c1:
+            if st.button("Back", key="onb_prev", disabled=_idx <= 0):
+                st.session_state.onboarding_slide = _idx - 1
+                st.rerun()
+        with _c3:
+            if st.button("Next", key="onb_next", disabled=_idx >= _n - 1):
+                st.session_state.onboarding_slide = _idx + 1
+                st.rerun()
+        with _c2:
+            st.caption(f"Step {_idx + 1} of {_n}")
 
         st.divider()
 
-        # Protocol Upload (optional)
-        st.markdown("### Upload Your Protocol (Optional)")
-        uploaded_file = st.file_uploader(
-            "Upload your protocol document",
-            type=["pdf", "docx", "txt"],
-            help="We'll extract construct parameters automatically from your protocol.",
-        )
-        if uploaded_file is not None:
-            try:
-                from core.ingest import (
-                    extract_text_from_pdf, extract_text_from_docx,
-                    extract_text_from_txt, parse_protocol_to_profile,
-                )
-                file_bytes = uploaded_file.read()
-                fname = uploaded_file.name.lower()
-                if fname.endswith(".pdf"):
-                    text = extract_text_from_pdf(file_bytes)
-                elif fname.endswith(".txt"):
-                    text = extract_text_from_txt(file_bytes)
-                else:
-                    text = extract_text_from_docx(file_bytes)
-
-                with st.spinner("Extracting parameters..."):
-                    detected = parse_protocol_to_profile(text)
-
-                # Show extracted parameters
-                non_null = {k: v for k, v in detected.items() if v is not None}
-                if non_null:
-                    st.success(f"Extracted {len(non_null)} parameters from protocol:")
-                    cols = st.columns(2)
-                    for i, (k, v) in enumerate(non_null.items()):
-                        label = k.replace("_", " ").title()
-                        cols[i % 2].markdown(f"**{label}**: {v}")
-                    # Pre-populate session state
-                    for k, v in detected.items():
-                        if v is not None and k in ConstructProfile.model_fields:
-                            setattr(st.session_state.construct_profile, k, v)
-                else:
-                    st.info("No construct parameters detected. The chat will help collect them.")
-
-                # Show extracted text in expander
-                with st.expander("View extracted text"):
-                    st.text(text[:3000] + ("..." if len(text) > 3000 else ""))
-
-            except Exception as e:
-                st.warning(f"Could not parse protocol: {e}")
-
+        # Protocol upload (collapsed for shorter landing page)
+        with st.expander("Optional: upload a protocol (PDF, DOCX, TXT)", expanded=False):
+            uploaded_file = st.file_uploader(
+                "Upload your protocol document",
+                type=["pdf", "docx", "txt"],
+                help="We'll extract construct parameters automatically from your protocol.",
+            )
+            if uploaded_file is not None:
+                try:
+                    from core.ingest import (
+                        extract_text_from_pdf, extract_text_from_docx,
+                        extract_text_from_txt, parse_protocol_to_profile,
+                    )
+                    file_bytes = uploaded_file.read()
+                    fname = uploaded_file.name.lower()
+                    if fname.endswith(".pdf"):
+                        text = extract_text_from_pdf(file_bytes)
+                    elif fname.endswith(".txt"):
+                        text = extract_text_from_txt(file_bytes)
+                    else:
+                        text = extract_text_from_docx(file_bytes)
+            
+                    with st.spinner("Extracting parameters..."):
+                        detected = parse_protocol_to_profile(text)
+            
+                    # Show extracted parameters
+                    non_null = {k: v for k, v in detected.items() if v is not None}
+                    if non_null:
+                        st.success(f"Extracted {len(non_null)} parameters from protocol:")
+                        cols = st.columns(2)
+                        for i, (k, v) in enumerate(non_null.items()):
+                            label = k.replace("_", " ").title()
+                            cols[i % 2].markdown(f"**{label}**: {v}")
+                        # Pre-populate session state
+                        for k, v in detected.items():
+                            if v is not None and k in ConstructProfile.model_fields:
+                                setattr(st.session_state.construct_profile, k, v)
+                    else:
+                        st.info("No construct parameters detected. The chat will help collect them.")
+            
+                    # Show extracted text in expander
+                    with st.expander("View extracted text"):
+                        st.text(text[:3000] + ("..." if len(text) > 3000 else ""))
+            
+                except Exception as e:
+                    st.warning(f"Could not parse protocol: {e}")
+            
         st.divider()
 
         # Application Domain
@@ -592,7 +625,7 @@ def _render_biosim_tab():
         # ========================================================================
 
         st.title("BioSim Copilot")
-        st.subheader("Answer a few questions. Get a literature-grounded variance analysis of your 3D construct.")
+        st.subheader("Answer a few questions. Literature-grounded analysis of your biofabrication construct.")
 
         # Initialize chat chain on first load
         if st.session_state.chain is None:
