@@ -13,8 +13,36 @@ from typing import Callable
 import streamlit as st
 
 from core.action_plan import build_action_checklist, checklist_to_prompt_text
+from core.expand_action_plan import expand_action_plan_narrative
 from core.models import ConstructProfile, VarianceReport
-from core.rag import expand_action_plan_narrative
+
+# region agent log
+def _agent_dbg_import_ok() -> None:
+    import json
+    import time
+    from pathlib import Path
+
+    try:
+        p = Path(__file__).resolve().parent / "debug-579e47.log"
+        line = json.dumps(
+            {
+                "sessionId": "579e47",
+                "timestamp": int(time.time() * 1000),
+                "hypothesisId": "H_fix",
+                "location": "results_tab_renderers.py:module",
+                "message": "expand_import_ok",
+                "data": {"import_from": "core.expand_action_plan"},
+            }
+        )
+        with p.open("a", encoding="utf-8") as f:
+            f.write(line + "\n")
+    except Exception:
+        pass
+
+
+_agent_dbg_import_ok()
+# endregion agent log
+
 from core.viz import build_parameter_scatter, build_radar_chart, build_risk_scorecard
 
 
