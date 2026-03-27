@@ -15,34 +15,6 @@ import streamlit as st
 from core.action_plan import build_action_checklist, checklist_to_prompt_text
 from core.expand_action_plan import expand_action_plan_narrative
 from core.models import ConstructProfile, VarianceReport
-
-# region agent log
-def _agent_dbg_import_ok() -> None:
-    import json
-    import time
-    from pathlib import Path
-
-    try:
-        p = Path(__file__).resolve().parent / "debug-579e47.log"
-        line = json.dumps(
-            {
-                "sessionId": "579e47",
-                "timestamp": int(time.time() * 1000),
-                "hypothesisId": "H_fix",
-                "location": "results_tab_renderers.py:module",
-                "message": "expand_import_ok",
-                "data": {"import_from": "core.expand_action_plan"},
-            }
-        )
-        with p.open("a", encoding="utf-8") as f:
-            f.write(line + "\n")
-    except Exception:
-        pass
-
-
-_agent_dbg_import_ok()
-# endregion agent log
-
 from core.viz import build_parameter_scatter, build_radar_chart, build_risk_scorecard
 
 
@@ -167,148 +139,143 @@ def render_results_feasibility_tab(profile: ConstructProfile, report: VarianceRe
 
 
 def render_results_simulation_tab(profile: ConstructProfile, report: VarianceReport) -> None:
-    col1, col2 = st.columns([60, 40])
+    with st.expander("Benchmarks & narrative", expanded=True):
+        col1, col2 = st.columns([60, 40])
+        with col1:
+            st.plotly_chart(build_radar_chart(report), use_container_width=True)
+        with col2:
+            st.plotly_chart(build_risk_scorecard(report), use_container_width=True)
 
-    with col1:
-        st.plotly_chart(build_radar_chart(report), use_container_width=True)
+        st.markdown('<div class="narrative-container">', unsafe_allow_html=True)
+        st.markdown("### Analysis summary")
+        st.markdown(report.ai_narrative)
 
-    with col2:
-        st.plotly_chart(build_risk_scorecard(report), use_container_width=True)
+        if report.supporting_pmids:
+            pmid_links = ", ".join(
+                [f"[{pmid}](https://pubmed.ncbi.nlm.nih.gov/{pmid}/)" for pmid in report.supporting_pmids]
+            )
+            st.markdown(
+                f'<p style="color: #888; font-size: 0.9em; margin-top: 1rem;">'
+                f'<strong>Supporting literature:</strong> {pmid_links}</p>',
+                unsafe_allow_html=True,
+            )
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown('<div class="narrative-container">', unsafe_allow_html=True)
-    st.markdown("### 📊 Analysis Summary")
-    st.markdown(report.ai_narrative)
-
-    if report.supporting_pmids:
-        pmid_links = ", ".join(
-            [f"[{pmid}](https://pubmed.ncbi.nlm.nih.gov/{pmid}/)" for pmid in report.supporting_pmids]
-        )
-        st.markdown(
-            f'<p style="color: #888; font-size: 0.9em; margin-top: 1rem;">'
-            f'<strong>Supporting Literature:</strong> {pmid_links}</p>',
-            unsafe_allow_html=True,
-        )
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    if report.key_references:
-        with st.expander("📚 Source Literature"):
-            for ref in report.key_references:
-                st.markdown(
-                    f"""
-                    **{ref.get('title', 'Untitled')}** ({ref.get('year', 'N/A')})
-                    PMID: [{ref.get('pmid', 'N/A')}](https://pubmed.ncbi.nlm.nih.gov/{ref.get('pmid')})
-                    *{ref.get('relevance_note', 'No note provided')}*
-                    """
-                )
-                st.divider()
-
-    st.plotly_chart(build_parameter_scatter(report), use_container_width=True)
-
-    st.markdown("### 🏗️ Scaffold Geometry")
-
-    scaf_col1, scaf_col2 = st.columns([2, 1])
-    with scaf_col2:
-        scaffold_arch = st.selectbox(
-            "Architecture",
-            ["gyroid", "schwarz_p", "diamond", "lidinoid", "woodpile", "grid", "custom_stl"],
-            index=0,
-            key="scaf_arch_sim",
-        )
-        scaf_pore = st.slider("Pore size (um)", 100, 800, 300, key="scaf_pore_sim")
-        scaf_porosity = st.slider("Porosity (%)", 30, 90, 70, key="scaf_porosity_sim")
-
-        stl_file = st.file_uploader("Upload STL", type=["stl", "obj"], key="stl_upload_sim")
-
-        if scaffold_arch != "custom_stl" or stl_file is not None:
-            generate_scaffold = st.button("Generate Preview", key="gen_scaffold_sim", use_container_width=True)
-        else:
-            generate_scaffold = False
-
-    with scaf_col1:
-        if generate_scaffold:
-            try:
-                from core.scaffold_geometry import (
-                    generate_filament_lattice,
-                    generate_tpms,
-                    import_stl,
-                    preview_scaffold,
-                )
-
-                if stl_file is not None:
-                    mesh = import_stl(stl_file.read())
-                elif scaffold_arch in ("woodpile", "grid"):
-                    mesh = generate_filament_lattice(
-                        strand_diameter_um=scaf_pore * 0.5,
-                        strand_spacing_um=scaf_pore,
-                        pattern=scaffold_arch,
+        if report.key_references:
+            with st.expander("Source literature"):
+                for ref in report.key_references:
+                    st.markdown(
+                        f"""
+                        **{ref.get('title', 'Untitled')}** ({ref.get('year', 'N/A')})
+                        PMID: [{ref.get('pmid', 'N/A')}](https://pubmed.ncbi.nlm.nih.gov/{ref.get('pmid')})
+                        *{ref.get('relevance_note', 'No note provided')}*
+                        """
                     )
-                else:
-                    mesh = generate_tpms(
-                        topology=scaffold_arch,
-                        pore_size_um=scaf_pore,
-                        porosity_pct=scaf_porosity,
+                    st.divider()
+
+        st.plotly_chart(build_parameter_scatter(report), use_container_width=True)
+
+    with st.expander("Scaffold geometry", expanded=False):
+        scaf_col1, scaf_col2 = st.columns([2, 1])
+        with scaf_col2:
+            scaffold_arch = st.selectbox(
+                "Architecture",
+                ["gyroid", "schwarz_p", "diamond", "lidinoid", "woodpile", "grid", "custom_stl"],
+                index=0,
+                key="scaf_arch_sim",
+            )
+            scaf_pore = st.slider("Pore size (um)", 100, 800, 300, key="scaf_pore_sim")
+            scaf_porosity = st.slider("Porosity (%)", 30, 90, 70, key="scaf_porosity_sim")
+
+            stl_file = st.file_uploader("Upload STL", type=["stl", "obj"], key="stl_upload_sim")
+
+            if scaffold_arch != "custom_stl" or stl_file is not None:
+                generate_scaffold = st.button("Generate Preview", key="gen_scaffold_sim", use_container_width=True)
+            else:
+                generate_scaffold = False
+
+        with scaf_col1:
+            if generate_scaffold:
+                try:
+                    from core.scaffold_geometry import (
+                        generate_filament_lattice,
+                        generate_tpms,
+                        import_stl,
+                        preview_scaffold,
                     )
-                st.session_state["scaffold_mesh"] = mesh
-                fig_scaf = preview_scaffold(mesh)
+
+                    if stl_file is not None:
+                        mesh = import_stl(stl_file.read())
+                    elif scaffold_arch in ("woodpile", "grid"):
+                        mesh = generate_filament_lattice(
+                            strand_diameter_um=scaf_pore * 0.5,
+                            strand_spacing_um=scaf_pore,
+                            pattern=scaffold_arch,
+                        )
+                    else:
+                        mesh = generate_tpms(
+                            topology=scaffold_arch,
+                            pore_size_um=scaf_pore,
+                            porosity_pct=scaf_porosity,
+                        )
+                    st.session_state["scaffold_mesh"] = mesh
+                    fig_scaf = preview_scaffold(mesh)
+                    st.plotly_chart(fig_scaf, use_container_width=True)
+
+                    profile.scaffold_architecture = scaffold_arch
+                    profile.pore_size_um = scaf_pore
+                    profile.porosity_percent = scaf_porosity
+                except Exception as e:
+                    st.warning(f"Scaffold generation error: {e}")
+            elif "scaffold_mesh" in st.session_state:
+                from core.scaffold_geometry import preview_scaffold
+
+                fig_scaf = preview_scaffold(st.session_state["scaffold_mesh"])
                 st.plotly_chart(fig_scaf, use_container_width=True)
-
-                profile.scaffold_architecture = scaffold_arch
-                profile.pore_size_um = scaf_pore
-                profile.porosity_percent = scaf_porosity
-            except Exception as e:
-                st.warning(f"Scaffold generation error: {e}")
-        elif "scaffold_mesh" in st.session_state:
-            from core.scaffold_geometry import preview_scaffold
-
-            fig_scaf = preview_scaffold(st.session_state["scaffold_mesh"])
-            st.plotly_chart(fig_scaf, use_container_width=True)
-        else:
-            st.info("Select scaffold parameters and click Generate Preview.")
+            else:
+                st.info("Select scaffold parameters and click Generate Preview.")
 
     if profile.stiffness_kpa and profile.cell_density_per_ml:
         from core.fem_solver import predict_scaffold_deformation, predict_stress_distribution
 
-        st.markdown("### 🏗️ Scaffold Mechanics (FEA)")
-
-        fea_result = predict_scaffold_deformation(
-            stiffness_kpa=profile.stiffness_kpa,
-            cell_density_per_ml=profile.cell_density_per_ml,
-        )
-
-        fea_col1, fea_col2, fea_col3 = st.columns(3)
-        with fea_col1:
-            st.metric("Max Deformation", f"{fea_result['max_deformation_um']:.1f} um")
-        with fea_col2:
-            st.metric("Strain", f"{fea_result['strain_percent']:.2f}%")
-        with fea_col3:
-            risk = fea_result["failure_risk"]
-            risk_color = {"low": "#00ff88", "medium": "#ffd700", "high": "#ff4444"}.get(risk, "#888")
-            st.markdown(
-                f'<p style="font-size: 0.85em; color: #888;">Failure Risk</p>'
-                f'<p style="font-size: 1.5em; font-weight: bold; color: {risk_color};">{risk.upper()}</p>',
-                unsafe_allow_html=True,
-            )
-
-        st.markdown(
-            f'<div style="border: 1px solid #444; padding: 0.8rem; border-radius: 0.5rem; '
-            f'background: #1a1a1a; margin: 0.5rem 0;">'
-            f'<span style="color: #aaa;">{fea_result["recommendation"]}</span></div>',
-            unsafe_allow_html=True,
-        )
-
-        if profile.porosity_percent:
-            stress_result = predict_stress_distribution(
+        with st.expander("Scaffold mechanics (FEA)", expanded=False):
+            fea_result = predict_scaffold_deformation(
                 stiffness_kpa=profile.stiffness_kpa,
-                porosity_percent=profile.porosity_percent,
+                cell_density_per_ml=profile.cell_density_per_ml,
             )
+
+            fea_col1, fea_col2, fea_col3 = st.columns(3)
+            with fea_col1:
+                st.metric("Max Deformation", f"{fea_result['max_deformation_um']:.1f} um")
+            with fea_col2:
+                st.metric("Strain", f"{fea_result['strain_percent']:.2f}%")
+            with fea_col3:
+                risk = fea_result["failure_risk"]
+                risk_color = {"low": "#00ff88", "medium": "#ffd700", "high": "#ff4444"}.get(risk, "#888")
+                st.markdown(
+                    f'<p style="font-size: 0.85em; color: #888;">Failure Risk</p>'
+                    f'<p style="font-size: 1.5em; font-weight: bold; color: {risk_color};">{risk.upper()}</p>',
+                    unsafe_allow_html=True,
+                )
+
             st.markdown(
                 f'<div style="border: 1px solid #444; padding: 0.8rem; border-radius: 0.5rem; '
                 f'background: #1a1a1a; margin: 0.5rem 0;">'
-                f'<span style="color: #aaa;">{stress_result["recommendation"]}</span></div>',
+                f'<span style="color: #aaa;">{fea_result["recommendation"]}</span></div>',
                 unsafe_allow_html=True,
             )
 
-    st.markdown("### 🔬 Simulation Brief — What CC3D Would Predict")
+            if profile.porosity_percent:
+                stress_result = predict_stress_distribution(
+                    stiffness_kpa=profile.stiffness_kpa,
+                    porosity_percent=profile.porosity_percent,
+                )
+                st.markdown(
+                    f'<div style="border: 1px solid #444; padding: 0.8rem; border-radius: 0.5rem; '
+                    f'background: #1a1a1a; margin: 0.5rem 0;">'
+                    f'<span style="color: #aaa;">{stress_result["recommendation"]}</span></div>',
+                    unsafe_allow_html=True,
+                )
 
     if st.session_state.simulation_brief is None:
         try:
@@ -322,13 +289,15 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
     sim_brief = st.session_state.simulation_brief
 
     if sim_brief is not None:
+        st.markdown("### CC3D simulation brief")
+        st.caption("What a CompuCell3D run would target—plus optional cloud execution on your sidecar.")
         st.markdown(
             f'<p style="font-size: 1.2em; font-weight: 500; margin: 1rem 0;">'
             f'{sim_brief["simulation_question"]}</p>',
             unsafe_allow_html=True,
         )
 
-        st.markdown("**Key CC3D Parameters:**")
+        st.markdown("**Key CC3D parameters:**")
         st.code(json.dumps(sim_brief["key_parameters"], indent=2), language="json")
 
         param_sources = sim_brief.get("parameter_sources", {})
@@ -452,67 +421,71 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                 use_container_width=True,
                 help="Set CC3D_API_URL environment variable to your VPS sidecar address.",
             )
+            st.caption(
+                "Cloud CC3D is optional. You can still use **Exports** below for the PDF report "
+                "and a scaffold PNG after you generate a preview."
+            )
     else:
         st.warning("Simulation brief could not be generated. Check your API key and try again.")
 
-    st.divider()
-    export_col1, export_col2 = st.columns(2)
-    with export_col1:
-        try:
-            from core.export import generate_pdf_report
+    with st.expander("Exports (PDF & PNG)", expanded=False):
+        export_col1, export_col2 = st.columns(2)
+        with export_col1:
+            try:
+                from core.export import generate_pdf_report
 
-            pdf_path = generate_pdf_report(report, client_name="")
-            with open(pdf_path, "rb") as f:
-                st.download_button(
-                    "Download PDF Report",
-                    data=f.read(),
-                    file_name=Path(pdf_path).name,
-                    mime="application/pdf",
-                    use_container_width=True,
-                    key="download_pdf_sim_tab",
-                )
-        except Exception as e:
-            st.button(
-                "Download PDF Report",
-                disabled=True,
-                use_container_width=True,
-                key="download_pdf_sim_disabled",
-                help=f"PDF export unavailable: {e}",
-            )
-
-    with export_col2:
-        try:
-            scaffold_mesh = st.session_state.get("scaffold_mesh")
-            if scaffold_mesh:
-                from core.export import export_figure_png
-                from core.scaffold_geometry import preview_scaffold
-
-                viz_fig = preview_scaffold(scaffold_mesh)
-                png_bytes = export_figure_png(viz_fig)
-                st.download_button(
-                    "Download Scaffold Preview (PNG)",
-                    data=png_bytes,
-                    file_name=f"stromalytix_{profile.target_tissue or 'construct'}_scaffold.png",
-                    mime="image/png",
-                    use_container_width=True,
-                    key="download_png_sim_tab",
-                )
-            else:
+                pdf_path = generate_pdf_report(report, client_name="")
+                with open(pdf_path, "rb") as f:
+                    st.download_button(
+                        "Download PDF Report",
+                        data=f.read(),
+                        file_name=Path(pdf_path).name,
+                        mime="application/pdf",
+                        use_container_width=True,
+                        key="download_pdf_sim_tab",
+                    )
+            except Exception as e:
                 st.button(
-                    "Download Scaffold Preview (PNG)",
+                    "Download PDF Report",
                     disabled=True,
                     use_container_width=True,
-                    key="download_png_sim_disabled",
-                    help="Generate a scaffold preview first.",
+                    key="download_pdf_sim_disabled",
+                    help=f"PDF export unavailable: {e}",
                 )
-        except Exception as e:
-            st.button(
-                "Download Scaffold (PNG)",
-                disabled=True,
-                use_container_width=True,
-                key="download_png_sim_err",
-                help=f"PNG export unavailable: {e}",
-            )
+
+        with export_col2:
+            try:
+                scaffold_mesh = st.session_state.get("scaffold_mesh")
+                if scaffold_mesh:
+                    from core.export import export_figure_png
+                    from core.scaffold_geometry import preview_scaffold
+
+                    viz_fig = preview_scaffold(scaffold_mesh)
+                    png_bytes = export_figure_png(viz_fig)
+                    st.download_button(
+                        "Download Scaffold Preview (PNG)",
+                        data=png_bytes,
+                        file_name=f"stromalytix_{profile.target_tissue or 'construct'}_scaffold.png",
+                        mime="image/png",
+                        use_container_width=True,
+                        key="download_png_sim_tab",
+                    )
+                else:
+                    st.button(
+                        "Download Scaffold Preview (PNG)",
+                        disabled=True,
+                        use_container_width=True,
+                        key="download_png_sim_disabled",
+                        help="Generate a scaffold preview first.",
+                    )
+            except Exception as e:
+                st.button(
+                    "Download Scaffold (PNG)",
+                    disabled=True,
+                    use_container_width=True,
+                    key="download_png_sim_err",
+                    help=f"PNG export unavailable: {e}",
+                )
 
 
 def render_results_action_plan_tab(
@@ -530,11 +503,19 @@ def render_results_action_plan_tab(
     if rows:
         import pandas as pd
 
-        st.dataframe(
-            pd.DataFrame(rows),
-            use_container_width=True,
-            hide_index=True,
-        )
+        st.markdown("**Top priorities (first five)**")
+        for i, row in enumerate(rows[:5], start=1):
+            pr = row.get("priority", "")
+            st.markdown(
+                f"{i}. **{row.get('parameter', '')}** ({pr}) — {row.get('what_to_do', '')}  \n"
+                f"_Why:_ {row.get('why', '')[:220]}{'…' if len(row.get('why', '')) > 220 else ''}"
+            )
+        with st.expander("Full checklist (table)", expanded=False):
+            st.dataframe(
+                pd.DataFrame(rows),
+                use_container_width=True,
+                hide_index=True,
+            )
     else:
         st.info(
             "No structured checklist items — your profile aligns well with the curated library. "

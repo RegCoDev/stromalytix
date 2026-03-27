@@ -4,7 +4,6 @@ Stromalytix — BioSim Copilot
 Main Streamlit application for 3D cell culture variance analysis.
 """
 
-import base64
 import csv
 import json
 import os
@@ -26,7 +25,6 @@ def ensure_vectorstore():
 from core.chat import extract_construct_profile, initialize_chat, send_message
 from core.models import ConstructProfile, VarianceReport
 from core.rag import retrieve_benchmarks, synthesize_variance_report
-from core.viz import build_parameter_scatter, build_radar_chart, build_risk_scorecard
 from results_tab_renderers import (
     render_results_action_plan_tab,
     render_results_feasibility_tab,
@@ -157,6 +155,8 @@ def reset_analysis():
     st.session_state.persona = None
     st.session_state.application_domain = None
     st.session_state.onboarding_slide = 0
+    st.session_state.pop("_assess_preview_n", None)
+    st.session_state.pop("_assess_preview_profile", None)
     st.rerun()
 
 
@@ -168,6 +168,68 @@ def save_signup(email: str):
     with open(csv_path, "a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([timestamp, email])
+
+
+def _show_sidebar_debug() -> bool:
+    """Gate debug UI: set SHOW_DEBUG_SIDEBAR=1 in env or Streamlit secrets."""
+    try:
+        if st.secrets.get("SHOW_DEBUG_SIDEBAR", False):
+            return True
+    except Exception:
+        pass
+    return os.environ.get("SHOW_DEBUG_SIDEBAR", "").lower() in ("1", "true", "yes")
+
+
+def _render_results_hero(profile: ConstructProfile, report: VarianceReport) -> None:
+    """Compact value summary above the three result tabs."""
+    st.markdown("#### At a glance")
+    col_a, col_b = st.columns([1, 2])
+    with col_a:
+        try:
+            from core.feasibility import analyse as feasibility_analyse
+
+            feas = feasibility_analyse(profile, report)
+            st.metric("Library fit (feasibility)", feas.overall.replace("_", " ").title())
+        except Exception:
+            st.caption("Feasibility snapshot unavailable.")
+    with col_b:
+        reds = [k for k, v in (report.risk_flags or {}).items() if v == "red"]
+        if reds:
+            shown = ", ".join(k.replace("_", " ") for k in reds[:4])
+            more = f" (+{len(reds) - 4} more)" if len(reds) > 4 else ""
+            st.markdown(f"**Red benchmark flags:** {shown}{more}")
+        else:
+            st.markdown(
+                "**Red benchmark flags:** none — still review **Feasibility** for marginal or aspirational axes."
+            )
+    st.info(
+        "**Next step:** open **Methods & materials plan** for prioritized measurements, sourcing, and signup."
+    )
+    st.divider()
+
+
+def _render_assessment_progress() -> None:
+    """Surface chat depth and handoff rules during assessment."""
+    n = len(st.session_state.messages)
+    st.progress(min(1.0, n / 8.0) if n else 0.0)
+    st.caption(
+        f"**{n}/8 messages** — usual minimum before automatic analysis. "
+        "When your profile is complete, we advance after your next assistant reply."
+    )
+    st.caption(
+        "Need results sooner? Use **Run analysis now** in the sidebar (demos or thin transcripts)."
+    )
+    if n >= 8:
+        if st.session_state.get("_assess_preview_n") != n:
+            conv = "\n".join(f"{m['role']}: {m['content']}" for m in st.session_state.messages)
+            st.session_state["_assess_preview_profile"] = extract_construct_profile(conv)
+            st.session_state["_assess_preview_n"] = n
+        prev = st.session_state.get("_assess_preview_profile")
+        if prev is not None and not is_profile_complete(prev):
+            st.warning(
+                "Enough messages, but the construct profile still looks incomplete. "
+                "Keep chatting, or use **Run analysis now** in the sidebar."
+            )
 
 
 def is_profile_complete(profile: ConstructProfile) -> bool:
@@ -305,20 +367,20 @@ with st.sidebar:
     st.progress(progress_pct)
     st.caption(f"{completed_count}/{total_count} steps complete")
 
-    # Checklist
+    # Checklist (plain markdown for readability)
     for step_name, completed in steps:
-        icon = "[OK]" if completed else "[ ]"
-        color = "#00ff88" if completed else "#666666"
-        st.markdown(f'<p style="color: {color}; font-size: 0.85em; margin: 0.2rem 0;">{icon} {step_name}</p>', unsafe_allow_html=True)
+        mark = "✓" if completed else "○"
+        st.markdown(f"{mark} **{step_name}**" if completed else f"{mark} {step_name}")
 
-    # Debug info
-    with st.expander("Debug Info", expanded=False):
-        st.caption(f"Phase: {st.session_state.phase}")
-        st.caption(f"Docs in session: {len(st.session_state.docs)}")
-        st.caption(f"Profile exists: {st.session_state.construct_profile is not None}")
-        st.caption(f"Report exists: {st.session_state.variance_report is not None}")
-        st.caption(f"Sim brief exists: {st.session_state.simulation_brief is not None}")
-        st.caption(f"Messages: {len(st.session_state.messages)}")
+    # Debug info (off by default — set SHOW_DEBUG_SIDEBAR in secrets or env)
+    if _show_sidebar_debug():
+        with st.expander("Debug info", expanded=False):
+            st.caption(f"Phase: {st.session_state.phase}")
+            st.caption(f"Docs in session: {len(st.session_state.docs)}")
+            st.caption(f"Profile exists: {st.session_state.construct_profile is not None}")
+            st.caption(f"Report exists: {st.session_state.variance_report is not None}")
+            st.caption(f"Sim brief exists: {st.session_state.simulation_brief is not None}")
+            st.caption(f"Messages: {len(st.session_state.messages)}")
 
     st.divider()
 
@@ -402,11 +464,11 @@ with st.sidebar:
     if st.button("🔄 Reset Analysis", use_container_width=True):
         reset_analysis()
 
-    # Debug: Force analysis button
+    # Early analysis (sidebar) — same path as sparse demos
     if st.session_state.phase == "assessment" and len(st.session_state.messages) > 0:
         st.divider()
-        st.caption("🔧 Debug Tools")
-        if st.button("⚡ Force Analysis →", use_container_width=True, type="secondary"):
+        st.caption("Advanced")
+        if st.button("Run analysis now", use_container_width=True, type="secondary", help="Skip waiting for 8 messages / full profile. Uses best-effort extraction from the chat so far."):
             # Create a minimal profile from conversation
             full_conversation = "\n".join([
                 f"{msg['role']}: {msg['content']}"
@@ -564,14 +626,14 @@ def _render_biosim_tab():
 
         domain_col1, domain_col2 = st.columns(2)
         with domain_col1:
-            if st.button("🧬 Tissue Engineering", use_container_width=True, type="secondary"):
+            if st.button("🧬 Tissue Engineering", use_container_width=True, type="primary"):
                 st.session_state.application_domain = "tissue_engineering"
                 if st.session_state.construct_profile:
                     st.session_state.construct_profile.application_domain = "tissue_engineering"
                 st.rerun()
             st.caption("Regenerative medicine, disease models, drug screening")
         with domain_col2:
-            if st.button("🥩 Cellular Agriculture", use_container_width=True, type="secondary"):
+            if st.button("🥩 Cellular Agriculture", use_container_width=True, type="primary"):
                 st.session_state.application_domain = "cellular_agriculture"
                 if st.session_state.construct_profile:
                     st.session_state.construct_profile.application_domain = "cellular_agriculture"
@@ -579,30 +641,31 @@ def _render_biosim_tab():
             st.caption("Cultivated meat, structured protein, fat tissue")
 
         if not st.session_state.get("application_domain"):
+            st.info("Choose **Tissue Engineering** or **Cellular Agriculture** above to continue.")
             st.stop()
 
         st.divider()
 
         # Persona Selection
-        st.markdown("### 👤 Select Your Role")
-        st.markdown("Help us tailor the experience to your workflow:")
+        st.markdown("### 👤 Select your role")
+        st.caption("We use this to tune questions—not to gate science.")
 
         if st.session_state.application_domain == "cellular_agriculture":
             col1, col2, col3 = st.columns(3)
             with col1:
-                if st.button("🎓 Academic / Research", use_container_width=True, type="secondary"):
+                if st.button("🎓 Academic / Research", use_container_width=True, type="primary"):
                     st.session_state.persona = "academic"
                     st.session_state.phase = "assessment"
                     st.rerun()
                 st.caption("University labs, food science research")
             with col2:
-                if st.button("🏭 Cell Ag Startup", use_container_width=True, type="secondary"):
+                if st.button("🏭 Cell Ag Startup", use_container_width=True, type="primary"):
                     st.session_state.persona = "cellag_startup"
                     st.session_state.phase = "assessment"
                     st.rerun()
                 st.caption("Cultivated meat, scale-up, product development")
             with col3:
-                if st.button("🔬 Ingredient / Equipment", use_container_width=True, type="secondary"):
+                if st.button("🔬 Ingredient / Equipment", use_container_width=True, type="primary"):
                     st.session_state.persona = "hardware_service"
                     st.session_state.phase = "assessment"
                     st.rerun()
@@ -610,19 +673,19 @@ def _render_biosim_tab():
         else:
             col1, col2, col3 = st.columns(3)
             with col1:
-                if st.button("🎓 Academic Researcher", use_container_width=True, type="secondary"):
+                if st.button("🎓 Academic Researcher", use_container_width=True, type="primary"):
                     st.session_state.persona = "academic"
                     st.session_state.phase = "assessment"
                     st.rerun()
                 st.caption("University labs, research institutes")
             with col2:
-                if st.button("💊 Pharma / Biotech", use_container_width=True, type="secondary"):
+                if st.button("💊 Pharma / Biotech", use_container_width=True, type="primary"):
                     st.session_state.persona = "pharma_biotech"
                     st.session_state.phase = "assessment"
                     st.rerun()
                 st.caption("Drug discovery, therapeutic development")
             with col3:
-                if st.button("🔬 Hardware / Service Provider", use_container_width=True, type="secondary"):
+                if st.button("🔬 Hardware / Service Provider", use_container_width=True, type="primary"):
                     st.session_state.persona = "hardware_service"
                     st.session_state.phase = "assessment"
                     st.rerun()
@@ -633,8 +696,11 @@ def _render_biosim_tab():
         # PHASE: ASSESSMENT (Chat Interface)
         # ========================================================================
 
-        st.title("BioSim Copilot")
-        st.subheader("Answer a few questions. Literature-grounded analysis of your biofabrication construct.")
+        st.title("Stromalytix")
+        st.caption("BioSim Copilot — short chat, then literature-backed benchmarks and optional simulation.")
+        st.subheader("Describe your construct; we’ll benchmark it against the knowledge base.")
+
+        _render_assessment_progress()
 
         # Initialize chat chain on first load
         if st.session_state.chain is None:
@@ -839,20 +905,17 @@ def _render_biosim_tab():
         report = st.session_state.variance_report
 
         st.title(f"Analysis: {profile.target_tissue or 'Your Construct'}")
-        st.caption(
-            "Three pillars: feasibility evidence, simulation views, and a methods & materials plan."
-        )
+        _render_results_hero(profile, report)
 
-        tab_feas, tab_sim, tab_plan = st.tabs(
-            ["Feasibility", "Simulation", "Methods & materials plan"]
+        tab_feas, tab_sim, tab_methods = st.tabs(
+            ["Feasibility & migration", "Simulation & exports", "Methods & materials plan"]
         )
         with tab_feas:
             render_results_feasibility_tab(profile, report)
         with tab_sim:
             render_results_simulation_tab(profile, report)
-        with tab_plan:
+        with tab_methods:
             render_results_action_plan_tab(profile, report, save_signup)
-
 
 # ============================================================================
 # Render
