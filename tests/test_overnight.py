@@ -2,7 +2,7 @@
 Stromalytix Overnight Test Suite
 
 Validates core cell-ECM interaction modeling functionality:
-- Onboarding phase initialization
+- Assessment-first session defaults
 - RAG pipeline (vectorstore, retrieval, benchmarks)
 - Simulation brief confidence tagging
 - CC3D parameters knowledge base
@@ -20,7 +20,7 @@ from core.rag import load_vectorstore, retrieve_benchmarks, generate_simulation_
 
 
 # ============================================================================
-# TEST 1 — Onboarding Phase
+# TEST 1 — Session defaults (chat-first)
 # ============================================================================
 
 def test_session_state_defaults():
@@ -35,8 +35,8 @@ def test_session_state_defaults():
     assert app_path.exists(), "app.py not found"
 
     app_content = app_path.read_text(encoding='utf-8')
-    assert 'st.session_state.phase = "onboarding"' in app_content, \
-        "Default phase should be 'onboarding'"
+    assert 'st.session_state.phase = "assessment"' in app_content, \
+        "Default phase should be 'assessment' (chat-first)"
     assert 'if "construct_profile" not in st.session_state:' in app_content, \
         "Session state should initialize construct_profile"
 
@@ -454,7 +454,7 @@ if __name__ == "__main__":
     print("=" * 70)
     print("\nRun with: uv run pytest tests/test_overnight.py -v --tb=short\n")
     print("Expected baseline (before overnight work):")
-    print("  PASS: TEST 1 (Onboarding phase)")
+    print("  PASS: TEST 1 (Session defaults)")
     print("  PASS: TEST 2 (RAG pipeline)")
     print("  SKIP: TEST 3 (Confidence tagging - to be implemented)")
     print("  SKIP: TEST 4 (CC3D params KB - to be created)")
