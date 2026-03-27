@@ -27,6 +27,11 @@ from core.chat import extract_construct_profile, initialize_chat, send_message
 from core.models import ConstructProfile, VarianceReport
 from core.rag import retrieve_benchmarks, synthesize_variance_report
 from core.viz import build_parameter_scatter, build_radar_chart, build_risk_scorecard
+from results_tab_renderers import (
+    render_results_action_plan_tab,
+    render_results_feasibility_tab,
+    render_results_simulation_tab,
+)
 
 # Page configuration
 st.set_page_config(
@@ -123,6 +128,9 @@ if "docs" not in st.session_state:
 if "simulation_brief" not in st.session_state:
     st.session_state.simulation_brief = None
 
+if "action_plan_narrative" not in st.session_state:
+    st.session_state.action_plan_narrative = ""
+
 if "phase" not in st.session_state:
     st.session_state.phase = "onboarding"
 
@@ -143,6 +151,7 @@ def reset_analysis():
     st.session_state.construct_profile = None
     st.session_state.variance_report = None
     st.session_state.simulation_brief = None
+    st.session_state.action_plan_narrative = ""
     st.session_state.docs = []
     st.session_state.phase = "onboarding"
     st.session_state.persona = None
@@ -813,6 +822,7 @@ def _render_biosim_tab():
                 docs
             )
             st.session_state.variance_report = variance_report
+            st.session_state.action_plan_narrative = ""
             print(f"[ANALYZING] Variance report generated successfully")
 
             # Always move to results
@@ -828,472 +838,20 @@ def _render_biosim_tab():
         profile = st.session_state.construct_profile
         report = st.session_state.variance_report
 
-        # Header
         st.title(f"Analysis: {profile.target_tissue or 'Your Construct'}")
-
-        # ── Feasibility Analysis (top of results) ──
-        st.markdown("### Feasibility Analysis")
-        st.caption("Cross-referencing your protocol against the literature parameter library.")
-        try:
-            from core.feasibility import analyse as feasibility_analyse
-            feas = feasibility_analyse(profile, report)
-
-            tier_color = {
-                "feasible": "#00ff88",
-                "marginal": "#ffd700",
-                "aspirational": "#ff4444",
-            }
-
-            overall_color = tier_color.get(feas.overall, "#888")
-            st.markdown(
-                f'<p style="font-size:1.1em;">Overall assessment: '
-                f'<strong style="color:{overall_color};">{feas.overall.upper()}</strong></p>',
-                unsafe_allow_html=True,
-            )
-
-            for tier_name, items, color in [
-                ("Feasible — literature-backed", feas.feasible, tier_color["feasible"]),
-                ("Marginal — partial data", feas.marginal, tier_color["marginal"]),
-                ("Aspirational — limited / no data", feas.aspirational, tier_color["aspirational"]),
-            ]:
-                if not items:
-                    continue
-                st.markdown(
-                    f'<p style="color:{color}; font-weight:600; margin-top:0.8rem;">{tier_name} '
-                    f'({len(items)})</p>',
-                    unsafe_allow_html=True,
-                )
-                for it in items:
-                    detail_html = f'<span style="color:#e0e0e0;">{it.detail}</span>'
-                    if it.suggestion:
-                        detail_html += (
-                            f'<br><span style="color:#aaa; font-style:italic;">'
-                            f'Suggestion: {it.suggestion}</span>'
-                        )
-                    st.markdown(
-                        f'<div style="border-left:3px solid {color}; padding:0.4rem 0.8rem; '
-                        f'margin:0.3rem 0; background:#111;">'
-                        f'<strong style="color:{color};">{it.axis}</strong><br>'
-                        f'{detail_html}</div>',
-                        unsafe_allow_html=True,
-                    )
-        except Exception as e:
-            st.warning(f"Feasibility analysis unavailable: {e}")
-
-        # ── Migration & Gradient Insights ──
-        st.markdown("### Migration & Gradient Hypotheses")
         st.caption(
-            "How fabricated and spontaneous gradients are expected to "
-            "influence cell migration in this construct."
-        )
-        try:
-            from core.migration_insights import analyse as migration_analyse
-            mig_rpt = migration_analyse(profile)
-
-            category_icons = {
-                "Spontaneous O2 Gradient": "🫁",
-                "Nutrient / Waste Gradients": "🧪",
-                "Fabricated / Emergent Stiffness Gradient": "🔧",
-                "Contact Guidance (Geometric)": "📐",
-                "Migration Kinetics": "🏃",
-                "Degradation-Driven Migration": "♻️",
-            }
-            conf_badge = {
-                "high": ("🟢", "#00ff88"),
-                "medium": ("🟡", "#ffd700"),
-                "low": ("🔴", "#ff4444"),
-            }
-
-            for cat, insights in mig_rpt.by_category.items():
-                icon = category_icons.get(cat, "🔬")
-                st.markdown(
-                    f'<p style="font-weight:600; font-size:1.05em; margin-top:1rem;">'
-                    f'{icon} {cat}</p>',
-                    unsafe_allow_html=True,
-                )
-                for ins in insights:
-                    badge_char, badge_color = conf_badge.get(ins.confidence, ("⚪", "#888"))
-                    source_html = ""
-                    if ins.sources:
-                        links = ", ".join(
-                            f'<a href="https://doi.org/{d}" style="color:#4a9eff;">{d}</a>'
-                            for d in ins.sources if d
-                        )
-                        if links:
-                            source_html = f'<br><span style="color:#666; font-size:0.85em;">Sources: {links}</span>'
-                    st.markdown(
-                        f'<div style="border-left:3px solid #333; padding:0.5rem 0.8rem; '
-                        f'margin:0.3rem 0; background:#0d0d0d;">'
-                        f'<strong style="color:#e0e0e0;">{ins.headline}</strong> '
-                        f'<span style="color:{badge_color}; font-size:0.85em;">{badge_char} {ins.confidence}</span>'
-                        f'<br><span style="color:#aaa; font-size:0.92em;">{ins.detail}</span>'
-                        f'{source_html}</div>',
-                        unsafe_allow_html=True,
-                    )
-
-            if not mig_rpt.insights:
-                st.info("Insufficient data to generate migration hypotheses. "
-                        "Specify cell types, scaffold material, and dimensions.")
-        except Exception as e:
-            st.warning(f"Migration analysis unavailable: {e}")
-
-        st.divider()
-
-        # Row 1: Radar chart + Risk scorecard
-        col1, col2 = st.columns([60, 40])
-
-        with col1:
-            st.plotly_chart(
-                build_radar_chart(report),
-                use_container_width=True
-            )
-
-        with col2:
-            st.plotly_chart(
-                build_risk_scorecard(report),
-                use_container_width=True
-            )
-
-        # Row 2: AI Narrative
-        st.markdown('<div class="narrative-container">', unsafe_allow_html=True)
-        st.markdown("### 📊 Analysis Summary")
-        st.markdown(report.ai_narrative)
-
-        if report.supporting_pmids:
-            pmid_links = ", ".join([
-                f"[{pmid}](https://pubmed.ncbi.nlm.nih.gov/{pmid}/)"
-                for pmid in report.supporting_pmids
-            ])
-            st.markdown(
-                f'<p style="color: #888; font-size: 0.9em; margin-top: 1rem;">'
-                f'<strong>Supporting Literature:</strong> {pmid_links}</p>',
-                unsafe_allow_html=True
-            )
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # Key References (Task 3)
-        if report.key_references:
-            with st.expander("📚 Source Literature"):
-                for ref in report.key_references:
-                    st.markdown(f"""
-                    **{ref.get('title', 'Untitled')}** ({ref.get('year', 'N/A')})
-                    PMID: [{ref.get('pmid', 'N/A')}](https://pubmed.ncbi.nlm.nih.gov/{ref.get('pmid')})
-                    *{ref.get('relevance_note', 'No note provided')}*
-                    """)
-                    st.divider()
-
-        # Row 3: Parameter scatter
-        st.plotly_chart(
-            build_parameter_scatter(report),
-            use_container_width=True
+            "Three pillars: feasibility evidence, simulation views, and a methods & materials plan."
         )
 
-        # Scaffold Geometry Preview
-        st.markdown("### 🏗️ Scaffold Geometry")
-
-        scaf_col1, scaf_col2 = st.columns([2, 1])
-        with scaf_col2:
-            scaffold_arch = st.selectbox(
-                "Architecture",
-                ["gyroid", "schwarz_p", "diamond", "lidinoid", "woodpile", "grid", "custom_stl"],
-                index=0,
-                key="scaf_arch",
-            )
-            scaf_pore = st.slider("Pore size (um)", 100, 800, 300, key="scaf_pore")
-            scaf_porosity = st.slider("Porosity (%)", 30, 90, 70, key="scaf_porosity")
-
-            stl_file = st.file_uploader("Upload STL", type=["stl", "obj"], key="stl_upload")
-
-            if scaffold_arch != "custom_stl" or stl_file is not None:
-                generate_scaffold = st.button("Generate Preview", key="gen_scaffold", use_container_width=True)
-            else:
-                generate_scaffold = False
-
-        with scaf_col1:
-            if generate_scaffold:
-                try:
-                    from core.scaffold_geometry import (
-                        generate_tpms, generate_filament_lattice,
-                        import_stl, preview_scaffold,
-                    )
-                    if stl_file is not None:
-                        mesh = import_stl(stl_file.read())
-                    elif scaffold_arch in ("woodpile", "grid"):
-                        mesh = generate_filament_lattice(
-                            strand_diameter_um=scaf_pore * 0.5,
-                            strand_spacing_um=scaf_pore,
-                            pattern=scaffold_arch,
-                        )
-                    else:
-                        mesh = generate_tpms(
-                            topology=scaffold_arch,
-                            pore_size_um=scaf_pore,
-                            porosity_pct=scaf_porosity,
-                        )
-                    st.session_state["scaffold_mesh"] = mesh
-                    fig_scaf = preview_scaffold(mesh)
-                    st.plotly_chart(fig_scaf, use_container_width=True)
-
-                    # Update profile
-                    profile.scaffold_architecture = scaffold_arch
-                    profile.pore_size_um = scaf_pore
-                    profile.porosity_percent = scaf_porosity
-                except Exception as e:
-                    st.warning(f"Scaffold generation error: {e}")
-            elif "scaffold_mesh" in st.session_state:
-                from core.scaffold_geometry import preview_scaffold
-                fig_scaf = preview_scaffold(st.session_state["scaffold_mesh"])
-                st.plotly_chart(fig_scaf, use_container_width=True)
-            else:
-                st.info("Select scaffold parameters and click Generate Preview.")
-
-        # Row 3.75: Scaffold Mechanics (FEA)
-        if profile.stiffness_kpa and profile.cell_density_per_ml:
-            from core.fem_solver import predict_scaffold_deformation, predict_stress_distribution
-
-            st.markdown("### 🏗️ Scaffold Mechanics (FEA)")
-
-            fea_result = predict_scaffold_deformation(
-                stiffness_kpa=profile.stiffness_kpa,
-                cell_density_per_ml=profile.cell_density_per_ml,
-            )
-
-            fea_col1, fea_col2, fea_col3 = st.columns(3)
-            with fea_col1:
-                st.metric("Max Deformation", f"{fea_result['max_deformation_um']:.1f} um")
-            with fea_col2:
-                st.metric("Strain", f"{fea_result['strain_percent']:.2f}%")
-            with fea_col3:
-                risk = fea_result["failure_risk"]
-                risk_color = {"low": "#00ff88", "medium": "#ffd700", "high": "#ff4444"}.get(risk, "#888")
-                st.markdown(
-                    f'<p style="font-size: 0.85em; color: #888;">Failure Risk</p>'
-                    f'<p style="font-size: 1.5em; font-weight: bold; color: {risk_color};">{risk.upper()}</p>',
-                    unsafe_allow_html=True,
-                )
-
-            st.markdown(
-                f'<div style="border: 1px solid #444; padding: 0.8rem; border-radius: 0.5rem; '
-                f'background: #1a1a1a; margin: 0.5rem 0;">'
-                f'<span style="color: #aaa;">{fea_result["recommendation"]}</span></div>',
-                unsafe_allow_html=True,
-            )
-
-            if profile.porosity_percent:
-                stress_result = predict_stress_distribution(
-                    stiffness_kpa=profile.stiffness_kpa,
-                    porosity_percent=profile.porosity_percent,
-                )
-                st.markdown(
-                    f'<div style="border: 1px solid #444; padding: 0.8rem; border-radius: 0.5rem; '
-                    f'background: #1a1a1a; margin: 0.5rem 0;">'
-                    f'<span style="color: #aaa;">{stress_result["recommendation"]}</span></div>',
-                    unsafe_allow_html=True,
-                )
-
-        # Row 4: CC3D Simulation Brief (Task 6)
-        st.markdown("### 🔬 Simulation Brief — What CC3D Would Predict")
-
-        # Generate simulation brief (cache in session state)
-        if st.session_state.simulation_brief is None:
-            try:
-                from core.rag import generate_simulation_brief
-                st.session_state.simulation_brief = generate_simulation_brief(profile, report)
-            except Exception as e:
-                st.error(f"Could not generate simulation brief: {e}")
-                st.session_state.simulation_brief = None
-
-        sim_brief = st.session_state.simulation_brief
-
-        if sim_brief is not None:
-            # Simulation question
-            st.markdown(f'<p style="font-size: 1.2em; font-weight: 500; margin: 1rem 0;">{sim_brief["simulation_question"]}</p>', unsafe_allow_html=True)
-
-            # Key parameters as code block
-            st.markdown("**Key CC3D Parameters:**")
-            st.code(json.dumps(sim_brief["key_parameters"], indent=2), language="json")
-
-            # Parameter source table
-            param_sources = sim_brief.get("parameter_sources", {})
-            if param_sources:
-                st.markdown("**Parameter Provenance:**")
-                source_rows = []
-                for pname, info in param_sources.items():
-                    src = info.get("source", "unknown")
-                    conf = info.get("confidence", "?")
-                    doi = info.get("doi") or ""
-                    if conf == "high":
-                        conf_display = "🟢 high"
-                    elif conf == "medium":
-                        conf_display = "🟡 medium"
-                    else:
-                        conf_display = "🔴 low"
-                    source_rows.append({
-                        "Parameter": pname.replace("_", " ").title(),
-                        "Source": src,
-                        "Confidence": conf_display,
-                        "DOI": doi,
-                    })
-                if source_rows:
-                    import pandas as pd
-                    st.dataframe(
-                        pd.DataFrame(source_rows),
-                        use_container_width=True,
-                        hide_index=True,
-                    )
-
-            # Predicted outcomes
-            st.markdown("**Predicted Observations:**")
-            for i, outcome in enumerate(sim_brief["predicted_outcomes"], 1):
-                st.markdown(f"{i}. {outcome}")
-
-            # Risk prediction (red border)
-            st.markdown(
-                f'<div style="border: 2px solid #ff4444; padding: 1rem; border-radius: 0.5rem; background: #1a0a0a; margin: 1rem 0;">'
-                f'<strong style="color: #ff4444;">⚠ Risk Prediction:</strong><br>{sim_brief["risk_prediction"]}'
-                f'</div>',
-                unsafe_allow_html=True
-            )
-
-            # Validation experiment (green border)
-            st.markdown(
-                f'<div style="border: 2px solid #00ff88; padding: 1rem; border-radius: 0.5rem; background: #0a1a0a; margin: 1rem 0;">'
-                f'<strong style="color: #00ff88;">✓ Validation Experiment:</strong><br>{sim_brief["validation_experiment"]}'
-                f'</div>',
-                unsafe_allow_html=True
-            )
-
-            # CC3D Cloud Execution
-            from core.cc3d_runner import run_simulation, CC3D_API_URL
-
-            if CC3D_API_URL:
-                if st.button("⚡ Run CC3D Simulation (Cloud)", use_container_width=True):
-                    with st.spinner("Running CC3D simulation on cloud..."):
-                        cc3d_result = run_simulation(sim_brief)
-                        if cc3d_result["success"]:
-                            st.success(f"CC3D completed: {cc3d_result['mcs_completed']} MCS in {cc3d_result['duration_seconds']}s")
-                            if cc3d_result.get("output"):
-                                st.code(cc3d_result["output"], language="text")
-
-                            vtk_frames = cc3d_result.get("vtk_frames", [])
-                            if vtk_frames:
-                                from core.cc3d_viz import (
-                                    parse_vtk_from_bytes, parse_vtk_scalar_field,
-                                    get_default_type_map, render_unified_scene,
-                                )
-
-                                type_map = get_default_type_map(sim_brief.get("key_parameters", sim_brief))
-
-                                cell_frames = [f for f in vtk_frames if f.get("field_type") == "cell"]
-                                o2_frames = [f for f in vtk_frames if f.get("field_type") == "o2"]
-
-                                display_frames = cell_frames if cell_frames else vtk_frames
-                                frame_idx = len(display_frames) - 1
-                                if len(display_frames) > 1:
-                                    frame_idx = st.slider(
-                                        "Simulation frame",
-                                        0, len(display_frames) - 1,
-                                        value=len(display_frames) - 1,
-                                        key="cc3d_frame_slider",
-                                    )
-
-                                frame = display_frames[frame_idx]
-                                vtk_bytes = base64.b64decode(frame["data_b64"])
-                                lattice = parse_vtk_from_bytes(vtk_bytes)
-
-                                # Find matching O2 frame
-                                o2_field = None
-                                if o2_frames and frame_idx < len(o2_frames):
-                                    o2_bytes = base64.b64decode(o2_frames[frame_idx]["data_b64"])
-                                    o2_field = parse_vtk_scalar_field(o2_bytes)
-
-                                scaffold_mesh = st.session_state.get("scaffold_mesh")
-
-                                fig_cc3d = render_unified_scene(
-                                    cell_lattice=lattice,
-                                    type_map=type_map,
-                                    o2_field=o2_field,
-                                    scaffold_mesh=scaffold_mesh,
-                                    title="CC3D Simulation Result",
-                                    timestep=frame_idx,
-                                )
-                                st.plotly_chart(fig_cc3d, use_container_width=True)
-
-                                if o2_field is not None:
-                                    st.caption("Red markers indicate hypoxic zones (O2 < 5%)")
-                        else:
-                            st.warning(f"CC3D: {cc3d_result.get('error', 'Unknown error')}")
-            else:
-                st.button(
-                    "⚡ Run CC3D Simulation (Cloud)",
-                    disabled=True,
-                    use_container_width=True,
-                    help="Set CC3D_API_URL environment variable to your VPS sidecar address.",
-                )
-        else:
-            st.warning("Simulation brief could not be generated. Check your API key and try again.")
-
-        # Row 5: Export & Download
-        st.divider()
-        export_col1, export_col2 = st.columns(2)
-        with export_col1:
-            try:
-                from core.export import generate_pdf_report
-                pdf_path = generate_pdf_report(report, client_name="")
-                with open(pdf_path, "rb") as f:
-                    st.download_button(
-                        "Download PDF Report",
-                        data=f.read(),
-                        file_name=Path(pdf_path).name,
-                        mime="application/pdf",
-                        use_container_width=True,
-                    )
-            except Exception as e:
-                st.button("Download PDF Report", disabled=True, use_container_width=True,
-                          help=f"PDF export unavailable: {e}")
-
-        with export_col2:
-            try:
-                scaffold_mesh = st.session_state.get("scaffold_mesh")
-                if scaffold_mesh:
-                    from core.export import export_figure_png
-                    from core.scaffold_geometry import preview_scaffold
-                    viz_fig = preview_scaffold(scaffold_mesh)
-                    png_bytes = export_figure_png(viz_fig)
-                    st.download_button(
-                        "Download Scaffold Preview (PNG)",
-                        data=png_bytes,
-                        file_name=f"stromalytix_{profile.target_tissue or 'construct'}_scaffold.png",
-                        mime="image/png",
-                        use_container_width=True,
-                    )
-                else:
-                    st.button("Download Scaffold Preview (PNG)", disabled=True,
-                              use_container_width=True, help="Generate a scaffold preview first.")
-            except Exception as e:
-                st.button("Download Scaffold (PNG)", disabled=True, use_container_width=True,
-                          help=f"PNG export unavailable: {e}")
-
-        # Row 6: Signup CTA
-        st.divider()
-        st.markdown("### 💾 Save this analysis + get early access to the full platform")
-
-        col1, col2 = st.columns([3, 1])
-
-        with col1:
-            email = st.text_input(
-                "Email address",
-                placeholder="your.email@institution.edu",
-                label_visibility="collapsed"
-            )
-
-        with col2:
-            if st.button("Sign Up", use_container_width=True):
-                if email and "@" in email:
-                    save_signup(email)
-                    st.success("You're on the list. We'll be in touch.")
-                else:
-                    st.error("Please enter a valid email address.")
+        tab_feas, tab_sim, tab_plan = st.tabs(
+            ["Feasibility", "Simulation", "Methods & materials plan"]
+        )
+        with tab_feas:
+            render_results_feasibility_tab(profile, report)
+        with tab_sim:
+            render_results_simulation_tab(profile, report)
+        with tab_plan:
+            render_results_action_plan_tab(profile, report, save_signup)
 
 
 # ============================================================================
