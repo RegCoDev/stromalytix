@@ -53,11 +53,30 @@ def expand_action_plan_narrative(
     profile_json = profile.model_dump_json(indent=2)
     narrative = report.ai_narrative[:4000] if report.ai_narrative else ""
 
-    prompt = f"""You are a tissue engineering methods advisor. The user has a construct profile,
-a variance summary, and a prioritized checklist of gaps. Write a concise **methods & materials plan**
-as markdown (use ## and ### headings, bullet lists).
+    ref_lines: list[str] = []
+    for ref in (report.key_references or [])[:8]:
+        pmid = ref.get("pmid", "")
+        title = (ref.get("title") or "")[:120]
+        ref_lines.append(f"- PMID {pmid}: {title}")
+    if not ref_lines and report.supporting_pmids:
+        ref_lines = [f"- PMID {p}" for p in report.supporting_pmids[:10]]
+    refs_block = "\n".join(ref_lines) if ref_lines else "(none listed—suggest search terms, not fake PMIDs)"
 
-Do not invent PMID numbers. If something is unknown, say what experiment would resolve it.
+    prompt = f"""You are a senior methods advisor writing for **bench scientists and lab leads**
+(not for software engineers). They need to execute, source, and staff work—not debug the platform.
+
+Use the profile, variance summary, checklist, and reference list below. Write a practical
+**methods & materials plan** as markdown (## and ### headings, bullet lists).
+
+Rules:
+- Do **not** invent PMID or DOI strings. For further reading, use only PMIDs from the REFERENCE LIST
+  section, or name journals/search terms if the list is thin.
+- Be specific about **supplies and reagents** (categories, what to order, what needs a COA or lot tracking).
+- Include **further modeling**: when FEA, lattice/CC3D-style thought experiments, or re-benchmarking
+  after new measurements would save wet-lab time; state assumptions briefly.
+- Name **who to involve**: imaging core, histology, mechanical testing, flow, bioinformatics, CRO types,
+  co-PI skill sets—tied to this construct and readout where possible.
+- If cellular agriculture context appears in the profile, mention food-grade/edible inputs where relevant.
 
 CONSTRUCT PROFILE (JSON):
 {profile_json}
@@ -65,16 +84,22 @@ CONSTRUCT PROFILE (JSON):
 VARIANCE SUMMARY (excerpt):
 {narrative}
 
-PRIORITIZED CHECKLIST (from tool-derived gaps):
+REFERENCE LIST (use these for "further reading" citations only):
+{refs_block}
+
+PRIORITIZED CHECKLIST (gaps + experimentalist anchors):
 {checklist_text}
 
-Structure your answer roughly as:
+Structure your answer as:
+## Supplies, reagents, and consumables
 ## Measurements and assays
-## Materials and sourcing
-## Sequencing and milestones
+## Further modeling and computation (when and why)
+## People, cores, CROs, and collaborators
+## Further reading (PMIDs from list above only, or search guidance)
+## Timeline / milestones
 ## Risks and mitigations
 
-Keep total length under 900 words."""
+Keep total length under 1100 words."""
 
     response = llm.invoke(prompt)
     return (response.content or "").strip()
