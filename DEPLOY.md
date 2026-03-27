@@ -2,6 +2,8 @@
 
 The demo has two parts: **Streamlit Cloud** (UI, already connected to your GitHub repo) and an optional **CC3D sidecar** on your **Hostinger VPS**.
 
+**Agent handoff (full VPS checklist for Claude Code / similar):** [services/cc3d_runner_api/CLAUDE_CODE_VPS_DEPLOY.md](services/cc3d_runner_api/CLAUDE_CODE_VPS_DEPLOY.md)
+
 ## Streamlit Cloud
 
 1. Repo: connect `RegCoDev/stromalytix`, main file `app.py`.
