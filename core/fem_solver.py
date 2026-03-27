@@ -1,14 +1,15 @@
 """
-Scaffold mechanics solver using scikit-fem.
+Scaffold mechanics — linear-elastic sketches only.
 
-Answers: Will this scaffold deform under cell contractile forces?
-What stress distribution does this geometry produce?
+Most biofabrication matrices are viscoelastic (stress relaxation, creep, rate dependence).
+These helpers use **Hookean / elastic heuristics** for order-of-magnitude intuition, not
+cell-scale mechanotransduction maps or polymer rupture criteria.
 
-Two tiers:
-- Analytical: predict_scaffold_deformation / predict_stress_distribution
-  (fast, used in BioSim results for instant feedback)
-- FEA: solve_compression / render_fea_results
-  (real scikit-fem solve, used for detailed FEA panel)
+- predict_scaffold_deformation: toy bulk strain under assumed contractile loading
+  → interpret as **construct integrity / gross deformation**, not mechanoreceptor signaling.
+- predict_stress_distribution: porosity-based elastic stress-hotspot index
+  → **load path / structural heterogeneity** intuition; not nucleus-scale sensing.
+- solve_compression / render_fea_results: coarse scikit-fem linear elastic compression.
 
 scikit-fem: MIT licensed. Safe for commercial use.
 """
@@ -45,24 +46,27 @@ def predict_scaffold_deformation(
     deformation_um = deformation_m * 1e6
     strain_pct = (deformation_m / height_m) * 100
 
-    # Risk thresholds from literature
+    # Tiered readout: bulk construct strain / integrity (NOT biological "cell failure")
     if strain_pct > 15:
         risk = "high"
         rec = (
-            f"Scaffold at {stiffness_kpa} kPa will deform >{strain_pct:.1f}% "
-            f"under cell load. Increase stiffness to >10 kPa or reduce cell density."
+            f"**Bulk strain ~{strain_pct:.1f}%** in this simplified elastic slab model: high risk of "
+            f"**macroscopic construct issues** (tear, delamination, pore collapse, loss of shape)—not a diagnosis "
+            f"of apoptosis or mechanoreceptor overload. Consider higher modulus, lower cell density in the model, "
+            f"or a thinner construct for the assumed footprint."
         )
     elif strain_pct > 5:
         risk = "medium"
         rec = (
-            f"Moderate deformation predicted ({strain_pct:.1f}%). "
-            f"Monitor construct integrity at day 3-5."
+            f"Moderate **bulk strain ({strain_pct:.1f}%)**: monitor **mechanical integrity** of the macroscopic "
+            f"scaffold (buckling, local necking). Viscoelastic matrices often relax much of this stress over time; "
+            f"the number is a linear-elastic snapshot only."
         )
     else:
         risk = "low"
         rec = (
-            f"Scaffold mechanics stable. Predicted strain "
-            f"{strain_pct:.1f}% within acceptable range."
+            f"Low bulk strain ({strain_pct:.1f}%) in this toy model: **construct shape** likely stable under the "
+            f"assumed collective traction. Does not rule out local defects or time-dependent flow."
         )
 
     return {
@@ -70,6 +74,10 @@ def predict_scaffold_deformation(
         "strain_percent": round(strain_pct, 2),
         "stress_kpa": round(stress_kpa_val, 4),
         "failure_risk": risk,
+        "failure_risk_explainer": (
+            "“Failure” here means **gross scaffold / construct integrity** under this crude elastic estimate—not "
+            "material rupture prediction and not single-cell mechanosensing."
+        ),
         "recommendation": rec,
         "n_cells_estimated": int(n_cells),
         "collective_force_nN": round(contractile_force_nN, 1),
@@ -81,8 +89,12 @@ def predict_stress_distribution(
     porosity_percent: float = 80.0,
 ) -> dict:
     """
-    Estimate stress concentration factor from porosity.
-    High porosity -> stress concentrations at pore walls.
+    Porosity-based **elastic** stress-hotspot index (Kt) and effective-modulus proxy.
+
+    Kt is a textbook-style concentration heuristic for **porous linear solids** under load:
+    useful for thinking about **strut overload and uneven load paths**, not for mapping
+    integrin–nucleus mechanotransduction (which depends on matrix viscoelasticity, adhesion,
+    cell traction, and time). Real hydrogels redistribute stress via relaxation and fluid flow.
     """
     relative_density = 1 - (porosity_percent / 100)
     if relative_density > 0:
@@ -103,9 +115,16 @@ def predict_stress_distribution(
         "stress_concentration_factor": round(Kt, 2),
         "effective_local_stiffness_kpa": round(effective_stiffness, 2),
         "heterogeneity_risk": het_risk,
+        "elastic_hotspot_tier": het_risk,
         "recommendation": (
-            f"Stress concentration factor {Kt:.1f}x at pore walls. "
-            f"Cells near pores experience {effective_stiffness:.1f} kPa locally."
+            f"Elastic hotspot index Kt ≈ {Kt:.1f}× (porosity {porosity_percent:.0f}%): **stiffer load paths** "
+            f"are expected near pore walls in a **linear elastic** solid. Treat this as **structural / material "
+            f"failure intuition** (strut stress, crack initiation, uneven remodeling substrate)—**not** as the "
+            f"local stiffness a nucleus “feels,” and **not** viscoelastic. Order-of-magnitude effective modulus "
+            f"proxy ~{effective_stiffness:.1f} kPa (highly simplified)."
+        ),
+        "model_limits": (
+            "No creep, relaxation, poroelasticity, or damage. Mechanoreceptor biology is not inferred from Kt."
         ),
     }
 
@@ -226,23 +245,23 @@ def solve_compression(profile, compressive_strain=0.10, resolution=8) -> dict:
     scf = max_stress_pa / max(mean_stress_pa, 1e-10)
     high_stress_frac = max(0, scf - 1) / 3
 
-    # Interpretation
+    # Interpretation — coarse linear model; avoid cell-fate claims
     if scf > 3.0:
         interp = (
-            f"High stress concentration (SCF={scf:.1f}x). "
-            f"Cells near high-stress regions may receive "
-            f"mechanotransductive signals promoting fibrosis or apoptosis."
+            f"High **elastic** stress heterogeneity (model SCF≈{scf:.1f}×): suggests **localized load carrying** "
+            f"in this simplified mesh—not a prediction of fibrosis or apoptosis. For real matrices, check "
+            f"relaxation, damage, and perfusion."
         )
     elif scf > 1.5:
         interp = (
-            f"Moderate stress heterogeneity (SCF={scf:.1f}x). "
-            f"Physiologically relevant gradients — "
-            f"may promote differentiation at interfaces."
+            f"Moderate elastic heterogeneity (SCF≈{scf:.1f}×): **uneven macroscopic stress paths** in the solid "
+            f"scaffold; may matter for **mechanical failure or remodeling patterns**, not as a direct map of "
+            f"mechanoreceptor activation."
         )
     else:
         interp = (
-            f"Uniform stress distribution (SCF={scf:.1f}x). "
-            f"Consistent mechanical environment for all cells."
+            f"Relatively uniform elastic response (SCF≈{scf:.1f}×) in this toy compression model—still not "
+            f"viscoelastic and not cell-resolved."
         )
 
     return {
@@ -303,7 +322,7 @@ def render_fea_results(fea_result: dict) -> go.Figure:
 
     scf = fea_result["stress_concentration_factor"]
     fig.add_annotation(
-        text=f"SCF: {scf:.1f}x | Max: {fea_result['max_stress_kpa']:.1f} kPa",
+        text=f"Elastic SCF (toy): {scf:.1f}x | σ_max≈{fea_result['max_stress_kpa']:.1f} kPa",
         xref="paper", yref="paper",
         x=0.02, y=0.98,
         font=dict(color="#00ff88", family="JetBrains Mono", size=12),
@@ -315,9 +334,9 @@ def render_fea_results(fea_result: dict) -> go.Figure:
     fig.update_layout(
         title=dict(
             text=(
-                f"Scaffold FEA — {fea_result['E_kpa']:.0f} kPa, "
-                f"{fea_result['compressive_strain']*100:.0f}% compression "
-                f"(20x exaggerated)"
+                f"Linear elastic compression sketch — E≈{fea_result['E_kpa']:.0f} kPa, "
+                f"{fea_result['compressive_strain']*100:.0f}% nominal strain "
+                f"(disp. 20× exaggerated; not viscoelastic)"
             ),
             font=dict(color="#00ff88", size=14, family="JetBrains Mono"),
         ),
