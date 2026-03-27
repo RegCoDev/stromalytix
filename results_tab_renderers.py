@@ -177,17 +177,87 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
 
     with st.expander("Scaffold geometry", expanded=False):
         scaf_col1, scaf_col2 = st.columns([2, 1])
+        _simple_archs = frozenset(
+            {
+                "cylinder_solid",
+                "cylinder_hollow",
+                "ring_torus",
+                "sphere_droplet",
+                "droplet_in_droplet",
+                "multimaterial_bilayer_cylinder",
+            }
+        )
+
         with scaf_col2:
             scaffold_arch = st.selectbox(
                 "Architecture",
-                ["gyroid", "schwarz_p", "diamond", "lidinoid", "woodpile", "grid", "custom_stl"],
+                [
+                    "gyroid",
+                    "schwarz_p",
+                    "diamond",
+                    "lidinoid",
+                    "woodpile",
+                    "grid",
+                    "cylinder_solid",
+                    "cylinder_hollow",
+                    "ring_torus",
+                    "sphere_droplet",
+                    "droplet_in_droplet",
+                    "multimaterial_bilayer_cylinder",
+                    "custom_stl",
+                ],
                 index=0,
                 key="scaf_arch_sim",
+                help="Primitives: solid/hollow cylinders, torus ring, droplet spheres, core–shell and bilayer multimaterial.",
             )
-            scaf_pore = st.slider("Pore size (um)", 100, 800, 300, key="scaf_pore_sim")
-            scaf_porosity = st.slider("Porosity (%)", 30, 90, 70, key="scaf_porosity_sim")
 
             stl_file = st.file_uploader("Upload STL", type=["stl", "obj"], key="stl_upload_sim")
+
+            if scaffold_arch in _simple_archs:
+                scaf_pore = 300
+                scaf_porosity = 70
+                s_r = s_h = s_inner = s_major = s_minor = 1.5
+                if scaffold_arch in (
+                    "cylinder_solid",
+                    "cylinder_hollow",
+                    "sphere_droplet",
+                    "droplet_in_droplet",
+                    "multimaterial_bilayer_cylinder",
+                ):
+                    s_r = st.slider("Outer / droplet radius (mm)", 0.35, 2.8, 1.5, key="scaf_simple_r_sim")
+                if scaffold_arch in (
+                    "cylinder_solid",
+                    "cylinder_hollow",
+                    "multimaterial_bilayer_cylinder",
+                ):
+                    s_h = st.slider("Height (mm)", 0.8, 6.0, 3.5, key="scaf_simple_h_sim")
+                if scaffold_arch in ("cylinder_hollow", "multimaterial_bilayer_cylinder", "droplet_in_droplet"):
+                    default_in = min(0.95, s_r * 0.52) if scaffold_arch != "droplet_in_droplet" else min(0.85, s_r * 0.45)
+                    s_inner = st.slider(
+                        "Inner / core radius (mm)",
+                        0.15,
+                        max(0.2, s_r - 0.2),
+                        default_in,
+                        key="scaf_simple_inner_sim",
+                    )
+                if scaffold_arch == "ring_torus":
+                    s_major = st.slider("Ring major radius (mm)", 0.8, 2.5, 1.7, key="scaf_torus_major_sim")
+                    s_minor = st.slider("Ring tube radius (mm)", 0.15, 0.8, 0.35, key="scaf_torus_minor_sim")
+                box_l = max(
+                    4.0,
+                    s_r * 2.8,
+                    (s_h + 0.5) if scaffold_arch in ("cylinder_solid", "cylinder_hollow", "multimaterial_bilayer_cylinder") else 0,
+                    (s_major * 2 + s_minor * 2 + 0.5) if scaffold_arch == "ring_torus" else 0,
+                )
+                zh = max(box_l, s_h + 0.5) if scaffold_arch in ("cylinder_solid", "cylinder_hollow", "multimaterial_bilayer_cylinder") else box_l
+                if scaffold_arch == "ring_torus":
+                    zh = max(box_l, (s_minor * 2 + 0.2))
+                outer_box = (box_l, box_l, zh)
+            else:
+                scaf_pore = st.slider("Pore size (um)", 100, 800, 300, key="scaf_pore_sim")
+                scaf_porosity = st.slider("Porosity (%)", 30, 90, 70, key="scaf_porosity_sim")
+                s_r = s_h = s_inner = s_major = s_minor = 0.0
+                outer_box = (4.0, 4.0, 4.0)
 
             if scaffold_arch != "custom_stl" or stl_file is not None:
                 generate_scaffold = st.button("Generate Preview", key="gen_scaffold_sim", use_container_width=True)
@@ -198,7 +268,13 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
             if generate_scaffold:
                 try:
                     from core.scaffold_geometry import (
+                        generate_cylinder_hollow,
+                        generate_cylinder_solid,
+                        generate_droplet_in_droplet,
                         generate_filament_lattice,
+                        generate_multimaterial_bilayer_cylinder,
+                        generate_ring_torus,
+                        generate_sphere_droplet,
                         generate_tpms,
                         import_stl,
                         preview_scaffold,
@@ -206,6 +282,41 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
 
                     if stl_file is not None:
                         mesh = import_stl(stl_file.read())
+                    elif scaffold_arch == "cylinder_solid":
+                        mesh = generate_cylinder_solid(
+                            radius_mm=s_r, height_mm=s_h, outer_dims_mm=outer_box
+                        )
+                    elif scaffold_arch == "cylinder_hollow":
+                        ir = min(s_inner, s_r - 0.15)
+                        mesh = generate_cylinder_hollow(
+                            outer_radius_mm=s_r,
+                            inner_radius_mm=max(0.15, ir),
+                            height_mm=s_h,
+                            outer_dims_mm=outer_box,
+                        )
+                    elif scaffold_arch == "ring_torus":
+                        mesh = generate_ring_torus(
+                            major_radius_mm=s_major,
+                            minor_radius_mm=s_minor,
+                            outer_dims_mm=outer_box,
+                        )
+                    elif scaffold_arch == "sphere_droplet":
+                        mesh = generate_sphere_droplet(radius_mm=s_r, outer_dims_mm=outer_box)
+                    elif scaffold_arch == "droplet_in_droplet":
+                        cr = min(s_inner, s_r - 0.2)
+                        mesh = generate_droplet_in_droplet(
+                            outer_radius_mm=s_r,
+                            core_radius_mm=max(0.2, cr),
+                            outer_dims_mm=outer_box,
+                        )
+                    elif scaffold_arch == "multimaterial_bilayer_cylinder":
+                        ir = min(s_inner, s_r - 0.15)
+                        mesh = generate_multimaterial_bilayer_cylinder(
+                            outer_radius_mm=s_r,
+                            inner_radius_mm=max(0.15, ir),
+                            height_mm=s_h,
+                            outer_dims_mm=outer_box,
+                        )
                     elif scaffold_arch in ("woodpile", "grid"):
                         mesh = generate_filament_lattice(
                             strand_diameter_um=scaf_pore * 0.5,
@@ -221,6 +332,8 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                     st.session_state["scaffold_mesh"] = mesh
                     fig_scaf = preview_scaffold(mesh)
                     st.plotly_chart(fig_scaf, use_container_width=True)
+                    if mesh.get("hollow_note"):
+                        st.caption(mesh["hollow_note"])
 
                     profile.scaffold_architecture = scaffold_arch
                     profile.pore_size_um = scaf_pore
