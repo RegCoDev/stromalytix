@@ -495,10 +495,10 @@ def render_results_action_plan_tab(
 ) -> None:
     st.markdown("### Methods & materials plan")
     st.caption(
-        "Prioritized follow-ups from parameter gaps, low-confidence library matches, and feasibility "
-        "tiers—oriented toward **what to measure or try next**, not a single locked design. "
-        "Charts and PDF list **literature ranges** vs. your working values. "
-        "Use **Expand with AI** for a narrative plan (optional)."
+        "Checklist merges **library gaps** with **bench-ready** items: supplies and reagents, follow-on "
+        "modeling, and who to pull in (cores, CROs, collaborators). "
+        "**Expand with AI** drafts a narrative for experimentalists—sourcing, assays, modeling, people, "
+        "and further reading from your report’s references (no fake PMIDs)."
     )
 
     rows = build_action_checklist(profile, report)
@@ -528,7 +528,7 @@ def render_results_action_plan_tab(
     has_key = _anthropic_configured()
 
     expand_kwargs = {
-        "label": "Expand with AI",
+        "label": "Expand for lab execution (AI)",
         "disabled": not has_key,
         "key": "expand_plan_ai",
         "use_container_width": True,
