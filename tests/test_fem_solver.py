@@ -14,6 +14,7 @@ def test_predict_deformation_returns_required_keys():
     assert "strain_percent" in result
     assert "stress_kpa" in result
     assert "failure_risk" in result
+    assert "failure_risk_explainer" in result
     assert "recommendation" in result
     assert "n_cells_estimated" in result
     assert "collective_force_nN" in result
@@ -38,6 +39,8 @@ def test_stress_distribution_returns_keys():
     assert "stress_concentration_factor" in result
     assert "effective_local_stiffness_kpa" in result
     assert "heterogeneity_risk" in result
+    assert result["elastic_hotspot_tier"] == result["heterogeneity_risk"]
+    assert "model_limits" in result
     assert "recommendation" in result
 
 

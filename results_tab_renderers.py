@@ -351,7 +351,12 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
     if profile.stiffness_kpa and profile.cell_density_per_ml:
         from core.fem_solver import predict_scaffold_deformation, predict_stress_distribution
 
-        with st.expander("Scaffold mechanics (FEA)", expanded=False):
+        with st.expander("Scaffold mechanics (linear elastic sketch)", expanded=False):
+            st.caption(
+                "**Not viscoelastic:** no creep, relaxation, or poroelastic flow. "
+                "Readouts are coarse order-of-magnitude sketches for **bulk construct mechanics**, "
+                "not mechanoreceptor maps or matrix rupture criteria."
+            )
             fea_result = predict_scaffold_deformation(
                 stiffness_kpa=profile.stiffness_kpa,
                 cell_density_per_ml=profile.cell_density_per_ml,
@@ -359,18 +364,19 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
 
             fea_col1, fea_col2, fea_col3 = st.columns(3)
             with fea_col1:
-                st.metric("Max Deformation", f"{fea_result['max_deformation_um']:.1f} um")
+                st.metric("Max deformation (model)", f"{fea_result['max_deformation_um']:.1f} μm")
             with fea_col2:
-                st.metric("Strain", f"{fea_result['strain_percent']:.2f}%")
+                st.metric("Bulk strain (model)", f"{fea_result['strain_percent']:.2f}%")
             with fea_col3:
                 risk = fea_result["failure_risk"]
                 risk_color = {"low": "#00ff88", "medium": "#ffd700", "high": "#ff4444"}.get(risk, "#888")
                 st.markdown(
-                    f'<p style="font-size: 0.85em; color: #888;">Failure Risk</p>'
+                    f'<p style="font-size: 0.85em; color: #888;">Construct integrity band</p>'
                     f'<p style="font-size: 1.5em; font-weight: bold; color: {risk_color};">{risk.upper()}</p>',
                     unsafe_allow_html=True,
                 )
 
+            st.caption(fea_result.get("failure_risk_explainer", ""))
             st.markdown(
                 f'<div style="border: 1px solid #444; padding: 0.8rem; border-radius: 0.5rem; '
                 f'background: #1a1a1a; margin: 0.5rem 0;">'
@@ -383,6 +389,8 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                     stiffness_kpa=profile.stiffness_kpa,
                     porosity_percent=profile.porosity_percent,
                 )
+                st.markdown("##### Porous solid: elastic load-path hotspot index")
+                st.caption(stress_result.get("model_limits", ""))
                 st.markdown(
                     f'<div style="border: 1px solid #444; padding: 0.8rem; border-radius: 0.5rem; '
                     f'background: #1a1a1a; margin: 0.5rem 0;">'
