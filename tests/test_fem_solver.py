@@ -15,6 +15,7 @@ def test_predict_deformation_returns_required_keys():
     assert "stress_kpa" in result
     assert "failure_risk" in result
     assert "failure_risk_explainer" in result
+    assert "excluded_physics_summary" in result
     assert "recommendation" in result
     assert "n_cells_estimated" in result
     assert "collective_force_nN" in result
