@@ -12,10 +12,10 @@
 
 ## Test-by-Test Breakdown
 
-### ✅ TEST 1 — Onboarding Phase (2/2 PASSED)
+### ✅ TEST 1 — Session defaults (2/2 PASSED)
 
 - **test_session_state_defaults**: PASSED ✓
-  - Verified app.py initializes with `phase = "onboarding"`
+  - Verified app.py initializes with `phase = "assessment"` (chat-first)
   - Verified session state initializes `construct_profile`
 
 - **test_construct_profile_fields**: PASSED ✓

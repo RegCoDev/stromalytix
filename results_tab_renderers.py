@@ -495,7 +495,9 @@ def render_results_action_plan_tab(
 ) -> None:
     st.markdown("### Methods & materials plan")
     st.caption(
-        "Prioritized follow-ups from parameter gaps and feasibility tiers. "
+        "Prioritized follow-ups from parameter gaps, low-confidence library matches, and feasibility "
+        "tiers—oriented toward **what to measure or try next**, not a single locked design. "
+        "Charts and PDF list **literature ranges** vs. your working values. "
         "Use **Expand with AI** for a narrative plan (optional)."
     )
 
