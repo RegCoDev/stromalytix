@@ -5,6 +5,12 @@ Most biofabrication matrices are viscoelastic (stress relaxation, creep, rate de
 These helpers use **Hookean / elastic heuristics** for order-of-magnitude intuition, not
 cell-scale mechanotransduction maps or polymer rupture criteria.
 
+**Not modeled (any path in this module):** solvent **swelling** / deswelling; **hydrolytic**
+degradation; **enzymolytic** erosion (e.g. MMPs); mass loss or **porosity evolving in time**;
+pH / ionic / Donnan effects; or coupled chemo-mechanical **pore collapse**. Mentions of
+pore collapse in user-facing text are **qualitative integrity hints** under a fixed-geometry
+elastic snapshot—not a simulation of degradation kinetics.
+
 - predict_scaffold_deformation: toy bulk strain under assumed contractile loading
   → interpret as **construct integrity / gross deformation**, not mechanoreceptor signaling.
 - predict_stress_distribution: porosity-based elastic stress-hotspot index
@@ -13,8 +19,17 @@ cell-scale mechanotransduction maps or polymer rupture criteria.
 
 scikit-fem: MIT licensed. Safe for commercial use.
 """
+
 import numpy as np
 import plotly.graph_objects as go
+
+# Shown in Streamlit next to mechanics readouts — single source of truth.
+FEM_EXCLUDED_PHYSICS_SUMMARY = (
+    "**Not modeled:** matrix **swelling** or syneresis; **hydrolytic** or **enzymolytic** "
+    "(e.g. MMP) degradation and mass loss; **time-dependent** porosity or modulus; "
+    "chemo-mechanical **pore collapse** kinetics; pH/ionic coupling. "
+    "All plots use **instant linear elasticity** on your **nominal** geometry and stiffness."
+)
 
 
 def predict_scaffold_deformation(
@@ -26,7 +41,9 @@ def predict_scaffold_deformation(
     Simple compression model: estimate scaffold deformation
     under collective cell contractile force.
 
-    Cell contractile stress: ~1-10 nN/cell (use 5 nN typical)
+    Cell contractile stress: ~1-10 nN/cell (use 5 nN typical).
+
+    Does not include swelling, degradation, or evolving porosity — see FEM_EXCLUDED_PHYSICS_SUMMARY.
     """
     # Collective contractile force
     # Volume: 1cm x 1cm cross section * height
@@ -58,9 +75,10 @@ def predict_scaffold_deformation(
     elif strain_pct > 5:
         risk = "medium"
         rec = (
-            f"Moderate **bulk strain ({strain_pct:.1f}%)**: monitor **mechanical integrity** of the macroscopic "
-            f"scaffold (buckling, local necking). Viscoelastic matrices often relax much of this stress over time; "
-            f"the number is a linear-elastic snapshot only."
+            f"Moderate **bulk strain ({strain_pct:.1f}%)**: monitor **mechanical integrity** (buckling, necking, "
+            f"**pore collapse** under sustained load in soft lattices—named here only qualitatively; not simulated). "
+            f"Viscoelastic matrices often relax stress over time; swelling or enzyme-driven softening can worsen "
+            f"collapse but are **outside** this model."
         )
     else:
         risk = "low"
@@ -76,8 +94,10 @@ def predict_scaffold_deformation(
         "failure_risk": risk,
         "failure_risk_explainer": (
             "“Failure” here means **gross scaffold / construct integrity** under this crude elastic estimate—not "
-            "material rupture prediction and not single-cell mechanosensing."
+            "material rupture prediction and not single-cell mechanosensing. "
+            "**Pore collapse** is a real failure mode but is **not** computed here beyond qualitative mention."
         ),
+        "excluded_physics_summary": FEM_EXCLUDED_PHYSICS_SUMMARY,
         "recommendation": rec,
         "n_cells_estimated": int(n_cells),
         "collective_force_nN": round(contractile_force_nN, 1),
@@ -124,7 +144,8 @@ def predict_stress_distribution(
             f"proxy ~{effective_stiffness:.1f} kPa (highly simplified)."
         ),
         "model_limits": (
-            "No creep, relaxation, poroelasticity, or damage. Mechanoreceptor biology is not inferred from Kt."
+            "No creep, relaxation, poroelasticity, swelling, hydrolysis, enzymatic erosion, or damage evolution. "
+            "Mechanoreceptor biology is not inferred from Kt."
         ),
     }
 

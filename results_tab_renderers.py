@@ -349,7 +349,11 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                 st.info("Select scaffold parameters and click Generate Preview.")
 
     if profile.stiffness_kpa and profile.cell_density_per_ml:
-        from core.fem_solver import predict_scaffold_deformation, predict_stress_distribution
+        from core.fem_solver import (
+            FEM_EXCLUDED_PHYSICS_SUMMARY,
+            predict_scaffold_deformation,
+            predict_stress_distribution,
+        )
 
         with st.expander("Scaffold mechanics (linear elastic sketch)", expanded=False):
             st.caption(
@@ -357,6 +361,7 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                 "Readouts are coarse order-of-magnitude sketches for **bulk construct mechanics**, "
                 "not mechanoreceptor maps or matrix rupture criteria."
             )
+            st.caption(FEM_EXCLUDED_PHYSICS_SUMMARY)
             fea_result = predict_scaffold_deformation(
                 stiffness_kpa=profile.stiffness_kpa,
                 cell_density_per_ml=profile.cell_density_per_ml,
