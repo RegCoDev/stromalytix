@@ -383,9 +383,11 @@ def generate_cc3d_project(
     """
     params = brief.get("key_parameters", brief)
 
-    # Cell types
+    # Cell types — strip reserved CC3D names
+    _reserved = {"medium", "scaffold", "wall"}
     cell_types_raw = params.get("cell_types", ["Cell_A", "Cell_B"])
-    cell_types = [_sanitize(ct) for ct in cell_types_raw[:5]]
+    cell_types = [_sanitize(ct) for ct in cell_types_raw[:5]
+                  if _sanitize(ct).lower() not in _reserved]
     if not cell_types:
         cell_types = ["Cell_A"]
 
