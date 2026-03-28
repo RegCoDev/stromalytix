@@ -434,6 +434,56 @@ def generate_droplet_in_droplet(
     }
 
 
+def generate_cuboid(
+    lx_mm: float = 4.0,
+    ly_mm: float = 4.0,
+    lz_mm: float = 2.0,
+    outer_dims_mm: tuple[float, float, float] = (5.0, 5.0, 3.0),
+) -> dict:
+    """Rectangular block / cuboid / slab."""
+    import trimesh
+
+    box = trimesh.creation.box(extents=(lx_mm, ly_mm, lz_mm))
+    return _mesh_dict_single(box, "cuboid", outer_dims_mm, lx_mm=lx_mm, ly_mm=ly_mm, lz_mm=lz_mm)
+
+
+def generate_hemisphere(
+    radius_mm: float = 1.5,
+    outer_dims_mm: tuple[float, float, float] = (4.0, 4.0, 3.0),
+    subdivisions: int = 3,
+) -> dict:
+    """Hemisphere (upper half of an icosphere, z >= 0)."""
+    import trimesh
+
+    sph = trimesh.creation.icosphere(subdivisions=subdivisions, radius=radius_mm)
+    # Keep only faces where all vertices have z >= 0
+    verts = sph.vertices
+    keep_faces = np.all(verts[sph.faces, 2] >= -1e-6, axis=1)
+    hemi_faces = sph.faces[keep_faces]
+    if len(hemi_faces) == 0:
+        # Fallback to full sphere
+        return _mesh_dict_single(sph, "hemisphere_fallback", outer_dims_mm, radius_mm=radius_mm)
+    hemi = trimesh.Trimesh(vertices=verts, faces=hemi_faces, process=True)
+    return _mesh_dict_single(hemi, "hemisphere", outer_dims_mm, radius_mm=radius_mm)
+
+
+def generate_ellipsoid(
+    rx_mm: float = 2.0,
+    ry_mm: float = 1.5,
+    rz_mm: float = 1.0,
+    outer_dims_mm: tuple[float, float, float] = (5.0, 4.0, 3.0),
+    subdivisions: int = 3,
+) -> dict:
+    """Ellipsoid: icosphere scaled anisotropically by (rx, ry, rz)."""
+    import trimesh
+
+    sph = trimesh.creation.icosphere(subdivisions=subdivisions, radius=1.0)
+    sph.vertices[:, 0] *= rx_mm
+    sph.vertices[:, 1] *= ry_mm
+    sph.vertices[:, 2] *= rz_mm
+    return _mesh_dict_single(sph, "ellipsoid", outer_dims_mm, rx_mm=rx_mm, ry_mm=ry_mm, rz_mm=rz_mm)
+
+
 def generate_line_filament(
     radius_mm: float = 0.3,
     length_mm: float = 6.0,
@@ -698,6 +748,12 @@ def scaffold_from_text(description: str) -> dict:
         return {"method": "simple", "kwargs": {"kind": "sphere_droplet"}}
     if "bilayer" in desc or "core-shell" in desc or "coaxial" in desc:
         return {"method": "simple", "kwargs": {"kind": "multimaterial_bilayer_cylinder"}}
+    if any(k in desc for k in ("cuboid", "block", "slab", "cube")):
+        return {"method": "simple", "kwargs": {"kind": "cuboid"}}
+    if any(k in desc for k in ("hemisphere", "dome", "half sphere")):
+        return {"method": "simple", "kwargs": {"kind": "hemisphere"}}
+    if any(k in desc for k in ("ellipsoid", "oblate", "prolate", "oval")):
+        return {"method": "simple", "kwargs": {"kind": "ellipsoid"}}
 
     for keyword, topology in tpms_keywords.items():
         if keyword in desc:

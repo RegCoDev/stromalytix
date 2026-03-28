@@ -68,6 +68,7 @@ def _stiffness_to_packing(stiffness_kpa):
 def _method_to_geometry(biofab_method):
     """Map biofab method to spatial geometry type."""
     geometries = {
+        # Existing
         "bioprinting": "filament",
         "organ_on_chip": "planar",
         "ooc": "planar",
@@ -75,6 +76,44 @@ def _method_to_geometry(biofab_method):
         "acoustic_aggregation": "disc",
         "acoustic": "disc",
         "scaffold_free": "spheroid_loose",
+        # Extrusion variants -> filament
+        "extrusion": "filament",
+        "extrusion_bioprinting": "filament",
+        "pneumatic": "filament",
+        "piston": "filament",
+        "screw": "filament",
+        # Droplet -> disc
+        "inkjet": "disc",
+        "droplet": "disc",
+        # Light-based -> planar (layer-by-layer)
+        "sla": "planar",
+        "dlp": "planar",
+        "stereolithography": "planar",
+        "two_photon": "planar",
+        "2pp": "planar",
+        # Laser -> disc
+        "lift": "disc",
+        "lab": "disc",
+        "laser_assisted": "disc",
+        # Electrowriting/spinning -> filament
+        "melt_electrowriting": "filament",
+        "mew": "filament",
+        "electrospinning": "filament",
+        # Embedded -> spheroid (cells in gel matrix)
+        "fresh": "spheroid",
+        "swift": "spheroid",
+        "embedded": "spheroid",
+        # Volumetric -> spheroid
+        "volumetric": "spheroid",
+        # Coaxial -> filament
+        "coaxial": "filament",
+        "core_shell_printing": "filament",
+        # Sacrificial -> filament
+        "sacrificial": "filament",
+        "fugitive_ink": "filament",
+        # Assembly methods -> disc/spheroid
+        "magnetic_levitation": "disc",
+        "microfluidic": "planar",
     }
     return geometries.get(biofab_method or "", "spheroid")
 

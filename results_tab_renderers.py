@@ -244,6 +244,9 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                 "line_filament",
                 "disc",
                 "tube",
+                "cuboid",
+                "hemisphere",
+                "ellipsoid",
             }
         )
 
@@ -256,6 +259,9 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
             "grid": "Grid lattice",
             "cylinder_solid": "Cylinder (solid)",
             "cylinder_hollow": "Cylinder (hollow)",
+            "cuboid": "Cuboid / block",
+            "hemisphere": "Hemisphere / dome",
+            "ellipsoid": "Ellipsoid",
             "line_filament": "Line / filament",
             "disc": "Disc / wafer",
             "tube": "Tube / cannula",
@@ -282,12 +288,15 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                 scaf_pore = 300
                 scaf_porosity = 70
                 s_r = s_h = s_inner = s_major = s_minor = s_len = s_thick = 1.5
+                s_lx = s_ly = s_lz = 4.0
+                s_rx = s_ry = s_rz = 1.5
 
                 # Radius controls
                 if scaffold_arch in (
                     "cylinder_solid", "cylinder_hollow",
                     "sphere_droplet", "droplet_in_droplet",
                     "multimaterial_bilayer_cylinder", "disc", "tube",
+                    "hemisphere",
                 ):
                     default_r = 0.3 if scaffold_arch == "line_filament" else 1.5
                     s_r = st.slider("Radius (mm)", 0.2, 3.0, default_r, key="scaf_simple_r_sim")
@@ -322,6 +331,18 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                     s_major = st.slider("Ring major radius (mm)", 0.8, 2.5, 1.7, key="scaf_torus_major_sim")
                     s_minor = st.slider("Ring tube radius (mm)", 0.15, 0.8, 0.35, key="scaf_torus_minor_sim")
 
+                # Cuboid controls
+                if scaffold_arch == "cuboid":
+                    s_lx = st.slider("Length X (mm)", 0.5, 10.0, 4.0, key="scaf_cuboid_lx_sim")
+                    s_ly = st.slider("Length Y (mm)", 0.5, 10.0, 4.0, key="scaf_cuboid_ly_sim")
+                    s_lz = st.slider("Length Z (mm)", 0.5, 10.0, 2.0, key="scaf_cuboid_lz_sim")
+
+                # Ellipsoid controls
+                if scaffold_arch == "ellipsoid":
+                    s_rx = st.slider("Radius X (mm)", 0.3, 4.0, 2.0, key="scaf_ellipsoid_rx_sim")
+                    s_ry = st.slider("Radius Y (mm)", 0.3, 4.0, 1.5, key="scaf_ellipsoid_ry_sim")
+                    s_rz = st.slider("Radius Z (mm)", 0.3, 4.0, 1.0, key="scaf_ellipsoid_rz_sim")
+
                 # Compute bounding box
                 box_l = max(
                     4.0,
@@ -329,13 +350,26 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                     (s_h + 0.5) if scaffold_arch in ("cylinder_solid", "cylinder_hollow", "multimaterial_bilayer_cylinder") else 0,
                     (s_major * 2 + s_minor * 2 + 0.5) if scaffold_arch == "ring_torus" else 0,
                     (s_len + 0.5) if scaffold_arch in ("line_filament", "tube") else 0,
+                    (s_lx + 1.0) if scaffold_arch == "cuboid" else 0,
+                    (s_rx * 2 + 1.0) if scaffold_arch == "ellipsoid" else 0,
+                )
+                box_ly = max(
+                    box_l,
+                    (s_ly + 1.0) if scaffold_arch == "cuboid" else 0,
+                    (s_ry * 2 + 1.0) if scaffold_arch == "ellipsoid" else 0,
                 )
                 zh = max(box_l, s_h + 0.5) if scaffold_arch in ("cylinder_solid", "cylinder_hollow", "multimaterial_bilayer_cylinder") else box_l
                 if scaffold_arch == "ring_torus":
                     zh = max(box_l, (s_minor * 2 + 0.2))
                 if scaffold_arch in ("disc",):
                     zh = max(2.0, s_thick + 0.5)
-                outer_box = (box_l, box_l, zh)
+                if scaffold_arch == "cuboid":
+                    zh = max(zh, s_lz + 1.0)
+                if scaffold_arch == "ellipsoid":
+                    zh = max(zh, s_rz * 2 + 1.0)
+                if scaffold_arch == "hemisphere":
+                    zh = max(zh, s_r + 1.0)
+                outer_box = (box_l, box_ly, zh)
             else:
                 scaf_pore = st.slider("Pore size (um)", 100, 800, 300, key="scaf_pore_sim")
                 scaf_porosity = st.slider("Porosity (%)", 30, 90, 70, key="scaf_porosity_sim")
@@ -351,11 +385,14 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
             if generate_scaffold:
                 try:
                     from core.scaffold_geometry import (
+                        generate_cuboid,
                         generate_cylinder_hollow,
                         generate_cylinder_solid,
                         generate_disc,
                         generate_droplet_in_droplet,
+                        generate_ellipsoid,
                         generate_filament_lattice,
+                        generate_hemisphere,
                         generate_line_filament,
                         generate_multimaterial_bilayer_cylinder,
                         generate_ring_torus,
@@ -417,6 +454,20 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                             outer_radius_mm=s_r,
                             inner_radius_mm=max(0.15, ir),
                             height_mm=s_h,
+                            outer_dims_mm=outer_box,
+                        )
+                    elif scaffold_arch == "cuboid":
+                        mesh = generate_cuboid(
+                            lx_mm=s_lx, ly_mm=s_ly, lz_mm=s_lz,
+                            outer_dims_mm=outer_box,
+                        )
+                    elif scaffold_arch == "hemisphere":
+                        mesh = generate_hemisphere(
+                            radius_mm=s_r, outer_dims_mm=outer_box,
+                        )
+                    elif scaffold_arch == "ellipsoid":
+                        mesh = generate_ellipsoid(
+                            rx_mm=s_rx, ry_mm=s_ry, rz_mm=s_rz,
                             outer_dims_mm=outer_box,
                         )
                     elif scaffold_arch in ("woodpile", "grid"):
@@ -606,6 +657,120 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                 )
             else:
                 st.caption("Same as your current protocol.")
+
+    # ---- DOE / Parameter Screening ----
+    if profile.stiffness_kpa and profile.cell_density_per_ml:
+        with st.expander("Parameter screening (DOE)", expanded=False):
+            st.caption(
+                "Systematically screen parameter combinations to find the lowest-risk region. "
+                "Based on your current protocol as the center point."
+            )
+
+            from core.doe import (
+                factors_from_profile,
+                full_factorial,
+                one_at_a_time,
+                evaluate_design,
+                find_optimal,
+                design_summary,
+            )
+
+            doe_factors = factors_from_profile(profile)
+
+            doe_type = st.radio(
+                "Design type",
+                ["Full factorial (27 runs)", "Two-level factorial (8 runs)", "One-at-a-time (15 runs)"],
+                horizontal=True,
+                key="doe_design_type",
+            )
+
+            if st.button("Run screening", key="btn_run_doe", use_container_width=True):
+                if "Full" in doe_type and "27" in doe_type:
+                    runs = full_factorial(doe_factors, levels=3)
+                elif "Two" in doe_type:
+                    runs = full_factorial(doe_factors, levels=2)
+                else:
+                    runs = one_at_a_time(doe_factors, steps=5)
+
+                results = evaluate_design(runs)
+                st.session_state["doe_results"] = results
+                st.session_state["doe_factors"] = doe_factors
+
+            doe_results = st.session_state.get("doe_results")
+            doe_factors_saved = st.session_state.get("doe_factors")
+            if doe_results and doe_factors_saved:
+                import pandas as pd
+
+                optimal = find_optimal(doe_results)
+                st.markdown(design_summary(doe_results, doe_factors_saved))
+
+                # Results table
+                display_cols = ["stiffness_kpa", "cell_density_millions", "porosity_percent",
+                                "strain_pct", "stress_kt", "integrity_risk", "composite_risk_score"]
+                col_labels = {
+                    "stiffness_kpa": "Stiffness (kPa)",
+                    "cell_density_millions": "Density (M/mL)",
+                    "porosity_percent": "Porosity (%)",
+                    "strain_pct": "Strain (%)",
+                    "stress_kt": "Stress Kt",
+                    "integrity_risk": "Risk",
+                    "composite_risk_score": "Score",
+                }
+                df = pd.DataFrame(doe_results)
+                available = [c for c in display_cols if c in df.columns]
+                df_display = df[available].rename(columns=col_labels)
+                df_display = df_display.sort_values("Score")
+
+                st.dataframe(
+                    df_display.style.background_gradient(
+                        subset=["Score"], cmap="RdYlGn_r", vmin=0, vmax=1
+                    ),
+                    use_container_width=True,
+                    hide_index=True,
+                )
+
+                # Heatmap if full factorial
+                if len(doe_results) >= 8:
+                    import plotly.express as px
+
+                    fig_heat = px.scatter_3d(
+                        df,
+                        x="stiffness_kpa",
+                        y="cell_density_millions" if "cell_density_millions" in df.columns else "porosity_percent",
+                        z="porosity_percent" if "cell_density_millions" in df.columns else "strain_pct",
+                        color="composite_risk_score",
+                        color_continuous_scale="RdYlGn_r",
+                        range_color=[0, 1],
+                        labels={
+                            "stiffness_kpa": "Stiffness (kPa)",
+                            "cell_density_millions": "Density (M/mL)",
+                            "porosity_percent": "Porosity (%)",
+                            "composite_risk_score": "Risk score",
+                        },
+                        title="Parameter space — color = composite risk",
+                    )
+                    fig_heat.update_layout(
+                        paper_bgcolor="#1a1a1f",
+                        scene=dict(
+                            bgcolor="#252529",
+                            xaxis=dict(backgroundcolor="#252529", gridcolor="#333"),
+                            yaxis=dict(backgroundcolor="#252529", gridcolor="#333"),
+                            zaxis=dict(backgroundcolor="#252529", gridcolor="#333"),
+                        ),
+                        font=dict(color="#e0e0e5"),
+                        height=500,
+                        margin=dict(l=0, r=0, t=40, b=0),
+                    )
+                    fig_heat.update_traces(marker=dict(size=6))
+                    st.plotly_chart(fig_heat, use_container_width=True)
+
+                # Highlight optimal
+                f_list = list(doe_factors_saved.values())
+                opt_line = " | ".join(
+                    f"**{f.name}:** {optimal.get(f.key, 0):.1f} {f.unit}"
+                    for f in f_list
+                )
+                st.success(f"Suggested optimum: {opt_line}")
 
     if st.session_state.simulation_brief is None:
         try:
