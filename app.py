@@ -208,7 +208,7 @@ def _render_results_hero(profile: ConstructProfile, report: VarianceReport) -> N
             from core.feasibility import analyse as feasibility_analyse
 
             feas = feasibility_analyse(profile, report)
-            st.metric("Library fit (feasibility)", feas.overall.replace("_", " ").title())
+            st.metric("Literature match", feas.overall.replace("_", " ").title())
         except Exception:
             st.caption("Feasibility snapshot unavailable.")
     with col_b:
@@ -219,11 +219,10 @@ def _render_results_hero(profile: ConstructProfile, report: VarianceReport) -> N
             st.markdown(f"**Red benchmark flags:** {shown}{more}")
         else:
             st.markdown(
-                "**Red benchmark flags:** none — still review **Feasibility** for marginal or aspirational axes."
+                "**Red flags:** none. Check Feasibility for fine-tuning."
             )
     st.info(
-        "**Next step:** open **Methods & materials plan** for prioritized measurements, gaps vs. "
-        "literature ranges, and signup. Treat the profile as a working point in a larger experimental space."
+        "**Next:** check **Methods & materials plan** for what to measure and where you're outside published ranges."
     )
     st.divider()
 
@@ -233,11 +232,10 @@ def _render_assessment_progress() -> None:
     n = len(st.session_state.messages)
     st.progress(min(1.0, n / 8.0) if n else 0.0)
     st.caption(
-        f"**{n}/8 messages** — usual minimum before automatic analysis. "
-        "When your profile is complete, we advance after your next assistant reply."
+        f"**{n}/8 messages** — keep chatting, analysis starts automatically when we have enough detail."
     )
     st.caption(
-        "Need results sooner? Use **Run analysis now** in the sidebar (demos or thin transcripts)."
+        "Want results now? Use **Run analysis now** in the sidebar."
     )
     if n >= 8:
         if st.session_state.get("_assess_preview_n") != n:
@@ -486,7 +484,7 @@ with st.sidebar:
     if st.session_state.phase == "assessment" and len(st.session_state.messages) > 0:
         st.divider()
         st.caption("Advanced")
-        if st.button("Run analysis now", use_container_width=True, type="secondary", help="Skip waiting for 8 messages / full profile. Uses best-effort extraction from the chat so far."):
+        if st.button("Run analysis now", use_container_width=True, type="secondary", help="Jump straight to results with what you've told us so far."):
             # Create a minimal profile from conversation
             full_conversation = "\n".join([
                 f"{msg['role']}: {msg['content']}"
@@ -536,21 +534,16 @@ def _render_biosim_tab():
 
         st.title("Stromalytix")
         st.caption("Compare your construct against ~8,100 published protocols")
-        st.subheader("Describe your setup. Get parameter ranges from PubMed, risk flags, and optional 3D simulation.")
+        st.subheader("Describe your setup. See where you stand.")
 
         with st.expander("How Stromalytix works", expanded=False):
             st.markdown(
-                "**Designed for 3D cell culture** — Map your bioink, scaffold, and culture conditions "
-                "to published cell behavior data — adhesion, migration, proliferation."
-            )
-            st.markdown(
                 "**How it works** — (1) Describe your construct in chat. (2) We search ~8,100 "
                 "PubMed abstracts. (3) You get parameter ranges, risk flags, and "
-                "migration predictions. (4) Optional CompuCell3D run on your server."
+                "migration predictions. (4) Optional CompuCell3D simulation."
             )
             st.markdown(
-                "**Your results** — Parameter comparisons with published ranges, scaffold geometry preview, "
-                "and a CompuCell3D simulation brief you can run on your server."
+                "**Exports** — PDF report, scaffold preview PNG, and a methods & materials action plan."
             )
 
         _dom_codes = ["tissue_engineering", "cellular_agriculture"]
@@ -598,7 +591,7 @@ def _render_biosim_tab():
         ):
             st.session_state.construct_profile.application_domain = st.session_state.application_domain
 
-        with st.expander("Optional: upload a protocol (PDF, DOCX, TXT)", expanded=False):
+        with st.expander("Upload a protocol (PDF, DOCX, TXT)", expanded=False):
             uploaded_file = st.file_uploader(
                 "Upload your protocol document",
                 type=["pdf", "docx", "txt"],
@@ -645,8 +638,8 @@ def _render_biosim_tab():
                 except Exception as e:
                     st.warning(f"Could not parse protocol: {e}")
 
-        with st.expander("Optional: your role (for future tailoring)", expanded=False):
-            st.caption("Does not change the assistant today—optional context only.")
+        with st.expander("Your role (optional)", expanded=False):
+            st.caption("Used for future personalization.")
             if st.session_state.application_domain == "cellular_agriculture":
                 _p_opts = [
                     ("Prefer not to say", None),
