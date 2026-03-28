@@ -29,7 +29,7 @@ def _anthropic_configured() -> bool:
 
 def render_results_feasibility_tab(profile: ConstructProfile, report: VarianceReport) -> None:
     st.markdown("### Feasibility Analysis")
-    st.caption("Cross-referencing your protocol against the literature parameter library.")
+    st.caption("Checking your parameters against published ranges.")
     try:
         from core.feasibility import analyse as feasibility_analyse
 
@@ -79,8 +79,8 @@ def render_results_feasibility_tab(profile: ConstructProfile, report: VarianceRe
 
     st.markdown("### Migration & Gradient Hypotheses")
     st.caption(
-        "How fabricated and spontaneous gradients are expected to "
-        "influence cell migration in this construct."
+        "Predicted gradient effects on cell migration based on your "
+        "scaffold geometry and culture conditions."
     )
     try:
         from core.migration_insights import analyse as migration_analyse
@@ -403,6 +403,8 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                     unsafe_allow_html=True,
                 )
 
+    st.markdown("### CompuCell3D Simulation Brief")
+
     if st.session_state.simulation_brief is None:
         try:
             from core.rag import generate_simulation_brief
@@ -621,10 +623,8 @@ def render_results_action_plan_tab(
 ) -> None:
     st.markdown("### Methods & materials plan")
     st.caption(
-        "Checklist merges **library gaps** with **bench-ready** items: supplies and reagents, follow-on "
-        "modeling, and who to pull in (cores, CROs, collaborators). "
-        "**Expand with AI** drafts a narrative for experimentalists—sourcing, assays, modeling, people, "
-        "and further reading from your report’s references (no fake PMIDs)."
+        "Action items based on parameter gaps. "
+        "Use **Expand with AI** for a detailed write-up."
     )
 
     rows = build_action_checklist(profile, report)
@@ -677,7 +677,7 @@ def render_results_action_plan_tab(
         st.markdown(narrative)
 
     st.divider()
-    st.markdown("### 💾 Save this analysis + get early access to the full platform")
+    st.markdown("### 💾 Save your report and join the beta")
 
     col1, col2 = st.columns([3, 1])
     with col1:

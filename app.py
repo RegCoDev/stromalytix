@@ -335,7 +335,7 @@ def analyze_conversation_progress() -> dict:
 
 with st.sidebar:
     st.markdown('<h1 class="brand-text">🧬 Stromalytix</h1>', unsafe_allow_html=True)
-    st.markdown("**Cell-ECM for biofabrication**")
+    st.markdown("**3D cell culture analysis**")
     st.divider()
 
     # Show selected domain & optional persona
@@ -507,9 +507,9 @@ with st.sidebar:
     with st.expander("ℹ️ About"):
         st.markdown(
             """
-            **Stromalytix** models cell-ECM behavior for **biofabrication**:
-            bioinks, scaffolds, and culture protocols. Literature-grounded benchmarks,
-            optional CompuCell3D cloud runs, and scaffold geometry preview.
+            **Stromalytix** compares your protocol against ~8,100 PubMed
+            abstracts covering scaffolds, bioinks, and culture conditions.
+            Optional CompuCell3D simulation on your server.
             """
         )
 
@@ -527,23 +527,22 @@ def _render_biosim_tab():
         # ========================================================================
 
         st.title("Stromalytix")
-        st.caption("BioSim Copilot — short chat, then literature-backed benchmarks and optional simulation.")
-        st.subheader("Describe your construct; we’ll benchmark it against the knowledge base.")
+        st.caption("Compare your construct against ~8,100 published protocols")
+        st.subheader("Describe your setup. Get parameter ranges from PubMed, risk flags, and optional 3D simulation.")
 
         with st.expander("How Stromalytix works", expanded=False):
             st.markdown(
-                "**Built for biofabrication** — Relate bioinks, scaffolds, porosity, and culture setup "
-                "to how cells adhere, migrate, and proliferate in engineered matrices."
+                "**Designed for 3D cell culture** — Map your bioink, scaffold, and culture conditions "
+                "to published cell behavior data — adhesion, migration, proliferation."
             )
             st.markdown(
-                "**How it works** — (1) Describe your construct in chat. (2) We search PubMed-indexed "
-                "abstracts. (3) You get benchmarks, feasibility, and migration or gradient hypotheses. "
-                "(4) Optional CompuCell3D on your sidecar when configured."
+                "**How it works** — (1) Describe your construct in chat. (2) We search ~8,100 "
+                "PubMed abstracts. (3) You get parameter ranges, risk flags, and "
+                "migration predictions. (4) Optional CompuCell3D run on your server."
             )
             st.markdown(
-                "**What you get** — Charts vs. literature ranges, risk flags, parameter provenance, "
-                "scaffold preview, and a simulation brief. Your chat captures a **working hypothesis**; "
-                "results highlight where literature leaves room to explore."
+                "**Your results** — Parameter comparisons with published ranges, scaffold geometry preview, "
+                "and a CompuCell3D simulation brief you can run on your server."
             )
 
         _dom_codes = ["tissue_engineering", "cellular_agriculture"]
@@ -553,7 +552,7 @@ def _render_biosim_tab():
             prev_dom = "tissue_engineering"
         _ix = _dom_codes.index(prev_dom)
         picked_lbl = st.radio(
-            "I'm working on",
+            "I’m working on",
             _dom_lbls,
             index=_ix,
             horizontal=True,

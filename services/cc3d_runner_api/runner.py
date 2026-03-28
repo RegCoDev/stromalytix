@@ -266,9 +266,9 @@ def _generate_steppable_py(
     if doubling_time_mcs > 0:
         mitosis_class = f"""
 
-class StromalytixMitosisSteppable(MitosisSteppablePy):
+class StromalytixMitosisSteppable(_PySteppables.MitosisSteppablePy):
     def __init__(self, frequency=10):
-        MitosisSteppablePy.__init__(self, frequency)
+        super().__init__(frequency)
 
     def step(self, mcs):
         cells_to_divide = []
@@ -292,10 +292,10 @@ CompuCellSetup.register_steppable(
 
     mitosis_import = ""
     if doubling_time_mcs > 0:
-        mitosis_import = "\nfrom cc3d.core.PySteppables import MitosisSteppablePy"
+        mitosis_import = "\nimport cc3d.core.PySteppables as _PySteppables"
 
     script = f'''"""Auto-generated CC3D simulation — Stromalytix sidecar."""
-from cc3d.core.PySteppables import SteppableBasePy
+import cc3d.core.PySteppables as _PySteppables
 from cc3d import CompuCellSetup{mitosis_import}
 
 CELL_TYPES = {cell_types_repr}
@@ -308,9 +308,9 @@ VTK_OUTPUT_FREQ = {vtk_output_freq}
 MEDIA_CHANGE_SCHEDULE = {media_changes_repr}
 
 
-class StromalytixSteppable(SteppableBasePy):
+class StromalytixSteppable(_PySteppables.SteppableBasePy):
     def __init__(self, frequency=1):
-        SteppableBasePy.__init__(self, frequency)
+        super().__init__(frequency)
 
     def start(self):
 {seed_block}
@@ -484,7 +484,10 @@ async def execute_cc3d(
     """Execute CC3D script headlessly, capture output."""
     try:
         proc = await asyncio.create_subprocess_exec(
-            cc3d_python, str(script_path),
+            cc3d_python, "-m", "cc3d.run_script",
+            "-i", str(script_path),
+            "-o", str(output_dir),
+            "--current-dir", str(output_dir),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
             cwd=str(output_dir),
