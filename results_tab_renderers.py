@@ -117,10 +117,9 @@ def render_results_feasibility_tab(profile: ConstructProfile, report: VarianceRe
     except Exception as e:
         st.warning(f"Feasibility analysis unavailable: {e}")
 
-    st.markdown("### Migration & Gradient Hypotheses")
+    st.markdown("### Migration & Gradient Predictions")
     st.caption(
-        "Predicted gradient effects on cell migration based on your "
-        "scaffold geometry and culture conditions."
+        "What gradients form in your construct and how cells might respond."
     )
     try:
         from core.migration_insights import analyse as migration_analyse
@@ -130,7 +129,7 @@ def render_results_feasibility_tab(profile: ConstructProfile, report: VarianceRe
         category_icons = {
             "Spontaneous O2 Gradient": "🫁",
             "Nutrient / Waste Gradients": "🧪",
-            "Fabricated / Emergent Stiffness Gradient": "🔧",
+            "Stiffness Gradient": "🔧",
             "Contact Guidance (Geometric)": "📐",
             "Migration Kinetics": "🏃",
             "Degradation-Driven Migration": "♻️",
@@ -171,15 +170,14 @@ def render_results_feasibility_tab(profile: ConstructProfile, report: VarianceRe
 
         if not mig_rpt.insights:
             st.info(
-                "Insufficient data to generate migration hypotheses. "
-                "Specify cell types, scaffold material, and dimensions."
+                "Need more info for migration predictions — try adding cell types, scaffold material, and dimensions."
             )
     except Exception as e:
         st.warning(f"Migration analysis unavailable: {e}")
 
 
 def render_results_simulation_tab(profile: ConstructProfile, report: VarianceReport) -> None:
-    with st.expander("Benchmarks & narrative", expanded=True):
+    with st.expander("Results & benchmarks", expanded=True):
         col1, col2 = st.columns([60, 40])
         with col1:
             st.plotly_chart(build_radar_chart(report), use_container_width=True)
@@ -506,14 +504,26 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                 )
 
             # 3D FEA compression visualization
+            # Use scaffold bounding-box dims so FEA mesh matches the
+            # user's generated construct instead of a fixed 4x4x4 cube.
+            _scaffold_mesh = st.session_state.get("scaffold_mesh")
+            _fea_dims = None
+            if _scaffold_mesh and "outer_dims_mm" in _scaffold_mesh:
+                _fea_dims = tuple(_scaffold_mesh["outer_dims_mm"])
             try:
-                fea_3d = solve_compression(profile, resolution=8)
+                fea_3d = solve_compression(profile, resolution=8,
+                                           dimensions=_fea_dims)
                 fig_fea = render_fea_results(fea_3d)
                 st.plotly_chart(fig_fea, use_container_width=True)
+                _dims_label = (
+                    f"{_fea_dims[0]:.1f}x{_fea_dims[1]:.1f}x{_fea_dims[2]:.1f} mm"
+                    if _fea_dims else "4.0x4.0x4.0 mm (default)"
+                )
                 st.caption(
                     f"{fea_3d['n_nodes']} nodes, {fea_3d['n_elements']} elements | "
                     f"E = {fea_3d['E_kpa']:.0f} kPa | "
-                    f"SCF = {fea_3d['stress_concentration_factor']:.1f}x"
+                    f"SCF = {fea_3d['stress_concentration_factor']:.1f}x | "
+                    f"mesh dims: {_dims_label}"
                 )
             except Exception as e:
                 st.caption(f"3D compression preview unavailable: {e}")

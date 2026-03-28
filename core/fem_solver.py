@@ -206,12 +206,19 @@ def build_scaffold_mesh(geometry="cube", resolution=8, dimensions=(4.0, 4.0, 4.0
     return mesh
 
 
-def solve_compression(profile, compressive_strain=0.10, resolution=8) -> dict:
+def solve_compression(profile, compressive_strain=0.10, resolution=8, dimensions=None) -> dict:
     """
     Solve linear elastic compression using scikit-fem.
 
     Bottom face fixed, top face displaced by compressive_strain * height.
     Returns displacement field, stress metrics, and interpretation.
+
+    Parameters
+    ----------
+    dimensions : tuple[float, float, float] | None
+        (lx, ly, lz) in mm.  When supplied (e.g. from the user's scaffold
+        mesh bounding box) these override the default 4x4x4 cube so the
+        FEA mesh matches the construct the user actually generated.
     """
     from skfem import MeshTet1, ElementTetP1, Basis, condense, solve as sksolve
     from skfem.assembly import BilinearForm
@@ -221,7 +228,8 @@ def solve_compression(profile, compressive_strain=0.10, resolution=8) -> dict:
     method = getattr(profile, "biofab_method", "bioprinting")
     geom = _method_to_mesh_geometry(method)
 
-    mesh = build_scaffold_mesh(geometry=geom, resolution=resolution)
+    mesh = build_scaffold_mesh(geometry=geom, resolution=resolution,
+                               dimensions=dimensions or (4.0, 4.0, 4.0))
 
     # Scalar P1 element — solve z-displacement only (1D compression approx)
     e = ElementTetP1()
