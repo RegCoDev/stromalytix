@@ -204,12 +204,12 @@ def render_construct_3d(
     fig.update_layout(
         title=dict(
             text=title,
-            font=dict(color="#00ff88", size=16, family="JetBrains Mono, monospace"),
+            font=dict(color="#34d399", size=16, family="Inter, system-ui, sans-serif"),
         ),
-        paper_bgcolor="#0a0a0a",
-        plot_bgcolor="#0a0a0a",
+        paper_bgcolor="#1a1a1f",
+        plot_bgcolor="#1a1a1f",
         scene=dict(
-            bgcolor="#111111",
+            bgcolor="#252529",
             xaxis=dict(
                 backgroundcolor="#111111", gridcolor="#222222",
                 showbackground=True,
@@ -231,7 +231,7 @@ def render_construct_3d(
             camera=dict(eye=dict(x=1.5, y=1.5, z=1.0)),
         ),
         legend=dict(
-            font=dict(color="#aaaaaa", family="JetBrains Mono, monospace"),
+            font=dict(color="#aaaaaa", family="Inter, system-ui, sans-serif"),
             bgcolor="rgba(0,0,0,0.5)",
             bordercolor="#333333",
         ),

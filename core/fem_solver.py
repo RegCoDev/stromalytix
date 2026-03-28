@@ -346,7 +346,7 @@ def render_fea_results(fea_result: dict) -> go.Figure:
         text=f"Elastic SCF (toy): {scf:.1f}x | σ_max≈{fea_result['max_stress_kpa']:.1f} kPa",
         xref="paper", yref="paper",
         x=0.02, y=0.98,
-        font=dict(color="#00ff88", family="JetBrains Mono", size=12),
+        font=dict(color="#34d399", family="Inter, system-ui, sans-serif", size=12),
         bgcolor="rgba(0,0,0,0.5)",
         bordercolor="#333333",
         showarrow=False,
@@ -359,11 +359,11 @@ def render_fea_results(fea_result: dict) -> go.Figure:
                 f"{fea_result['compressive_strain']*100:.0f}% nominal strain "
                 f"(disp. 20× exaggerated; not viscoelastic)"
             ),
-            font=dict(color="#00ff88", size=14, family="JetBrains Mono"),
+            font=dict(color="#34d399", size=14, family="Inter, system-ui, sans-serif"),
         ),
-        paper_bgcolor="#0a0a0a",
+        paper_bgcolor="#1a1a1f",
         scene=dict(
-            bgcolor="#111111",
+            bgcolor="#252529",
             xaxis=dict(backgroundcolor="#111111", gridcolor="#222222",
                        showbackground=True, tickfont=dict(color="#555555")),
             yaxis=dict(backgroundcolor="#111111", gridcolor="#222222",

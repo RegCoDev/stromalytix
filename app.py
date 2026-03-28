@@ -1,5 +1,5 @@
 """
-Stromalytix — BioSim Copilot
+Stromalytix — 3D Culture Analysis
 
 Main Streamlit application for 3D cell culture variance analysis.
 """
@@ -33,7 +33,7 @@ from results_tab_renderers import (
 
 # Page configuration
 st.set_page_config(
-    page_title="Stromalytix | Biofabrication Cell-ECM",
+    page_title="Stromalytix | 3D Culture Analysis",
     page_icon="🧬",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -63,15 +63,15 @@ st.markdown(
 
     /* Buttons */
     .stButton>button {
-        border: 1px solid #00ff88;
-        color: #00ff88;
+        border: 1px solid #34d399;
+        color: #34d399;
         background: transparent;
         font-weight: 500;
         transition: all 0.3s ease;
     }
 
     .stButton>button:hover {
-        background: #00ff88;
+        background: #34d399;
         color: #000000;
     }
 
@@ -99,7 +99,7 @@ st.markdown(
 
     /* Accent color for brand */
     .brand-text {
-        color: #00ff88;
+        color: #34d399;
         font-weight: bold;
     }
     </style>
@@ -126,8 +126,14 @@ if "docs" not in st.session_state:
 if "simulation_brief" not in st.session_state:
     st.session_state.simulation_brief = None
 
+if "cc3d_result" not in st.session_state:
+    st.session_state.cc3d_result = None
+
 if "action_plan_narrative" not in st.session_state:
     st.session_state.action_plan_narrative = ""
+
+if "user_email" not in st.session_state:
+    st.session_state.user_email = None
 
 # application_domain selects TE vs cell-ag system prompt (initialize_chat) and action-plan rows.
 # persona is optional metadata only (sidebar / future use); not passed to the LLM.
@@ -153,7 +159,9 @@ def reset_analysis():
     st.session_state.construct_profile = None
     st.session_state.variance_report = None
     st.session_state.simulation_brief = None
+    st.session_state.cc3d_result = None
     st.session_state.action_plan_narrative = ""
+    st.session_state.user_email = None
     st.session_state.docs = []
     st.session_state.phase = "assessment"
     st.session_state.persona = None
@@ -349,7 +357,7 @@ with st.sidebar:
             "hardware_service": "🔬 Hardware / Service Provider",
             "cellag_startup": "🏭 Cell Ag Startup",
         }
-        st.markdown(f'<p style="color: #00ff88; font-size: 0.9em;"><strong>Role:</strong> {persona_labels.get(st.session_state.persona, "Unknown")}</p>', unsafe_allow_html=True)
+        st.markdown(f'<p style="color: #34d399; font-size: 0.9em;"><strong>Role:</strong> {persona_labels.get(st.session_state.persona, "Unknown")}</p>', unsafe_allow_html=True)
     st.divider()
 
     # Progress Checklist (Task 4)
@@ -360,7 +368,7 @@ with st.sidebar:
 
     # Calculate progress with real-time conversation tracking
     steps = [
-        ("BioSim chat started", len(st.session_state.messages) > 0),
+        ("Chat started", len(st.session_state.messages) > 0),
         ("Tissue type discussed", conv_progress["tissue_discussed"]),
         ("Goals defined", conv_progress["goals_discussed"]),
         ("Protocol details gathered", conv_progress["cells_discussed"] or conv_progress["scaffold_discussed"] or conv_progress["parameters_discussed"]),
@@ -520,7 +528,7 @@ with st.sidebar:
 
 
 def _render_biosim_tab():
-    """Render the BioSim Copilot tab — all existing app logic."""
+    """Render the Stromalytix analysis tab — all existing app logic."""
     if st.session_state.phase == "assessment":
         # ========================================================================
         # PHASE: ASSESSMENT (Chat Interface)
@@ -676,7 +684,7 @@ def _render_biosim_tab():
 
         # Initialize chat chain on first load
         if st.session_state.chain is None:
-            with st.spinner("Initializing BioSim Copilot..."):
+            with st.spinner("Starting up..."):
                 st.session_state.chain = initialize_chat(
                     domain=st.session_state.get("application_domain", "tissue_engineering")
                 )
@@ -782,7 +790,7 @@ def _render_biosim_tab():
             st.session_state.phase = "results"
             st.rerun()
 
-        with st.spinner("Querying PubMed knowledge base... Synthesizing variance report..."):
+        with st.spinner("Searching literature and building your report..."):
             # Handle None construct_profile (from force analysis with no data)
             if st.session_state.construct_profile is None:
                 print("[ANALYZING] No construct_profile found - creating minimal profile from chat")

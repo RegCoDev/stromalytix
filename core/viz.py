@@ -13,10 +13,10 @@ from core.models import VarianceReport
 
 # Dark Theme Configuration
 DARK_THEME = {
-    "background": "#0a0a0a",
-    "paper": "#111111",
+    "background": "#1a1a1f",
+    "paper": "#252529",
     "text": "#e0e0e0",
-    "accent_green": "#00ff88",
+    "accent_green": "#34d399",
     "grid": "#222222",
     "accent_blue": "#4a9eff",
     "accent_yellow": "#ffd700",
