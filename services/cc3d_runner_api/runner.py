@@ -40,6 +40,7 @@ def _generate_project_xml(
     o2_decay: float,
     o2_boundary: float,
     has_ecm_field: bool,
+    has_pif: bool = False,
     potts_temperature: float = 10.0,
     neighbor_order: int = 2,
 ) -> str:
@@ -115,6 +116,13 @@ def _generate_project_xml(
     </DiffusionField>
   </Steppable>"""
 
+    pif_block = ""
+    if has_pif:
+        pif_block = """
+  <Steppable Type="PIFInitializer">
+    <PIFName>simulation.pif</PIFName>
+  </Steppable>"""
+
     xml = f"""<CompuCell3D Version="4.0.0">
   <Potts>
     <Dimensions x="{dims[0]}" y="{dims[1]}" z="{dims[2]}"/>
@@ -141,11 +149,7 @@ def _generate_project_xml(
   </Plugin>
 
   <Plugin Name="PixelTracker"/>
-{o2_solver}{ecm_solver}
-
-  <Steppable Type="PIFInitializer">
-    <PIFName>simulation.pif</PIFName>
-  </Steppable>
+{o2_solver}{ecm_solver}{pif_block}
 </CompuCell3D>
 """
     return xml
@@ -171,22 +175,41 @@ def _generate_steppable_py(
     media_change_mcs: list[int],
     scaffold_type: str,
     ecm_degradation_rate: float,
+    dims: tuple[int, int, int] = (100, 100, 100),
 ) -> str:
     """Generate the Python steppable file."""
 
     cell_types_repr = repr(cell_types)
     media_changes_repr = repr(media_change_mcs)
 
-    seed_lines = []
-    cells_per_type = max(5, min(30, 60 // max(len(cell_types), 1)))
+    # Compute safe seeding: fit cells within lattice bounds
     grid_side = 5
+    n_types = max(len(cell_types), 1)
+    # Available slots per axis (leave margin)
+    usable_x = max(dims[0] - grid_side, grid_side)
+    usable_y = max(dims[1] - grid_side, grid_side)
+    usable_z = max(dims[2] - grid_side, grid_side)
+    # Slots along x per cell type
+    slots_x = usable_x // (grid_side * n_types)
+    slots_y = usable_y // grid_side
+    # Total safe slots per type = grid along x * grid along y
+    cells_per_type = max(3, min(slots_x * max(1, slots_y // 4), 30))
+
+    seed_lines = []
     for idx, ct in enumerate(cell_types):
-        x_off = idx * grid_side * cells_per_type // max(len(cell_types), 1)
+        x_start = idx * (usable_x // n_types)
+        x_end = x_start + (usable_x // n_types) - grid_side
         seed_lines.append(f"        # Seed {ct}")
+        seed_lines.append(f"        _nx = max(1, ({x_end} - {x_start}) // {grid_side})")
         seed_lines.append(f"        for i in range({cells_per_type}):")
         seed_lines.append(f"            cell = self.new_cell(self.{ct.upper()})")
-        seed_lines.append(f"            x0 = {x_off} + i * {grid_side}")
-        seed_lines.append(f"            self.cell_field[x0:x0+{grid_side}, 0:{grid_side}, 0:{grid_side}] = cell")
+        seed_lines.append(f"            ix = i % _nx")
+        seed_lines.append(f"            iy = i // _nx")
+        seed_lines.append(f"            x0 = {x_start} + ix * {grid_side}")
+        seed_lines.append(f"            y0 = iy * {grid_side}")
+        seed_lines.append(f"            if x0 + {grid_side} > {dims[0]} or y0 + {grid_side} > {dims[1]}:")
+        seed_lines.append(f"                continue")
+        seed_lines.append(f"            self.cell_field[x0:x0+{grid_side}, y0:y0+{grid_side}, 0:{min(grid_side, dims[2])}] = cell")
         seed_lines.append(f"            cell.targetVolume = {target_vol}")
         seed_lines.append(f"            cell.lambdaVolume = {lambda_vol}")
         seed_lines.append(f"            cell.targetSurface = {target_surf}")
@@ -234,7 +257,7 @@ def _generate_steppable_py(
     if media_change_mcs:
         media_change_block = f"""
         # Media change events
-        if mcs in MEDIA_CHANGE_SCHEDULE:
+        if mcs in self.MEDIA_CHANGE_SCHEDULE:
             if {has_o2}:
                 o2_field = self.field.O2
                 for x in range(self.dim.x):
@@ -294,21 +317,30 @@ CompuCellSetup.register_steppable(
     if doubling_time_mcs > 0:
         mitosis_import = "\nimport cc3d.core.PySteppables as _PySteppables"
 
+    # Build inline type ID list for step() — avoids module-level variable scope issues with CC3D exec()
+    type_attrs = ", ".join(f"self.{ct.upper()}" for ct in cell_types)
+
+    # Also inline references in proliferation block
+    proliferation_block = proliferation_block.replace(
+        "*[getattr(self, ct.upper()) for ct in CELL_TYPES]",
+        type_attrs,
+    )
+
     script = f'''"""Auto-generated CC3D simulation — Stromalytix sidecar."""
 import cc3d.core.PySteppables as _PySteppables
 from cc3d import CompuCellSetup{mitosis_import}
 
-CELL_TYPES = {cell_types_repr}
-TARGET_VOLUME = {target_vol}
-LAMBDA_VOLUME = {lambda_vol}
-TARGET_SURFACE = {target_surf}
-LAMBDA_SURFACE = {lambda_surf}
-MCS_STEPS = {mcs_steps}
-VTK_OUTPUT_FREQ = {vtk_output_freq}
-MEDIA_CHANGE_SCHEDULE = {media_changes_repr}
-
 
 class StromalytixSteppable(_PySteppables.SteppableBasePy):
+    CELL_TYPES = {cell_types_repr}
+    TARGET_VOLUME = {target_vol}
+    LAMBDA_VOLUME = {lambda_vol}
+    TARGET_SURFACE = {target_surf}
+    LAMBDA_SURFACE = {lambda_surf}
+    MCS_STEPS = {mcs_steps}
+    VTK_OUTPUT_FREQ = {vtk_output_freq}
+    MEDIA_CHANGE_SCHEDULE = {media_changes_repr}
+
     def __init__(self, frequency=1):
         super().__init__(frequency)
 
@@ -317,18 +349,20 @@ class StromalytixSteppable(_PySteppables.SteppableBasePy):
         print(f"Seeded {{sum(1 for _ in self.cell_list)}} cells")
 
     def step(self, mcs):
-        for cell in self.cell_list_by_type(*[getattr(self, ct.upper()) for ct in CELL_TYPES]):
-            cell.targetSurface = TARGET_SURFACE
-            cell.lambdaSurface = LAMBDA_SURFACE
+        for cell in self.cell_list_by_type({type_attrs}):
+            cell.targetSurface = self.TARGET_SURFACE
+            cell.lambdaSurface = self.LAMBDA_SURFACE
 {o2_uptake_block}{proliferation_block}{media_change_block}{ecm_degradation_block}
 
-        if mcs % VTK_OUTPUT_FREQ == 0:
-            print(f"MCS {{mcs}}/{{MCS_STEPS}}")
+        if mcs % self.VTK_OUTPUT_FREQ == 0:
+            print(f"MCS {{mcs}}/{{self.MCS_STEPS}}")
 
 
 CompuCellSetup.register_steppable(
     steppable=StromalytixSteppable(frequency=1)
 ){mitosis_class}
+
+CompuCellSetup.run()
 '''
     return script
 
@@ -446,6 +480,7 @@ def generate_cc3d_project(
         media_change_mcs=media_change_mcs,
         scaffold_type=scaffold_type,
         ecm_degradation_rate=ecm_deg_rate,
+        dims=dims,
     )
 
     project_xml = _generate_project_xml(
@@ -459,6 +494,7 @@ def generate_cc3d_project(
         o2_decay=o2_decay,
         o2_boundary=o2_boundary,
         has_ecm_field=has_ecm_field,
+        has_pif=bool(pif_content),
     )
 
     return steppable_py, project_xml, pif_content
@@ -480,6 +516,7 @@ async def execute_cc3d(
     script_path: Path,
     output_dir: Path,
     timeout: int = 120,
+    output_frequency: int = 100,
 ):
     """Execute CC3D script headlessly, capture output."""
     try:
@@ -487,6 +524,7 @@ async def execute_cc3d(
             cc3d_python, "-m", "cc3d.run_script",
             "-i", str(script_path),
             "-o", str(output_dir),
+            "-f", str(output_frequency),
             "--current-dir", str(output_dir),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,

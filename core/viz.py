@@ -236,12 +236,25 @@ def build_parameter_scatter(report: VarianceReport) -> go.Figure:
     for param, bench in report.benchmark_ranges.items():
         if not isinstance(bench, dict) or "min" not in bench or "max" not in bench:
             continue
+        try:
+            bmin = float(bench["min"])
+            bmax = float(bench["max"])
+        except (TypeError, ValueError):
+            continue
         user_val = getattr(report.construct_profile, param, None)
+        if user_val is not None:
+            try:
+                user_val = float(user_val)
+            except (TypeError, ValueError):
+                user_val = None
         unit = bench.get("unit", "")
-        optimal = bench.get("optimal", (bench["min"] + bench["max"]) / 2)
+        try:
+            optimal = float(bench.get("optimal", (bmin + bmax) / 2))
+        except (TypeError, ValueError):
+            optimal = (bmin + bmax) / 2
         risk = report.risk_flags.get(param, "green")
         rows.append(dict(
-            param=param, bmin=bench["min"], bmax=bench["max"],
+            param=param, bmin=bmin, bmax=bmax,
             optimal=optimal, user=user_val, unit=unit, risk=risk,
         ))
 
