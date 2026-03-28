@@ -202,10 +202,10 @@ async def _run_simulation(job_id: str, req: SimulationRequest):
 
         _update_job(job_id, message="Running CC3D simulation...")
 
-        cc3d_runner = os.environ.get("CC3D_RUNNER", CC3D_PYTHON)
+        cc3d_timeout = int(os.environ.get("CC3D_SUBPROCESS_TIMEOUT", "180"))
         script_path = job_dir / "simulation.cc3d"
         success, stdout, stderr = await execute_cc3d(
-            cc3d_runner, script_path, job_dir, timeout=120
+            CC3D_PYTHON, script_path, job_dir, timeout=cc3d_timeout
         )
 
         if not success:
