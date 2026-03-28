@@ -5,8 +5,10 @@ Streamlit renderers for the three results tabs (Feasibility, Simulation, Methods
 from __future__ import annotations
 
 import base64
+import csv
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 from typing import Callable
 
@@ -16,6 +18,44 @@ from core.action_plan import build_action_checklist, checklist_to_prompt_text
 from core.expand_action_plan import expand_action_plan_narrative
 from core.models import ConstructProfile, VarianceReport
 from core.viz import build_parameter_scatter, build_radar_chart, build_risk_scorecard
+
+
+def _save_signup(email: str) -> None:
+    """Append email to signups.csv (mirrors app.save_signup)."""
+    csv_path = Path("signups.csv")
+    timestamp = datetime.now().isoformat()
+    with open(csv_path, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([timestamp, email])
+
+
+def _email_gate(key_suffix: str) -> bool:
+    """Show an inline email capture if ``user_email`` is not set.
+
+    Returns ``True`` when the feature is unlocked (email already on file),
+    ``False`` when the gate was rendered instead.
+    """
+    if st.session_state.get("user_email"):
+        return True
+
+    gc1, gc2 = st.columns([3, 1])
+    with gc1:
+        email = st.text_input(
+            "Enter your email to unlock this feature",
+            placeholder="you@institution.edu",
+            label_visibility="collapsed",
+            key=f"email_gate_{key_suffix}",
+        )
+    with gc2:
+        if st.button("Unlock", key=f"email_gate_btn_{key_suffix}", use_container_width=True):
+            if email and "@" in email:
+                st.session_state["user_email"] = email
+                _save_signup(email)
+                st.rerun()
+            else:
+                st.error("Enter a valid email.")
+    st.caption("Enter your email to unlock this feature.")
+    return False
 
 
 def _anthropic_configured() -> bool:
@@ -36,7 +76,7 @@ def render_results_feasibility_tab(profile: ConstructProfile, report: VarianceRe
         feas = feasibility_analyse(profile, report)
 
         tier_color = {
-            "feasible": "#00ff88",
+            "feasible": "#34d399",
             "marginal": "#ffd700",
             "aspirational": "#ff4444",
         }
@@ -96,7 +136,7 @@ def render_results_feasibility_tab(profile: ConstructProfile, report: VarianceRe
             "Degradation-Driven Migration": "♻️",
         }
         conf_badge = {
-            "high": ("🟢", "#00ff88"),
+            "high": ("🟢", "#34d399"),
             "medium": ("🟡", "#ffd700"),
             "low": ("🔴", "#ff4444"),
         }
@@ -175,6 +215,24 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
 
         st.plotly_chart(build_parameter_scatter(report), use_container_width=True)
 
+    with st.expander("Tissue construct preview", expanded=False):
+        try:
+            from core.tissue_viz import render_construct_3d
+
+            tissue_title = f"{profile.target_tissue or 'Construct'} — cell distribution"
+            fig_tissue = render_construct_3d(profile, title=tissue_title)
+            st.plotly_chart(fig_tissue, use_container_width=True)
+
+            cell_types = profile.cell_types or ["default"]
+            method = profile.biofab_method or "scaffold_free"
+            st.caption(
+                f"{len(cell_types)} cell type{'s' if len(cell_types) != 1 else ''} | "
+                f"{method.replace('_', ' ')} geometry | "
+                f"stiffness: {profile.stiffness_kpa or '?'} kPa"
+            )
+        except Exception as e:
+            st.caption(f"Tissue preview unavailable: {e}")
+
     with st.expander("Scaffold geometry", expanded=False):
         scaf_col1, scaf_col2 = st.columns([2, 1])
         _simple_archs = frozenset(
@@ -185,73 +243,100 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                 "sphere_droplet",
                 "droplet_in_droplet",
                 "multimaterial_bilayer_cylinder",
+                "line_filament",
+                "disc",
+                "tube",
             }
         )
 
+        _arch_labels = {
+            "gyroid": "Gyroid (TPMS)",
+            "schwarz_p": "Schwarz-P (TPMS)",
+            "diamond": "Diamond (TPMS)",
+            "lidinoid": "Lidinoid (TPMS)",
+            "woodpile": "Woodpile lattice",
+            "grid": "Grid lattice",
+            "cylinder_solid": "Cylinder (solid)",
+            "cylinder_hollow": "Cylinder (hollow)",
+            "line_filament": "Line / filament",
+            "disc": "Disc / wafer",
+            "tube": "Tube / cannula",
+            "ring_torus": "Ring / torus",
+            "sphere_droplet": "Sphere / droplet",
+            "droplet_in_droplet": "Core-shell sphere",
+            "multimaterial_bilayer_cylinder": "Bilayer cylinder",
+            "custom_stl": "Upload STL",
+        }
+        _arch_keys = list(_arch_labels.keys())
+
         with scaf_col2:
-            scaffold_arch = st.selectbox(
+            scaffold_arch_label = st.selectbox(
                 "Architecture",
-                [
-                    "gyroid",
-                    "schwarz_p",
-                    "diamond",
-                    "lidinoid",
-                    "woodpile",
-                    "grid",
-                    "cylinder_solid",
-                    "cylinder_hollow",
-                    "ring_torus",
-                    "sphere_droplet",
-                    "droplet_in_droplet",
-                    "multimaterial_bilayer_cylinder",
-                    "custom_stl",
-                ],
+                list(_arch_labels.values()),
                 index=0,
                 key="scaf_arch_sim",
-                help="Primitives: solid/hollow cylinders, torus ring, droplet spheres, core–shell and bilayer multimaterial.",
             )
+            scaffold_arch = _arch_keys[list(_arch_labels.values()).index(scaffold_arch_label)]
 
             stl_file = st.file_uploader("Upload STL", type=["stl", "obj"], key="stl_upload_sim")
 
             if scaffold_arch in _simple_archs:
                 scaf_pore = 300
                 scaf_porosity = 70
-                s_r = s_h = s_inner = s_major = s_minor = 1.5
+                s_r = s_h = s_inner = s_major = s_minor = s_len = s_thick = 1.5
+
+                # Radius controls
                 if scaffold_arch in (
-                    "cylinder_solid",
-                    "cylinder_hollow",
-                    "sphere_droplet",
-                    "droplet_in_droplet",
-                    "multimaterial_bilayer_cylinder",
+                    "cylinder_solid", "cylinder_hollow",
+                    "sphere_droplet", "droplet_in_droplet",
+                    "multimaterial_bilayer_cylinder", "disc", "tube",
                 ):
-                    s_r = st.slider("Outer / droplet radius (mm)", 0.35, 2.8, 1.5, key="scaf_simple_r_sim")
-                if scaffold_arch in (
-                    "cylinder_solid",
-                    "cylinder_hollow",
-                    "multimaterial_bilayer_cylinder",
-                ):
+                    default_r = 0.3 if scaffold_arch == "line_filament" else 1.5
+                    s_r = st.slider("Radius (mm)", 0.2, 3.0, default_r, key="scaf_simple_r_sim")
+
+                # Height controls (vertical cylinders)
+                if scaffold_arch in ("cylinder_solid", "cylinder_hollow", "multimaterial_bilayer_cylinder"):
                     s_h = st.slider("Height (mm)", 0.8, 6.0, 3.5, key="scaf_simple_h_sim")
-                if scaffold_arch in ("cylinder_hollow", "multimaterial_bilayer_cylinder", "droplet_in_droplet"):
+
+                # Length controls (horizontal shapes)
+                if scaffold_arch in ("line_filament", "tube"):
+                    s_len = st.slider("Length (mm)", 1.0, 10.0, 6.0, key="scaf_simple_len_sim")
+                if scaffold_arch == "line_filament":
+                    s_r = st.slider("Filament radius (mm)", 0.1, 1.0, 0.3, key="scaf_line_r_sim")
+
+                # Thickness (disc)
+                if scaffold_arch == "disc":
+                    s_thick = st.slider("Thickness (mm)", 0.1, 2.0, 0.5, key="scaf_disc_thick_sim")
+
+                # Inner radius (hollow shapes)
+                if scaffold_arch in ("cylinder_hollow", "multimaterial_bilayer_cylinder", "droplet_in_droplet", "tube"):
                     default_in = min(0.95, s_r * 0.52) if scaffold_arch != "droplet_in_droplet" else min(0.85, s_r * 0.45)
                     s_inner = st.slider(
-                        "Inner / core radius (mm)",
+                        "Inner radius (mm)",
                         0.15,
-                        max(0.2, s_r - 0.2),
-                        default_in,
+                        max(0.2, s_r - 0.15),
+                        min(default_in, s_r - 0.15),
                         key="scaf_simple_inner_sim",
                     )
+
+                # Torus controls
                 if scaffold_arch == "ring_torus":
                     s_major = st.slider("Ring major radius (mm)", 0.8, 2.5, 1.7, key="scaf_torus_major_sim")
                     s_minor = st.slider("Ring tube radius (mm)", 0.15, 0.8, 0.35, key="scaf_torus_minor_sim")
+
+                # Compute bounding box
                 box_l = max(
                     4.0,
                     s_r * 2.8,
                     (s_h + 0.5) if scaffold_arch in ("cylinder_solid", "cylinder_hollow", "multimaterial_bilayer_cylinder") else 0,
                     (s_major * 2 + s_minor * 2 + 0.5) if scaffold_arch == "ring_torus" else 0,
+                    (s_len + 0.5) if scaffold_arch in ("line_filament", "tube") else 0,
                 )
                 zh = max(box_l, s_h + 0.5) if scaffold_arch in ("cylinder_solid", "cylinder_hollow", "multimaterial_bilayer_cylinder") else box_l
                 if scaffold_arch == "ring_torus":
                     zh = max(box_l, (s_minor * 2 + 0.2))
+                if scaffold_arch in ("disc",):
+                    zh = max(2.0, s_thick + 0.5)
                 outer_box = (box_l, box_l, zh)
             else:
                 scaf_pore = st.slider("Pore size (um)", 100, 800, 300, key="scaf_pore_sim")
@@ -270,12 +355,15 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                     from core.scaffold_geometry import (
                         generate_cylinder_hollow,
                         generate_cylinder_solid,
+                        generate_disc,
                         generate_droplet_in_droplet,
                         generate_filament_lattice,
+                        generate_line_filament,
                         generate_multimaterial_bilayer_cylinder,
                         generate_ring_torus,
                         generate_sphere_droplet,
                         generate_tpms,
+                        generate_tube,
                         import_stl,
                         preview_scaffold,
                     )
@@ -292,6 +380,22 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                             outer_radius_mm=s_r,
                             inner_radius_mm=max(0.15, ir),
                             height_mm=s_h,
+                            outer_dims_mm=outer_box,
+                        )
+                    elif scaffold_arch == "line_filament":
+                        mesh = generate_line_filament(
+                            radius_mm=s_r, length_mm=s_len, outer_dims_mm=outer_box
+                        )
+                    elif scaffold_arch == "disc":
+                        mesh = generate_disc(
+                            radius_mm=s_r, thickness_mm=s_thick, outer_dims_mm=outer_box
+                        )
+                    elif scaffold_arch == "tube":
+                        ir = min(s_inner, s_r - 0.15)
+                        mesh = generate_tube(
+                            outer_radius_mm=s_r,
+                            inner_radius_mm=max(0.15, ir),
+                            length_mm=s_len,
                             outer_dims_mm=outer_box,
                         )
                     elif scaffold_arch == "ring_torus":
@@ -350,18 +454,18 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
 
     if profile.stiffness_kpa and profile.cell_density_per_ml:
         from core.fem_solver import (
-            FEM_EXCLUDED_PHYSICS_SUMMARY,
             predict_scaffold_deformation,
             predict_stress_distribution,
+            render_fea_results,
+            solve_compression,
         )
 
-        with st.expander("Scaffold mechanics (linear elastic sketch)", expanded=False):
+        with st.expander("Scaffold mechanics", expanded=False):
             st.caption(
-                "**Not viscoelastic:** no creep, relaxation, or poroelastic flow. "
-                "Readouts are coarse order-of-magnitude sketches for **bulk construct mechanics**, "
-                "not mechanoreceptor maps or matrix rupture criteria."
+                "Linear elastic estimate — real matrices are viscoelastic. "
+                "Treat as order-of-magnitude intuition, not a prediction."
             )
-            st.caption(FEM_EXCLUDED_PHYSICS_SUMMARY)
+
             fea_result = predict_scaffold_deformation(
                 stiffness_kpa=profile.stiffness_kpa,
                 cell_density_per_ml=profile.cell_density_per_ml,
@@ -369,19 +473,18 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
 
             fea_col1, fea_col2, fea_col3 = st.columns(3)
             with fea_col1:
-                st.metric("Max deformation (model)", f"{fea_result['max_deformation_um']:.1f} μm")
+                st.metric("Max deformation", f"{fea_result['max_deformation_um']:.1f} um")
             with fea_col2:
-                st.metric("Bulk strain (model)", f"{fea_result['strain_percent']:.2f}%")
+                st.metric("Bulk strain", f"{fea_result['strain_percent']:.2f}%")
             with fea_col3:
                 risk = fea_result["failure_risk"]
-                risk_color = {"low": "#00ff88", "medium": "#ffd700", "high": "#ff4444"}.get(risk, "#888")
+                risk_color = {"low": "#34d399", "medium": "#ffd700", "high": "#ff4444"}.get(risk, "#888")
                 st.markdown(
-                    f'<p style="font-size: 0.85em; color: #888;">Construct integrity band</p>'
+                    f'<p style="font-size: 0.85em; color: #888;">Integrity risk</p>'
                     f'<p style="font-size: 1.5em; font-weight: bold; color: {risk_color};">{risk.upper()}</p>',
                     unsafe_allow_html=True,
                 )
 
-            st.caption(fea_result.get("failure_risk_explainer", ""))
             st.markdown(
                 f'<div style="border: 1px solid #444; padding: 0.8rem; border-radius: 0.5rem; '
                 f'background: #1a1a1a; margin: 0.5rem 0;">'
@@ -394,8 +497,7 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                     stiffness_kpa=profile.stiffness_kpa,
                     porosity_percent=profile.porosity_percent,
                 )
-                st.markdown("##### Porous solid: elastic load-path hotspot index")
-                st.caption(stress_result.get("model_limits", ""))
+                st.markdown("##### Stress hotspots")
                 st.markdown(
                     f'<div style="border: 1px solid #444; padding: 0.8rem; border-radius: 0.5rem; '
                     f'background: #1a1a1a; margin: 0.5rem 0;">'
@@ -403,7 +505,18 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
                     unsafe_allow_html=True,
                 )
 
-    st.markdown("### CompuCell3D Simulation Brief")
+            # 3D FEA compression visualization
+            try:
+                fea_3d = solve_compression(profile, resolution=8)
+                fig_fea = render_fea_results(fea_3d)
+                st.plotly_chart(fig_fea, use_container_width=True)
+                st.caption(
+                    f"{fea_3d['n_nodes']} nodes, {fea_3d['n_elements']} elements | "
+                    f"E = {fea_3d['E_kpa']:.0f} kPa | "
+                    f"SCF = {fea_3d['stress_concentration_factor']:.1f}x"
+                )
+            except Exception as e:
+                st.caption(f"3D compression preview unavailable: {e}")
 
     if st.session_state.simulation_brief is None:
         try:
@@ -471,8 +584,8 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
         )
 
         st.markdown(
-            f'<div style="border: 2px solid #00ff88; padding: 1rem; border-radius: 0.5rem; background: #0a1a0a; margin: 1rem 0;">'
-            f'<strong style="color: #00ff88;">✓ Validation Experiment:</strong><br>{sim_brief["validation_experiment"]}'
+            f'<div style="border: 2px solid #34d399; padding: 1rem; border-radius: 0.5rem; background: #0a1a0a; margin: 1rem 0;">'
+            f'<strong style="color: #34d399;">✓ Validation Experiment:</strong><br>{sim_brief["validation_experiment"]}'
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -480,67 +593,77 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
         from core.cc3d_runner import CC3D_API_URL, run_simulation
 
         if CC3D_API_URL:
-            if st.button("⚡ Run CC3D Simulation (Cloud)", key="btn_run_cc3d_cloud_sim", use_container_width=True):
-                with st.spinner("Running CC3D simulation on cloud..."):
-                    cc3d_result = run_simulation(sim_brief)
-                    if cc3d_result["success"]:
-                        st.success(
-                            f"CC3D completed: {cc3d_result['mcs_completed']} MCS in "
-                            f"{cc3d_result['duration_seconds']}s"
+            if _email_gate("cc3d_run"):
+                if st.button("⚡ Run CC3D Simulation (Cloud)", key="btn_run_cc3d_cloud_sim", use_container_width=True):
+                    with st.spinner("Running CC3D simulation on cloud..."):
+                        cc3d_result = run_simulation(sim_brief)
+                        if cc3d_result["success"]:
+                            # Persist result in session state so it survives reruns
+                            st.session_state["cc3d_result"] = cc3d_result
+                        else:
+                            st.warning(f"CC3D: {cc3d_result.get('error', 'Unknown error')}")
+
+            # Render persisted CC3D result (survives Streamlit reruns)
+            cc3d_result = st.session_state.get("cc3d_result")
+            if cc3d_result and cc3d_result.get("success"):
+                st.success(
+                    f"CC3D completed: {cc3d_result['mcs_completed']} MCS in "
+                    f"{cc3d_result['duration_seconds']}s"
+                )
+                if cc3d_result.get("output"):
+                    st.code(cc3d_result["output"], language="text")
+
+                vtk_frames = cc3d_result.get("vtk_frames", [])
+                if vtk_frames:
+                    from core.cc3d_viz import (
+                        get_default_type_map,
+                        parse_vtk_fields_from_bytes,
+                        render_unified_scene,
+                    )
+
+                    type_map = get_default_type_map(sim_brief.get("key_parameters", sim_brief))
+
+                    frame_idx = len(vtk_frames) - 1
+                    if len(vtk_frames) > 1:
+                        frame_idx = st.slider(
+                            "Simulation frame",
+                            0,
+                            len(vtk_frames) - 1,
+                            value=len(vtk_frames) - 1,
+                            key="cc3d_frame_slider",
                         )
-                        if cc3d_result.get("output"):
-                            st.code(cc3d_result["output"], language="text")
 
-                        vtk_frames = cc3d_result.get("vtk_frames", [])
-                        if vtk_frames:
-                            from core.cc3d_viz import (
-                                get_default_type_map,
-                                parse_vtk_from_bytes,
-                                parse_vtk_scalar_field,
-                                render_unified_scene,
-                            )
+                    frame = vtk_frames[frame_idx]
+                    vtk_bytes = base64.b64decode(frame["data_b64"])
 
-                            type_map = get_default_type_map(sim_brief.get("key_parameters", sim_brief))
+                    # Parse all fields from the single VTK file
+                    parsed = parse_vtk_fields_from_bytes(vtk_bytes)
+                    lattice = {
+                        "dimensions": parsed["dimensions"],
+                        "cell_ids": parsed["cell_ids"],
+                        "spacing": parsed["spacing"],
+                    }
+                    o2_field = parsed["o2"]
 
-                            cell_frames = [f for f in vtk_frames if f.get("field_type") == "cell"]
-                            o2_frames = [f for f in vtk_frames if f.get("field_type") == "o2"]
+                    scaffold_mesh = st.session_state.get("scaffold_mesh")
 
-                            display_frames = cell_frames if cell_frames else vtk_frames
-                            frame_idx = len(display_frames) - 1
-                            if len(display_frames) > 1:
-                                frame_idx = st.slider(
-                                    "Simulation frame",
-                                    0,
-                                    len(display_frames) - 1,
-                                    value=len(display_frames) - 1,
-                                    key="cc3d_frame_slider",
-                                )
+                    fig_cc3d = render_unified_scene(
+                        cell_lattice=lattice,
+                        type_map=type_map,
+                        o2_field=o2_field,
+                        scaffold_mesh=scaffold_mesh,
+                        title="CC3D Simulation Result",
+                        timestep=frame_idx,
+                    )
+                    st.plotly_chart(fig_cc3d, use_container_width=True)
 
-                            frame = display_frames[frame_idx]
-                            vtk_bytes = base64.b64decode(frame["data_b64"])
-                            lattice = parse_vtk_from_bytes(vtk_bytes)
-
-                            o2_field = None
-                            if o2_frames and frame_idx < len(o2_frames):
-                                o2_bytes = base64.b64decode(o2_frames[frame_idx]["data_b64"])
-                                o2_field = parse_vtk_scalar_field(o2_bytes)
-
-                            scaffold_mesh = st.session_state.get("scaffold_mesh")
-
-                            fig_cc3d = render_unified_scene(
-                                cell_lattice=lattice,
-                                type_map=type_map,
-                                o2_field=o2_field,
-                                scaffold_mesh=scaffold_mesh,
-                                title="CC3D Simulation Result",
-                                timestep=frame_idx,
-                            )
-                            st.plotly_chart(fig_cc3d, use_container_width=True)
-
-                            if o2_field is not None:
-                                st.caption("Red markers indicate hypoxic zones (O2 < 5%)")
-                    else:
-                        st.warning(f"CC3D: {cc3d_result.get('error', 'Unknown error')}")
+                    has_o2 = o2_field is not None
+                    st.caption(
+                        f"{len(vtk_frames)} frames"
+                        + (" | O2 field detected" if has_o2 else " | No O2 field")
+                    )
+                    if has_o2:
+                        st.caption("Red markers indicate hypoxic zones (O2 < 5%)")
         else:
             st.button(
                 "⚡ Run CC3D Simulation (Cloud)",
@@ -559,27 +682,28 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
     with st.expander("Exports (PDF & PNG)", expanded=False):
         export_col1, export_col2 = st.columns(2)
         with export_col1:
-            try:
-                from core.export import generate_pdf_report
+            if _email_gate("pdf_download"):
+                try:
+                    from core.export import generate_pdf_report
 
-                pdf_path = generate_pdf_report(report, client_name="")
-                with open(pdf_path, "rb") as f:
-                    st.download_button(
+                    pdf_path = generate_pdf_report(report, client_name="")
+                    with open(pdf_path, "rb") as f:
+                        st.download_button(
+                            "Download PDF Report",
+                            data=f.read(),
+                            file_name=Path(pdf_path).name,
+                            mime="application/pdf",
+                            use_container_width=True,
+                            key="download_pdf_sim_tab",
+                        )
+                except Exception as e:
+                    st.button(
                         "Download PDF Report",
-                        data=f.read(),
-                        file_name=Path(pdf_path).name,
-                        mime="application/pdf",
+                        disabled=True,
                         use_container_width=True,
-                        key="download_pdf_sim_tab",
+                        key="download_pdf_sim_disabled",
+                        help=f"PDF export unavailable: {e}",
                     )
-            except Exception as e:
-                st.button(
-                    "Download PDF Report",
-                    disabled=True,
-                    use_container_width=True,
-                    key="download_pdf_sim_disabled",
-                    help=f"PDF export unavailable: {e}",
-                )
 
         with export_col2:
             try:
@@ -653,24 +777,25 @@ def render_results_action_plan_tab(
     checklist_txt = checklist_to_prompt_text(rows)
     has_key = _anthropic_configured()
 
-    expand_kwargs = {
-        "label": "Expand for lab execution (AI)",
-        "disabled": not has_key,
-        "key": "expand_plan_ai",
-        "use_container_width": True,
-    }
-    if not has_key:
-        expand_kwargs["help"] = (
-            "Set ANTHROPIC_API_KEY in the environment or Streamlit secrets to enable expansion."
-        )
-    if st.button(**expand_kwargs):
-        with st.spinner("Expanding methods & materials plan…"):
-            try:
-                st.session_state.action_plan_narrative = expand_action_plan_narrative(
-                    profile, report, checklist_txt
-                )
-            except Exception as e:
-                st.error(f"Could not expand plan: {e}")
+    if _email_gate("expand_plan"):
+        expand_kwargs = {
+            "label": "Expand for lab execution (AI)",
+            "disabled": not has_key,
+            "key": "expand_plan_ai",
+            "use_container_width": True,
+        }
+        if not has_key:
+            expand_kwargs["help"] = (
+                "Set ANTHROPIC_API_KEY in the environment or Streamlit secrets to enable expansion."
+            )
+        if st.button(**expand_kwargs):
+            with st.spinner("Expanding methods & materials plan…"):
+                try:
+                    st.session_state.action_plan_narrative = expand_action_plan_narrative(
+                        profile, report, checklist_txt
+                    )
+                except Exception as e:
+                    st.error(f"Could not expand plan: {e}")
 
     narrative = st.session_state.get("action_plan_narrative") or ""
     if narrative:
@@ -691,6 +816,7 @@ def render_results_action_plan_tab(
         if st.button("Sign Up", use_container_width=True, key="signup_plan_cta"):
             if email and "@" in email:
                 save_signup(email)
+                st.session_state["user_email"] = email
                 st.success("You're on the list. We'll be in touch.")
             else:
                 st.error("Please enter a valid email address.")

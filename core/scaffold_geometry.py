@@ -434,6 +434,66 @@ def generate_droplet_in_droplet(
     }
 
 
+def generate_line_filament(
+    radius_mm: float = 0.3,
+    length_mm: float = 6.0,
+    outer_dims_mm: tuple[float, float, float] = (7.0, 2.0, 2.0),
+    sections: int = 24,
+) -> dict:
+    """Single filament / rod / line along the X axis."""
+    import trimesh
+
+    cyl = trimesh.creation.cylinder(radius=radius_mm, height=length_mm, sections=sections)
+    # Rotate so axis is along X instead of Z
+    rot = trimesh.transformations.rotation_matrix(np.pi / 2, [0, 1, 0])
+    cyl.apply_transform(rot)
+    return _mesh_dict_single(cyl, "line_filament", outer_dims_mm, radius_mm=radius_mm, length_mm=length_mm)
+
+
+def generate_disc(
+    radius_mm: float = 2.0,
+    thickness_mm: float = 0.5,
+    outer_dims_mm: tuple[float, float, float] = (5.0, 5.0, 2.0),
+    sections: int = 48,
+) -> dict:
+    """Flat disc / disk (short cylinder)."""
+    import trimesh
+
+    cyl = trimesh.creation.cylinder(radius=radius_mm, height=thickness_mm, sections=sections)
+    return _mesh_dict_single(cyl, "disc", outer_dims_mm, radius_mm=radius_mm, thickness_mm=thickness_mm)
+
+
+def generate_tube(
+    outer_radius_mm: float = 1.5,
+    inner_radius_mm: float = 1.0,
+    length_mm: float = 6.0,
+    outer_dims_mm: tuple[float, float, float] = (7.0, 4.0, 4.0),
+    sections: int = 48,
+) -> dict:
+    """Hollow tube / cannula along the X axis (open ends)."""
+    import trimesh
+
+    outer = trimesh.creation.cylinder(radius=outer_radius_mm, height=length_mm, sections=sections)
+    inner = trimesh.creation.cylinder(
+        radius=inner_radius_mm, height=length_mm + 0.05, sections=max(sections // 2, 16)
+    )
+    diff = _boolean_difference(outer, inner, "tube")
+    # Rotate so axis is along X
+    rot = trimesh.transformations.rotation_matrix(np.pi / 2, [0, 1, 0])
+    if diff is None or diff.is_empty:
+        outer.apply_transform(rot)
+        return _mesh_dict_single(
+            outer, "tube_fallback_solid", outer_dims_mm,
+            hollow_note="Boolean engine unavailable — showing solid cylinder.",
+            outer_radius_mm=outer_radius_mm, inner_radius_mm=inner_radius_mm, length_mm=length_mm,
+        )
+    diff.apply_transform(rot)
+    return _mesh_dict_single(
+        diff, "tube", outer_dims_mm,
+        outer_radius_mm=outer_radius_mm, inner_radius_mm=inner_radius_mm, length_mm=length_mm,
+    )
+
+
 def generate_multimaterial_bilayer_cylinder(
     outer_radius_mm: float = 2.0,
     inner_radius_mm: float = 1.4,
@@ -622,8 +682,14 @@ def scaffold_from_text(description: str) -> dict:
     filament_keywords = ["woodpile", "filament", "grid", "lattice", "printed", "extru"]
     if any(k in desc for k in ("torus", "ring", "donut")):
         return {"method": "simple", "kwargs": {"kind": "ring_torus"}}
+    if any(k in desc for k in ("tube", "cannula", "hollow tube")):
+        return {"method": "simple", "kwargs": {"kind": "tube"}}
     if "hollow" in desc and "cylind" in desc:
         return {"method": "simple", "kwargs": {"kind": "cylinder_hollow"}}
+    if any(k in desc for k in ("disc", "disk", "wafer", "flat")):
+        return {"method": "simple", "kwargs": {"kind": "disc"}}
+    if any(k in desc for k in ("line", "filament", "fiber", "fibre", "strand")):
+        return {"method": "simple", "kwargs": {"kind": "line_filament"}}
     if "cylind" in desc or "rod" in desc:
         return {"method": "simple", "kwargs": {"kind": "cylinder_solid"}}
     if any(k in desc for k in ("droplet", "bead", "microsphere", "sphere")) and "shell" in desc:
@@ -709,11 +775,11 @@ def preview_scaffold(scaffold_mesh: dict, title: str = "Scaffold Preview") -> go
     fig.update_layout(
         title=dict(
             text=f"{title}<br><sub>{subtitle}</sub>",
-            font=dict(color="#00ff88", size=14, family="JetBrains Mono"),
+            font=dict(color="#34d399", size=14, family="Inter, system-ui, sans-serif"),
         ),
-        paper_bgcolor="#0a0a0a",
+        paper_bgcolor="#1a1a1f",
         scene=dict(
-            bgcolor="#111111",
+            bgcolor="#252529",
             xaxis=dict(backgroundcolor="#111111", gridcolor="#222222",
                        showbackground=True, title="X (mm)"),
             yaxis=dict(backgroundcolor="#111111", gridcolor="#222222",

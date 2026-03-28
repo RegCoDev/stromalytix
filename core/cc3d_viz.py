@@ -41,6 +41,8 @@ def parse_vtk_lattice(vtk_path: str) -> dict:
     Parse CC3D VTK ASCII structured points file.
     Minimal parser — no vtk library dependency.
 
+    Handles both LOOKUP_TABLE and CC3D FIELD FieldData formats.
+
     Returns:
     {
       dimensions: (nx, ny, nz),
@@ -52,31 +54,49 @@ def parse_vtk_lattice(vtk_path: str) -> dict:
     if not path.exists():
         return {"dimensions": (0, 0, 0), "cell_ids": np.array([]), "spacing": (1, 1, 1)}
 
+    with open(path, "r", encoding="utf-8", errors="replace") as f:
+        vtk_bytes = f.read().encode("utf-8")
+
+    result = parse_vtk_from_bytes(vtk_bytes)
+    return result
+
+
+def parse_vtk_from_bytes(vtk_bytes: bytes) -> dict:
+    """Parse CC3D VTK ASCII structured points from raw bytes.
+
+    Handles both formats:
+    - Legacy LOOKUP_TABLE format (SCALARS + LOOKUP_TABLE + data)
+    - CC3D FIELD FieldData format (FIELD FieldData N, then named fields)
+
+    For FIELD format, extracts the CellType field (cell IDs per voxel).
+    """
     dimensions = (1, 1, 1)
     spacing = (1.0, 1.0, 1.0)
-    data = []
-    reading_data = False
 
-    with open(path, "r", encoding="utf-8", errors="replace") as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith("DIMENSIONS"):
-                parts = line.split()
-                dimensions = (int(parts[1]), int(parts[2]), int(parts[3]))
-            elif line.startswith("SPACING") or line.startswith("ASPECT_RATIO"):
-                parts = line.split()
-                spacing = (float(parts[1]), float(parts[2]), float(parts[3]))
-            elif line.startswith("LOOKUP_TABLE"):
-                reading_data = True
-                continue
-            elif reading_data:
-                for val in line.split():
-                    try:
-                        data.append(int(float(val)))
-                    except ValueError:
-                        pass
+    text = vtk_bytes.decode("utf-8", errors="replace")
+    lines = text.splitlines()
 
-    cell_ids = np.array(data, dtype=np.int32) if data else np.array([], dtype=np.int32)
+    # First pass: extract dimensions/spacing
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("DIMENSIONS"):
+            parts = stripped.split()
+            dimensions = (int(parts[1]), int(parts[2]), int(parts[3]))
+        elif stripped.startswith("SPACING") or stripped.startswith("ASPECT_RATIO"):
+            parts = stripped.split()
+            spacing = (float(parts[1]), float(parts[2]), float(parts[3]))
+
+    # Try FIELD FieldData format first (CC3D default output)
+    cell_ids = _extract_field_data(lines, "CellType", dtype="int")
+    if cell_ids is None:
+        # Fallback: try CellId field
+        cell_ids = _extract_field_data(lines, "CellId", dtype="int")
+    if cell_ids is None:
+        # Fallback: legacy LOOKUP_TABLE format
+        cell_ids = _extract_lookup_table_data(lines, dtype="int")
+
+    if cell_ids is None:
+        cell_ids = np.array([], dtype=np.int32)
 
     return {
         "dimensions": dimensions,
@@ -85,42 +105,127 @@ def parse_vtk_lattice(vtk_path: str) -> dict:
     }
 
 
-def parse_vtk_from_bytes(vtk_bytes: bytes) -> dict:
-    """Parse CC3D VTK ASCII structured points from raw bytes.
+def _extract_field_data(lines: list, field_name: str, dtype: str = "float") -> np.ndarray | None:
+    """Extract a named field from CC3D FIELD FieldData format.
 
-    Same output format as parse_vtk_lattice but works on in-memory
-    bytes (e.g. base64-decoded cloud VTK frames).
+    Format:
+        FIELD FieldData N
+        FieldName components num_tuples data_type
+        <data values>
+        NextFieldName ...
     """
-    dimensions = (1, 1, 1)
-    spacing = (1.0, 1.0, 1.0)
+    reading = False
+    expected_count = 0
     data = []
-    reading_data = False
 
-    text = vtk_bytes.decode("utf-8", errors="replace")
-    for line in text.splitlines():
-        line = line.strip()
-        if line.startswith("DIMENSIONS"):
-            parts = line.split()
-            dimensions = (int(parts[1]), int(parts[2]), int(parts[3]))
-        elif line.startswith("SPACING") or line.startswith("ASPECT_RATIO"):
-            parts = line.split()
-            spacing = (float(parts[1]), float(parts[2]), float(parts[3]))
-        elif line.startswith("LOOKUP_TABLE"):
-            reading_data = True
-            continue
-        elif reading_data:
-            for val in line.split():
+    for line in lines:
+        stripped = line.strip()
+        if not reading:
+            # Look for field header: "FieldName 1 500000 char"
+            if stripped.startswith(field_name + " "):
+                parts = stripped.split()
+                if len(parts) >= 3:
+                    expected_count = int(parts[2])
+                    reading = True
+                continue
+        else:
+            # Check if we hit the next field header or end
+            if stripped and not stripped[0].isdigit() and not stripped[0] == '-':
+                # Non-numeric line = next field header or metadata
+                break
+            for val in stripped.split():
                 try:
-                    data.append(int(float(val)))
+                    if dtype == "int":
+                        data.append(int(float(val)))
+                    else:
+                        data.append(float(val))
                 except ValueError:
                     pass
+            if expected_count > 0 and len(data) >= expected_count:
+                break
 
-    cell_ids = np.array(data, dtype=np.int32) if data else np.array([], dtype=np.int32)
+    if not data:
+        return None
+
+    if dtype == "int":
+        return np.array(data[:expected_count] if expected_count else data, dtype=np.int32)
+    return np.array(data[:expected_count] if expected_count else data, dtype=np.float64)
+
+
+def _extract_lookup_table_data(lines: list, dtype: str = "int") -> np.ndarray | None:
+    """Extract data from legacy VTK LOOKUP_TABLE format."""
+    reading = False
+    data = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("LOOKUP_TABLE"):
+            reading = True
+            continue
+        elif reading:
+            for val in stripped.split():
+                try:
+                    if dtype == "int":
+                        data.append(int(float(val)))
+                    else:
+                        data.append(float(val))
+                except ValueError:
+                    pass
+    if not data:
+        return None
+    if dtype == "int":
+        return np.array(data, dtype=np.int32)
+    return np.array(data, dtype=np.float64)
+
+
+def parse_vtk_fields_from_bytes(vtk_bytes: bytes) -> dict:
+    """Parse a CC3D VTK file and return ALL fields.
+
+    Returns:
+    {
+        "dimensions": (nx, ny, nz),
+        "spacing": (dx, dy, dz),
+        "cell_ids": ndarray (from CellType field),
+        "o2": {"dimensions": ..., "values": ..., "spacing": ..., "field_name": "O2"} or None,
+    }
+    """
+    text = vtk_bytes.decode("utf-8", errors="replace")
+    lines = text.splitlines()
+
+    dimensions = (1, 1, 1)
+    spacing = (1.0, 1.0, 1.0)
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("DIMENSIONS"):
+            parts = stripped.split()
+            dimensions = (int(parts[1]), int(parts[2]), int(parts[3]))
+        elif stripped.startswith("SPACING") or stripped.startswith("ASPECT_RATIO"):
+            parts = stripped.split()
+            spacing = (float(parts[1]), float(parts[2]), float(parts[3]))
+
+    cell_ids = _extract_field_data(lines, "CellType", dtype="int")
+    if cell_ids is None:
+        cell_ids = _extract_field_data(lines, "CellId", dtype="int")
+    if cell_ids is None:
+        cell_ids = _extract_lookup_table_data(lines, dtype="int")
+    if cell_ids is None:
+        cell_ids = np.array([], dtype=np.int32)
+
+    o2_values = _extract_field_data(lines, "O2", dtype="float")
+    o2_field = None
+    if o2_values is not None and len(o2_values) > 0:
+        o2_field = {
+            "dimensions": dimensions,
+            "values": o2_values,
+            "spacing": spacing,
+            "field_name": "O2",
+        }
 
     return {
         "dimensions": dimensions,
-        "cell_ids": cell_ids,
         "spacing": spacing,
+        "cell_ids": cell_ids,
+        "o2": o2_field,
     }
 
 
@@ -153,7 +258,7 @@ def render_cc3d_lattice(
         fig.add_annotation(text="No VTK data available", xref="paper",
                            yref="paper", x=0.5, y=0.5, showarrow=False,
                            font=dict(color="#888", size=16))
-        fig.update_layout(paper_bgcolor="#0a0a0a", height=300)
+        fig.update_layout(paper_bgcolor="#1a1a1f", height=300)
         return fig
 
     # Reshape to 3D if possible
@@ -201,11 +306,11 @@ def render_cc3d_lattice(
     fig.update_layout(
         title=dict(
             text=f"{title}{ts_label}",
-            font=dict(color="#00ff88", size=14, family="JetBrains Mono"),
+            font=dict(color="#34d399", size=14, family="Inter, system-ui, sans-serif"),
         ),
-        paper_bgcolor="#0a0a0a",
+        paper_bgcolor="#1a1a1f",
         scene=dict(
-            bgcolor="#111111",
+            bgcolor="#252529",
             xaxis=dict(backgroundcolor="#111111", gridcolor="#222222",
                        showbackground=True),
             yaxis=dict(backgroundcolor="#111111", gridcolor="#222222",
@@ -231,8 +336,10 @@ def get_default_type_map(brief):
     return tmap
 
 
-def parse_vtk_scalar_field(vtk_bytes: bytes) -> dict:
-    """Parse a VTK structured points file containing a continuous scalar field.
+def parse_vtk_scalar_field(vtk_bytes: bytes, field_name_hint: str = "O2") -> dict:
+    """Parse a VTK file and extract a continuous scalar field.
+
+    Handles both SCALARS/LOOKUP_TABLE format and CC3D FIELD FieldData format.
 
     Returns:
         {
@@ -244,34 +351,34 @@ def parse_vtk_scalar_field(vtk_bytes: bytes) -> dict:
     """
     dimensions = (1, 1, 1)
     spacing = (1.0, 1.0, 1.0)
-    data: list[float] = []
-    reading_data = False
-    field_name = "unknown"
 
     text = vtk_bytes.decode("utf-8", errors="replace")
-    for line in text.splitlines():
-        line = line.strip()
-        if line.startswith("DIMENSIONS"):
-            parts = line.split()
-            dimensions = (int(parts[1]), int(parts[2]), int(parts[3]))
-        elif line.startswith("SPACING") or line.startswith("ASPECT_RATIO"):
-            parts = line.split()
-            spacing = (float(parts[1]), float(parts[2]), float(parts[3]))
-        elif line.startswith("SCALARS"):
-            parts = line.split()
-            if len(parts) >= 2:
-                field_name = parts[1]
-        elif line.startswith("LOOKUP_TABLE"):
-            reading_data = True
-            continue
-        elif reading_data:
-            for val in line.split():
-                try:
-                    data.append(float(val))
-                except ValueError:
-                    pass
+    lines = text.splitlines()
 
-    values = np.array(data, dtype=np.float64) if data else np.array([], dtype=np.float64)
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("DIMENSIONS"):
+            parts = stripped.split()
+            dimensions = (int(parts[1]), int(parts[2]), int(parts[3]))
+        elif stripped.startswith("SPACING") or stripped.startswith("ASPECT_RATIO"):
+            parts = stripped.split()
+            spacing = (float(parts[1]), float(parts[2]), float(parts[3]))
+
+    # Try FIELD FieldData extraction first
+    values = _extract_field_data(lines, field_name_hint, dtype="float")
+    field_name = field_name_hint
+
+    if values is None:
+        # Fallback: legacy SCALARS/LOOKUP_TABLE
+        field_name = "unknown"
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("SCALARS"):
+                parts = stripped.split()
+                if len(parts) >= 2:
+                    field_name = parts[1]
+        values_arr = _extract_lookup_table_data(lines, dtype="float")
+        values = values_arr if values_arr is not None else np.array([], dtype=np.float64)
 
     return {
         "dimensions": dimensions,
@@ -300,7 +407,7 @@ def render_o2_overlay(
         fig.add_annotation(text="O2 field data size mismatch",
                            xref="paper", yref="paper", x=0.5, y=0.5,
                            showarrow=False, font=dict(color="#888", size=14))
-        fig.update_layout(paper_bgcolor="#0a0a0a", height=300)
+        fig.update_layout(paper_bgcolor="#1a1a1f", height=300)
         return fig
 
     grid = values.reshape((nx, ny, nz))
@@ -338,10 +445,10 @@ def render_o2_overlay(
     ))
 
     fig.update_layout(
-        title=dict(text=title, font=dict(color="#00ff88", size=14, family="JetBrains Mono")),
-        paper_bgcolor="#0a0a0a",
+        title=dict(text=title, font=dict(color="#34d399", size=14, family="Inter, system-ui, sans-serif")),
+        paper_bgcolor="#1a1a1f",
         scene=dict(
-            bgcolor="#111111",
+            bgcolor="#252529",
             xaxis=dict(backgroundcolor="#111111", gridcolor="#222222", showbackground=True),
             yaxis=dict(backgroundcolor="#111111", gridcolor="#222222", showbackground=True),
             zaxis=dict(backgroundcolor="#111111", gridcolor="#222222", showbackground=True),
@@ -445,11 +552,11 @@ def render_unified_scene(
     fig.update_layout(
         title=dict(
             text=f"{title}{ts_label}",
-            font=dict(color="#00ff88", size=14, family="JetBrains Mono"),
+            font=dict(color="#34d399", size=14, family="Inter, system-ui, sans-serif"),
         ),
-        paper_bgcolor="#0a0a0a",
+        paper_bgcolor="#1a1a1f",
         scene=dict(
-            bgcolor="#111111",
+            bgcolor="#252529",
             xaxis=dict(backgroundcolor="#111111", gridcolor="#222222",
                        showbackground=True, title="X"),
             yaxis=dict(backgroundcolor="#111111", gridcolor="#222222",
