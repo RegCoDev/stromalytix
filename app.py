@@ -341,7 +341,7 @@ def analyze_conversation_progress() -> dict:
 
 with st.sidebar:
     st.markdown('<h1 class="brand-text">🧬 Stromalytix</h1>', unsafe_allow_html=True)
-    st.markdown("**3D cell culture analysis**")
+    st.markdown("**Protocol intelligence for 3D culture**")
     st.divider()
 
     # Show selected domain & optional persona
@@ -513,9 +513,10 @@ with st.sidebar:
     with st.expander("ℹ️ About"):
         st.markdown(
             """
-            **Stromalytix** compares your protocol against ~8,100 PubMed
-            abstracts covering scaffolds, bioinks, and culture conditions.
-            Optional CompuCell3D simulation on your server.
+            **Stromalytix** is protocol intelligence for 3D cell culture.
+            Benchmark your construct against ~8,100 published protocols,
+            get risk flags and parameter ranges, explore sensitivity,
+            and run optional CompuCell3D simulations.
             """
         )
 
@@ -533,17 +534,24 @@ def _render_biosim_tab():
         # ========================================================================
 
         st.title("Stromalytix")
-        st.caption("Compare your construct against ~8,100 published protocols")
+        st.caption("Protocol intelligence for 3D cell culture")
         st.subheader("Describe your setup. See where you stand.")
 
         with st.expander("How Stromalytix works", expanded=False):
             st.markdown(
-                "**How it works** — (1) Describe your construct in chat. (2) We search ~8,100 "
-                "PubMed abstracts. (3) You get parameter ranges, risk flags, and "
-                "migration predictions. (4) Optional CompuCell3D simulation."
+                "**The problem** — Most 3D culture protocols are designed by gut feel and inherited lab convention. "
+                "When an experiment fails at week 3, there's no structured way to trace back to which parameter "
+                "was the root cause."
             )
             st.markdown(
-                "**Exports** — PDF report, scaffold preview PNG, and a methods & materials action plan."
+                "**What Stromalytix does** — (1) You describe your construct in chat. "
+                "(2) We benchmark it against ~8,100 PubMed protocols. "
+                "(3) You get risk flags, parameter ranges, migration predictions, and a \"what if\" sensitivity panel. "
+                "(4) Optional 3D simulation with CompuCell3D."
+            )
+            st.markdown(
+                "**Think of it as** process intelligence for the wet lab — conformance checking, "
+                "root-cause flagging, and parameter optimization, grounded in published data."
             )
 
         _dom_codes = ["tissue_engineering", "cellular_agriculture"]

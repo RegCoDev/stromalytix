@@ -528,6 +528,85 @@ def render_results_simulation_tab(profile: ConstructProfile, report: VarianceRep
             except Exception as e:
                 st.caption(f"3D compression preview unavailable: {e}")
 
+    # ---- "What if?" sensitivity panel ----
+    if profile.stiffness_kpa and profile.cell_density_per_ml:
+        from core.fem_solver import (
+            predict_scaffold_deformation as _psd,
+            predict_stress_distribution as _pss,
+        )
+
+        with st.expander("What if? — parameter sensitivity", expanded=False):
+            st.caption(
+                "Drag the sliders to see how changing one parameter shifts "
+                "deformation, stress, and integrity risk in real time."
+            )
+
+            wi_col1, wi_col2, wi_col3 = st.columns(3)
+            with wi_col1:
+                wi_stiffness = st.slider(
+                    "Stiffness (kPa)",
+                    0.5, 50.0,
+                    value=float(profile.stiffness_kpa),
+                    step=0.5,
+                    key="wi_stiffness",
+                )
+            with wi_col2:
+                wi_density = st.slider(
+                    "Cell density (M/mL)",
+                    0.1, 20.0,
+                    value=round(float(profile.cell_density_per_ml) / 1e6, 1),
+                    step=0.1,
+                    key="wi_density",
+                )
+            with wi_col3:
+                wi_porosity = st.slider(
+                    "Porosity (%)",
+                    20, 95,
+                    value=int(profile.porosity_percent or 70),
+                    step=5,
+                    key="wi_porosity",
+                )
+
+            wi_deform = _psd(
+                stiffness_kpa=wi_stiffness,
+                cell_density_per_ml=wi_density * 1e6,
+            )
+            wi_stress = _pss(
+                stiffness_kpa=wi_stiffness,
+                porosity_percent=float(wi_porosity),
+            )
+
+            wi_risk = wi_deform["failure_risk"]
+            wi_color = {"low": "#34d399", "medium": "#ffd700", "high": "#ff4444"}.get(wi_risk, "#888")
+
+            m1, m2, m3, m4 = st.columns(4)
+            with m1:
+                st.metric("Strain", f"{wi_deform['strain_percent']:.2f}%")
+            with m2:
+                st.metric("Deformation", f"{wi_deform['max_deformation_um']:.1f} um")
+            with m3:
+                st.metric("Stress Kt", f"{wi_stress['stress_concentration_factor']:.1f}x")
+            with m4:
+                st.markdown(
+                    f'<p style="font-size:0.85em;color:#888;">Risk</p>'
+                    f'<p style="font-size:1.4em;font-weight:bold;color:{wi_color};">{wi_risk.upper()}</p>',
+                    unsafe_allow_html=True,
+                )
+
+            # Show delta vs. original
+            orig_strain = predict_scaffold_deformation(
+                stiffness_kpa=profile.stiffness_kpa,
+                cell_density_per_ml=profile.cell_density_per_ml,
+            )["strain_percent"]
+            delta = wi_deform["strain_percent"] - orig_strain
+            direction = "higher" if delta > 0 else "lower"
+            if abs(delta) > 0.01:
+                st.caption(
+                    f"Strain is **{abs(delta):.2f}%** {direction} than your current protocol."
+                )
+            else:
+                st.caption("Same as your current protocol.")
+
     if st.session_state.simulation_brief is None:
         try:
             from core.rag import generate_simulation_brief
