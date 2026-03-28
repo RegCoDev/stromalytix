@@ -135,6 +135,11 @@ if "action_plan_narrative" not in st.session_state:
 if "user_email" not in st.session_state:
     st.session_state.user_email = None
 
+if "doe_results" not in st.session_state:
+    st.session_state.doe_results = None
+if "doe_factors" not in st.session_state:
+    st.session_state.doe_factors = None
+
 # application_domain selects TE vs cell-ag system prompt (initialize_chat) and action-plan rows.
 # persona is optional metadata only (sidebar / future use); not passed to the LLM.
 if "phase" not in st.session_state:
@@ -162,6 +167,8 @@ def reset_analysis():
     st.session_state.cc3d_result = None
     st.session_state.action_plan_narrative = ""
     st.session_state.user_email = None
+    st.session_state.doe_results = None
+    st.session_state.doe_factors = None
     st.session_state.docs = []
     st.session_state.phase = "assessment"
     st.session_state.persona = None

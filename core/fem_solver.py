@@ -156,10 +156,14 @@ def predict_stress_distribution(
 
 def _method_to_mesh_geometry(method):
     """Map biofab method to mesh geometry."""
-    return {
-        "organ_on_chip": "channel",
-        "ooc": "channel",
-    }.get(method or "", "cube")
+    _planar_methods = {
+        "organ_on_chip", "ooc",
+        "sla", "dlp", "stereolithography", "two_photon", "2pp",
+        "microfluidic",
+    }
+    if (method or "") in _planar_methods:
+        return "channel"
+    return "cube"
 
 
 def material_properties_from_profile(profile) -> dict:
