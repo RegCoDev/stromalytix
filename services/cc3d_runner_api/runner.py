@@ -76,11 +76,10 @@ def _generate_project_xml(
     contact_block = "\n".join(contact_lines)
 
     # Diffusion solver for O2
-    o2_solver = ""
+    # Build diffusion fields — all must be in one DiffusionSolverFE block
+    diffusion_fields = []
     if has_o2:
-        o2_solver = f"""
-  <Steppable Type="DiffusionSolverFE">
-    <DiffusionField Name="O2">
+        diffusion_fields.append(f"""    <DiffusionField Name="O2">
       <DiffusionData>
         <FieldName>O2</FieldName>
         <DiffusionConstant>{o2_diffusion}</DiffusionConstant>
@@ -100,20 +99,23 @@ def _generate_project_xml(
           <ConstantValue PlanePosition="Max" Value="{o2_boundary}"/>
         </Plane>
       </BoundaryConditions>
-    </DiffusionField>
-  </Steppable>"""
+    </DiffusionField>""")
 
-    ecm_solver = ""
     if has_ecm_field:
-        ecm_solver = """
-  <Steppable Type="DiffusionSolverFE">
-    <DiffusionField Name="ECM_density">
+        diffusion_fields.append("""    <DiffusionField Name="ECM_density">
       <DiffusionData>
         <FieldName>ECM_density</FieldName>
         <DiffusionConstant>0</DiffusionConstant>
         <DecayConstant>0</DecayConstant>
       </DiffusionData>
-    </DiffusionField>
+    </DiffusionField>""")
+
+    diffusion_solver = ""
+    if diffusion_fields:
+        fields_xml = "\n".join(diffusion_fields)
+        diffusion_solver = f"""
+  <Steppable Type="DiffusionSolverFE">
+{fields_xml}
   </Steppable>"""
 
     pif_block = ""
@@ -149,7 +151,8 @@ def _generate_project_xml(
   </Plugin>
 
   <Plugin Name="PixelTracker"/>
-{o2_solver}{ecm_solver}{pif_block}
+  <Plugin Name="NeighborTracker"/>
+{diffusion_solver}{pif_block}
 </CompuCell3D>
 """
     return xml
@@ -289,7 +292,7 @@ def _generate_steppable_py(
     if doubling_time_mcs > 0:
         mitosis_class = f"""
 
-class StromalytixMitosisSteppable(_PySteppables.MitosisSteppablePy):
+class StromalytixMitosisSteppable(_PySteppables.MitosisSteppableBase):
     def __init__(self, frequency=10):
         super().__init__(frequency)
 
@@ -453,11 +456,11 @@ def generate_cc3d_project(
             media_change_mcs.append(int(t * mcs_per_hour))
             t += media_interval_h
 
-    # Lattice dimensions
-    dims = (100, 100, 100)
+    # Lattice dimensions (cap at 80 per axis to stay within timeout)
+    dims = (80, 80, 40)
     dim_spec = params.get("lattice_dimensions")
     if dim_spec and len(dim_spec) == 3:
-        dims = (int(dim_spec[0]), int(dim_spec[1]), int(dim_spec[2]))
+        dims = (min(80, int(dim_spec[0])), min(80, int(dim_spec[1])), min(80, int(dim_spec[2])))
 
     max_steps = max(100, min(50000, max_steps))
     output_frequency = max(1, min(max_steps, output_frequency))
