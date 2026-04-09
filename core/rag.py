@@ -148,6 +148,42 @@ def retrieve_benchmarks(profile: ConstructProfile, k: int = 12) -> List[Document
     Returns:
         List of Document objects with PMID metadata
     """
+    # Try Knowledge Vault API first
+    vault_url = os.getenv("VAULT_API_URL")
+    if vault_url:
+        from core.knowledge_vault import query as vault_query
+        query_parts = []
+        if profile.target_tissue:
+            query_parts.append(profile.target_tissue)
+        if profile.cell_types:
+            query_parts.append(" ".join(profile.cell_types))
+        if profile.scaffold_material:
+            query_parts.append(profile.scaffold_material)
+        if profile.stiffness_kpa is not None:
+            query_parts.append(f"stiffness {profile.stiffness_kpa} kPa")
+        if profile.porosity_percent is not None:
+            query_parts.append(f"porosity {profile.porosity_percent}")
+        if profile.experimental_goal:
+            query_parts.append(profile.experimental_goal)
+        if profile.primary_readout:
+            query_parts.append(profile.primary_readout)
+        query_text = " ".join(query_parts)
+
+        result = vault_query(text=query_text, k=k)
+        if result and result.get("chunks"):
+            docs = []
+            for chunk in result["chunks"]:
+                paper = chunk.get("paper", {})
+                docs.append(Document(
+                    page_content=chunk["text"],
+                    metadata={
+                        "pmid": paper.get("pmid", ""),
+                        "title": paper.get("title", ""),
+                        "year": str(paper.get("year", "")),
+                    }
+                ))
+            return validate_document_chunks(docs)
+
     # Build query string from profile fields
     query_parts = []
 

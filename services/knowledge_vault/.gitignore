@@ -1,0 +1,5 @@
+.venv/
+vault.db
+vault.db-shm
+vault.db-wal
+__pycache__/
