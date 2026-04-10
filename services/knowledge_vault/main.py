@@ -13,12 +13,14 @@ import os
 import time
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Header, Depends
+from fastapi import FastAPI, HTTPException, Depends
 
 from db import init_db, close_db
 from embedder import Embedder
 from retrieval import hybrid_search, search_parameters
 from ingest import ingest_papers as _ingest_papers, ingest_parameters as _ingest_params, ingest_benchmarks as _ingest_benchmarks
+from auth import verify_api_key as _verify_api_key
+from protocol_api import protocol_router
 from schema import (
     QueryRequest, QueryResponse, ChunkResult,
     IngestRequest, IngestResponse,
@@ -29,7 +31,7 @@ from schema import (
 
 # --------------- Auth ---------------
 
-STROMALYTIX_API_KEY = os.environ.get("STROMALYTIX_API_KEY", "dev-key-change-me")
+from auth import STROMALYTIX_API_KEY
 
 _INSECURE_API_KEYS = frozenset({
     "dev-key-change-me",
@@ -46,11 +48,8 @@ if _enforce and STROMALYTIX_API_KEY in _INSECURE_API_KEYS and not _allow_weak:
 
 DB_PATH = os.environ.get("VAULT_DB_PATH", "vault.db")
 
-
-def verify_api_key(x_api_key: str = Header(...)):
-    if x_api_key != STROMALYTIX_API_KEY:
-        raise HTTPException(status_code=401, detail="Invalid API key")
-    return x_api_key
+# Re-export for backward compatibility
+verify_api_key = _verify_api_key
 
 
 # --------------- Lifespan ---------------
@@ -64,6 +63,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Stromalytix Knowledge Vault", lifespan=lifespan)
+app.include_router(protocol_router)
 
 
 # --------------- Endpoints ---------------
