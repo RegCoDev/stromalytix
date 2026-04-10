@@ -1,7 +1,9 @@
 """
-Conversation Chain Logic for Stromalytix
+Conversation logic for Stromalytix construct assessment.
 
-Handles interactive chat assessment to collect construct parameters.
+Uses OpenRouter (OpenAI-compatible API) with free-tier models.
+Falls back to Anthropic if ANTHROPIC_API_KEY is set.
+No LangChain dependency — direct httpx calls.
 """
 
 import json
@@ -9,409 +11,247 @@ import os
 import re
 from typing import Optional
 
+import httpx
 from dotenv import load_dotenv
-from langchain_classic.chains import ConversationChain
-from langchain_classic.memory import ConversationBufferMemory
-from langchain_anthropic import ChatAnthropic
 
 from core.models import ConstructProfile
 
-# Load environment variables
 load_dotenv()
 
-# Verify Anthropic API key — check env vars and Streamlit secrets
-_api_key = os.getenv("ANTHROPIC_API_KEY")
-if not _api_key:
-    try:
-        import streamlit as st
-        _api_key = st.secrets.get("ANTHROPIC_API_KEY")
-        if _api_key:
-            os.environ["ANTHROPIC_API_KEY"] = _api_key
-    except Exception:
-        pass
-if not _api_key:
-    import warnings
-    warnings.warn("ANTHROPIC_API_KEY not set — chat features will be unavailable")
+# ---------------------------------------------------------------------------
+# Model configuration
+# ---------------------------------------------------------------------------
 
-# System prompt for construct assessment
-SYSTEM_PROMPT = """You are a Tissue Engineering Protocol Analyst for Stromalytix. Assess a researcher's 3D cell culture construct through a calm, professional conversation. Ask ONE question at a time, grouping related questions naturally.
-
-FORMATTING RULES — follow these strictly:
-- Do NOT use markdown headers (# or ##). Use plain text or bold (**text**) for emphasis.
-- Do NOT use emojis.
-- Keep a professional, measured tone. No hype, no exclamation marks, no cheerleading.
-- Write in short paragraphs. Use numbered lists only when listing options.
-
-Collect these parameters (in roughly this order):
-
-1. Target tissue and experimental goal
-2. Cell types (primary, support)
-3. Scaffold material and type (degradable / rigid / hybrid)
-4. Scaffold stiffness (kPa) and porosity (%)
-5. Culture format (wellplate, transwell, bioreactor, bioprinter) and construct dimensions (mm)
-6. Cell seeding density
-7. Culture duration (days), media change interval (hours), medium volume (mL), O2 tension (%)
-8. Primary readout
-
-If the user doesn't know a value, suggest a reasonable default from literature and confirm.
-
-IMPORTANT: When you have all parameters, output a JSON block wrapped in <construct_profile> tags. Use this EXACT format with SINGLE NUMERIC VALUES (not ranges):
-
-<construct_profile>
-{
-  "target_tissue": "string",
-  "cell_types": ["string1", "string2"],
-  "scaffold_material": "string",
-  "stiffness_kpa": 10.0,
-  "porosity_percent": 75.0,
-  "cell_density_per_ml": 5000000.0,
-  "experimental_goal": "string",
-  "primary_readout": "string",
-  "scaffold_type": "degradable",
-  "biofab_method": "bioprinting",
-  "scaffold_dimensions_mm": [4.0, 4.0, 2.0],
-  "pore_size_um": 300.0,
-  "culture_duration_days": 14,
-  "media_change_interval_hours": 48.0,
-  "medium_volume_ml": 2.0,
-  "oxygen_tension_percent": 20.0,
-  "culture_format": "wellplate"
-}
-</construct_profile>
-
-For numeric fields, output ONLY single numbers (e.g., 75.0, not "70-80%"). If given a range, output the midpoint.
-scaffold_type must be one of: "degradable", "rigid", "hybrid".
-culture_format should be one of: "wellplate", "transwell", "bioreactor", "bioprinter", "microfluidic", "other"."""
-
-CELLAG_SYSTEM_PROMPT = """You are a Cellular Agriculture Protocol Analyst for Stromalytix. Assess a researcher's cultivated meat / structured protein construct through a calm, professional conversation. Ask ONE question at a time, grouping related questions naturally.
-
-FORMATTING RULES — follow these strictly:
-- Do NOT use markdown headers (# or ##). Use plain text or bold (**text**) for emphasis.
-- Do NOT use emojis.
-- Keep a professional, measured tone. No hype, no exclamation marks, no cheerleading.
-- Write in short paragraphs. Use numbered lists only when listing options.
-
-You are working in the context of cellular agriculture — growing animal-derived cells (muscle, fat, connective tissue) on edible scaffolds for food production, NOT for therapeutic use.
-
-Collect these parameters (in roughly this order):
-
-1. Target product (cultivated beef, chicken, pork, fish, fat tissue, hybrid) and production goal (structured whole-cut, minced, fat marbling, proof-of-concept)
-2. Cell types — species and lineage (e.g. bovine satellite cells, chicken myoblasts, porcine adipocytes, C2C12 as model line)
-3. Scaffold material — must be food-grade/edible (e.g. textured soy protein, cellulose, chitosan, starch, plant-derived protein, decellularized plant tissue, edible GelMA, alginate, konjac). Note whether it is edible.
-4. Scaffold stiffness (kPa), porosity (%), and whether the scaffold is designed for surface seeding or bulk infiltration
-5. Culture format (spinner flask, packed-bed bioreactor, hollow-fibre, perfusion bioreactor, wellplate for R&D) and construct dimensions (mm)
-6. Cell seeding density
-7. Culture duration (days), media change interval (hours), medium volume (mL), O2 tension (%), and whether the medium is serum-free
-8. Primary readout (myotube alignment, protein content per gram, lipid accumulation, texture analysis, cell viability)
-
-Cell-ag-specific considerations to probe:
-- Serum-free medium composition (growth factors: FGF-2, IGF-1, TGF-beta for differentiation)
-- Differentiation protocol (proliferation phase, then differentiation phase, then maturation)
-- Whether the user plans to co-culture muscle + fat cells
-- Scale-up path (from wellplate to bioreactor)
-
-If the user doesn't know a value, suggest a reasonable default from literature and confirm.
-
-IMPORTANT: When you have all parameters, output a JSON block wrapped in <construct_profile> tags. Use this EXACT format with SINGLE NUMERIC VALUES (not ranges):
-
-<construct_profile>
-{
-  "application_domain": "cellular_agriculture",
-  "target_tissue": "string (e.g. bovine_muscle, chicken_breast, pork_fat)",
-  "cell_types": ["bovine satellite cells", "preadipocytes"],
-  "scaffold_material": "string",
-  "stiffness_kpa": 10.0,
-  "porosity_percent": 75.0,
-  "cell_density_per_ml": 5000000.0,
-  "experimental_goal": "string (e.g. structured_whole_cut, minced_product, fat_marbling, proof_of_concept)",
-  "primary_readout": "string",
-  "scaffold_type": "degradable",
-  "biofab_method": "bioprinting",
-  "scaffold_dimensions_mm": [10.0, 10.0, 5.0],
-  "pore_size_um": 200.0,
-  "culture_duration_days": 21,
-  "media_change_interval_hours": 48.0,
-  "medium_volume_ml": 5.0,
-  "oxygen_tension_percent": 20.0,
-  "culture_format": "bioreactor"
-}
-</construct_profile>
-
-For numeric fields, output ONLY single numbers (e.g., 75.0, not "70-80%"). If given a range, output the midpoint.
-scaffold_type must be one of: "degradable", "rigid", "hybrid".
-culture_format should be one of: "wellplate", "transwell", "bioreactor", "bioprinter", "microfluidic", "other"."""
+_OPENROUTER_MODELS = [
+    "qwen/qwen3.6-plus-preview:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
+    "qwen/qwen3-coder:free",
+    "minimax/minimax-m2.5:free",
+]
 
 
-def initialize_chat(domain: str = "tissue_engineering") -> ConversationChain:
-    """
-    Initialize a conversation chain with Haiku and buffer memory.
+def _get_llm_config() -> dict:
+    """Return config for the best available LLM."""
+    def _secret(name):
+        try:
+            import streamlit as st
+            return st.secrets.get(name)
+        except Exception:
+            return None
 
-    Args:
-        domain: "tissue_engineering" or "cellular_agriculture"
+    anthropic_key = _secret("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
+    if anthropic_key:
+        return {"api_key": anthropic_key, "model": "claude-haiku-4-5-20251001", "provider": "anthropic"}
 
-    Returns:
-        ConversationChain configured for construct assessment
-    """
-    prompt = CELLAG_SYSTEM_PROMPT if domain == "cellular_agriculture" else SYSTEM_PROMPT
+    or_key = _secret("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_API_KEY")
+    if or_key:
+        return {"api_key": or_key, "model": _OPENROUTER_MODELS[0], "provider": "openrouter"}
 
-    llm = ChatAnthropic(
-        model="claude-haiku-4-5-20251001",
-        temperature=0.7,
-        max_tokens=2048,
-        api_key=os.getenv("ANTHROPIC_API_KEY")
-    )
-
-    memory = ConversationBufferMemory(
-        return_messages=True,
-        memory_key="history"
-    )
-
-    chain = ConversationChain(
-        llm=llm,
-        memory=memory,
-        verbose=False
-    )
-
-    greeting_cue = (
-        "Introduce yourself briefly (one sentence) and ask the first question. "
-        "No emojis, no markdown headers, no hype. Plain professional tone."
-    )
-    chain.predict(input=f"SYSTEM: {prompt}\n\n{greeting_cue}")
-
-    return chain
+    return {}
 
 
-def _clean_response(response) -> str:
-    """Extract clean text from an LLM response, stripping AIMessage metadata."""
-    # AIMessage object
-    if hasattr(response, "content"):
-        text = response.content
-    else:
-        text = str(response)
+def _chat_completion(messages: list[dict], max_tokens: int = 1024) -> str:
+    """Call LLM via OpenAI-compatible API. Returns assistant text."""
+    config = _get_llm_config()
+    if not config:
+        return "Chat unavailable — no LLM API key configured."
 
-    # If str() of an AIMessage leaked metadata, extract just the content
-    if "additional_kwargs=" in text or "response_metadata=" in text:
-        match = re.search(r"content=['\"](.+?)['\"](?:\s+additional_kwargs=)", text, re.DOTALL)
-        if match:
-            text = match.group(1)
+    if config["provider"] == "anthropic":
+        return _anthropic_call(messages, config, max_tokens)
+
+    # OpenRouter
+    headers = {"Authorization": f"Bearer {config['api_key']}", "Content-Type": "application/json"}
+    body = {"messages": messages, "max_tokens": max_tokens, "temperature": 0.7}
+
+    for model in [config["model"]] + [m for m in _OPENROUTER_MODELS if m != config["model"]]:
+        body["model"] = model
+        try:
+            resp = httpx.post("https://openrouter.ai/api/v1/chat/completions",
+                              headers=headers, json=body, timeout=30.0)
+            if resp.status_code == 429:
+                continue
+            resp.raise_for_status()
+            return resp.json()["choices"][0]["message"]["content"]
+        except Exception:
+            continue
+
+    return "All models are currently rate-limited. Please try again shortly."
+
+
+def _anthropic_call(messages: list[dict], config: dict, max_tokens: int) -> str:
+    """Direct Anthropic Messages API call."""
+    system_text = ""
+    api_messages = []
+    for m in messages:
+        if m["role"] == "system":
+            system_text = m["content"]
         else:
-            # Fallback: strip everything after "additional_kwargs="
-            idx = text.find("additional_kwargs=")
-            if idx > 0:
-                text = text[:idx].strip()
-            # Remove leading "content=" wrapper if present
-            if text.startswith("content='") or text.startswith('content="'):
-                text = text[9:]
-                if text.endswith("'") or text.endswith('"'):
-                    text = text[:-1]
+            api_messages.append(m)
 
-    # Fix escaped newlines that came from repr()
-    text = text.replace("\\n", "\n")
+    body = {"model": config["model"], "max_tokens": max_tokens, "messages": api_messages}
+    if system_text:
+        body["system"] = system_text
 
-    return text.strip()
-
-
-def send_message(chain: ConversationChain, user_input: str) -> str:
-    """
-    Send a user message to the conversation chain and get response.
-
-    Sanitizes input to prevent prompt injection before sending to LLM.
-    """
-    from core.rag import sanitize_input
-
-    sanitized_input = sanitize_input(user_input)
-
-    if sanitized_input == "I can only help with tissue engineering protocol analysis.":
-        return sanitized_input
-
-    response = chain.predict(input=sanitized_input)
-    return _clean_response(response)
+    try:
+        resp = httpx.post("https://api.anthropic.com/v1/messages",
+                          headers={"x-api-key": config["api_key"],
+                                   "anthropic-version": "2023-06-01",
+                                   "content-type": "application/json"},
+                          json=body, timeout=30.0)
+        resp.raise_for_status()
+        return resp.json()["content"][0]["text"]
+    except Exception as e:
+        return f"LLM call failed: {e}"
 
 
-def clean_numeric_fields(profile_dict: dict) -> dict:
-    """
-    Clean numeric fields that might contain string ranges like '80-95%' or '5-10'.
-    Converts to midpoint float.
-    """
-    numeric_fields = [
-        'stiffness_kpa', 'porosity_percent', 'cell_density_per_ml',
-        'pore_size_um', 'culture_duration_days', 'media_change_interval_hours',
-        'medium_volume_ml', 'oxygen_tension_percent',
-    ]
-    for field in numeric_fields:
-        if field in profile_dict and isinstance(profile_dict[field], str):
-            value_str = profile_dict[field].strip()
-            # Remove % symbol
-            value_str = value_str.replace('%', '').strip()
+# ---------------------------------------------------------------------------
+# System prompts
+# ---------------------------------------------------------------------------
 
-            # Check if it's a range like "5-10" or "80-95"
-            if '-' in value_str:
+SYSTEM_PROMPT = """You are a Tissue Engineering Protocol Analyst for Stromalytix. Assess a researcher's 3D cell culture construct through a calm, professional conversation. Ask ONE question at a time.
+
+RULES: No markdown headers, no emojis, no hype. Short paragraphs. Numbered lists only for options.
+
+Collect: 1) Target tissue + goal 2) Cell types 3) Scaffold material + type 4) Stiffness + porosity 5) Culture format + dimensions 6) Cell density 7) Culture duration, media changes, O2 8) Primary readout
+
+Suggest literature defaults when user is unsure. When complete, output JSON in <construct_profile> tags:
+<construct_profile>
+{"target_tissue":"string","cell_types":["string"],"scaffold_material":"string","stiffness_kpa":10.0,"porosity_percent":75.0,"cell_density_per_ml":5e6,"experimental_goal":"string","primary_readout":"string","scaffold_type":"degradable","biofab_method":"bioprinting","scaffold_dimensions_mm":[4,4,2],"pore_size_um":300,"culture_duration_days":14,"media_change_interval_hours":48,"medium_volume_ml":2,"oxygen_tension_percent":20,"culture_format":"wellplate"}
+</construct_profile>
+Single numbers only (midpoint if range). scaffold_type: degradable/rigid/hybrid."""
+
+CELLAG_SYSTEM_PROMPT = """You are a Cellular Agriculture Protocol Analyst for Stromalytix. Assess a cultivated meat / structured protein construct. Ask ONE question at a time.
+
+RULES: No markdown headers, no emojis, no hype. Plain professional tone.
+
+CRITICAL: Cell ag uses animal cells (bovine, porcine, avian, piscine) where literature is thinner than human cell biology. When suggesting parameters:
+- State when extrapolating from human data to animal systems
+- Note species-specific differences (e.g. bovine satellite cell proliferation kinetics differ from human myoblasts)
+- Reference veterinary and animal science literature where available
+- Flag parameters well-characterized in human TE but unvalidated in the target species
+
+Collect: 1) Target product + goal 2) Cell types (species + lineage) 3) Scaffold (food-grade/edible) 4) Stiffness, porosity, seeding method 5) Culture format + dimensions 6) Cell density 7) Duration, media, O2, serum-free status 8) Readout (myotube alignment, protein/g, texture)
+
+Also probe: serum-free medium, differentiation protocol, muscle+fat co-culture, scale-up path.
+
+When complete, output JSON in <construct_profile> tags:
+<construct_profile>
+{"application_domain":"cellular_agriculture","target_tissue":"bovine_muscle","cell_types":["bovine satellite cells"],"scaffold_material":"string","stiffness_kpa":10.0,"porosity_percent":75.0,"cell_density_per_ml":5e6,"experimental_goal":"structured_whole_cut","primary_readout":"string","scaffold_type":"degradable","biofab_method":"bioreactor","scaffold_dimensions_mm":[10,10,5],"pore_size_um":200,"culture_duration_days":21,"media_change_interval_hours":48,"medium_volume_ml":5,"oxygen_tension_percent":20,"culture_format":"bioreactor"}
+</construct_profile>
+Single numbers only. scaffold_type: degradable/rigid/hybrid."""
+
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+class ChatSession:
+    """Lightweight chat session holding message history."""
+
+    def __init__(self, domain: str = "tissue_engineering"):
+        prompt = CELLAG_SYSTEM_PROMPT if domain == "cellular_agriculture" else SYSTEM_PROMPT
+        self.messages: list[dict] = [{"role": "system", "content": prompt}]
+
+    def send(self, user_input: str) -> str:
+        from core.rag import sanitize_input
+        sanitized = sanitize_input(user_input)
+        if sanitized == "I can only help with tissue engineering protocol analysis.":
+            return sanitized
+        self.messages.append({"role": "user", "content": sanitized})
+        response = _chat_completion(self.messages, max_tokens=1024)
+        self.messages.append({"role": "assistant", "content": response})
+        return response
+
+    def get_history_text(self) -> str:
+        return "\n".join(f"{m['role'].upper()}: {m['content']}" for m in self.messages if m["role"] != "system")
+
+
+def initialize_chat(domain: str = "tissue_engineering") -> ChatSession:
+    session = ChatSession(domain)
+    greeting = _chat_completion(
+        session.messages + [{"role": "user", "content": "Introduce yourself in one sentence and ask the first question."}],
+        max_tokens=256,
+    )
+    session.messages.append({"role": "user", "content": "(start)"})
+    session.messages.append({"role": "assistant", "content": greeting})
+    return session
+
+
+def send_message(session, user_input: str) -> str:
+    return session.send(user_input)
+
+
+# ---------------------------------------------------------------------------
+# Profile extraction
+# ---------------------------------------------------------------------------
+
+def clean_numeric_fields(d: dict) -> dict:
+    for field in ['stiffness_kpa', 'porosity_percent', 'cell_density_per_ml',
+                  'pore_size_um', 'culture_duration_days', 'media_change_interval_hours',
+                  'medium_volume_ml', 'oxygen_tension_percent']:
+        if field in d and isinstance(d[field], str):
+            v = d[field].strip().replace('%', '')
+            if '-' in v:
                 try:
-                    parts = value_str.split('-')
-                    if len(parts) == 2:
-                        low = float(parts[0].strip())
-                        high = float(parts[1].strip())
-                        profile_dict[field] = (low + high) / 2  # Use midpoint
-                        print(f"[CLEAN] Converted {field} range '{value_str}' to midpoint: {profile_dict[field]}")
+                    parts = v.split('-')
+                    d[field] = (float(parts[0]) + float(parts[1])) / 2
                 except ValueError:
-                    pass  # Leave as-is if can't parse
+                    pass
             else:
-                # Try to convert single value
                 try:
-                    profile_dict[field] = float(value_str)
-                    print(f"[CLEAN] Converted {field} string '{value_str}' to float: {profile_dict[field]}")
+                    d[field] = float(v)
                 except ValueError:
-                    pass  # Leave as-is if can't parse
-
-    return profile_dict
+                    pass
+    return d
 
 
 def extract_construct_profile(conversation_history: str) -> Optional[ConstructProfile]:
-    """
-    Extract ConstructProfile from conversation history.
-
-    ONLY extracts when the <construct_profile> tag is explicitly present.
-    This ensures the assistant has completed the assessment before extraction.
-
-    Args:
-        conversation_history: Full conversation text
-
-    Returns:
-        ConstructProfile if <construct_profile> tag found and valid, None otherwise
-    """
-    # Try to find <construct_profile> tags - REQUIRED for extraction
-    pattern = r"<construct_profile>(.*?)</construct_profile>"
-    match = re.search(pattern, conversation_history, re.DOTALL)
-
+    match = re.search(r"<construct_profile>(.*?)</construct_profile>", conversation_history, re.DOTALL)
     if not match:
-        # No explicit completion signal - return None
         return None
-
-    # Parse the tagged JSON
     try:
-        json_str = match.group(1).strip()
-        profile_dict = json.loads(json_str)
-
-        # Clean numeric fields that might be string ranges
-        profile_dict = clean_numeric_fields(profile_dict)
-
-        return ConstructProfile(**profile_dict)
+        return ConstructProfile(**clean_numeric_fields(json.loads(match.group(1).strip())))
     except (json.JSONDecodeError, ValueError) as e:
-        print(f"Warning: Failed to parse construct_profile JSON: {e}")
+        print(f"Warning: profile parse failed: {e}")
         return None
 
 
 def extract_partial_profile(conversation_history: str) -> Optional[ConstructProfile]:
-    """
-    Extract partially confirmed parameters from chat history.
-    Scans conversation for confirmed parameter values before
-    the full profile is complete.
-
-    Used for live visualization preview during BioSim chat.
-    """
     params = {}
-
-    # Tissue type patterns (includes cell-ag targets)
-    tissue_patterns = [
-        "cardiac", "liver", "hepatic", "neural", "brain", "lung",
-        "kidney", "intestinal", "bone", "cartilage", "skin",
-        "tumor", "vascular", "pancreatic",
-        "bovine_muscle", "chicken_breast", "pork", "fish",
-        "cultivated meat", "cultured meat",
-    ]
     text_lower = conversation_history.lower()
-    for tissue in tissue_patterns:
+
+    for tissue in ["cardiac", "liver", "hepatic", "neural", "brain", "lung", "kidney",
+                   "intestinal", "bone", "cartilage", "skin", "tumor", "vascular",
+                   "pancreatic", "bovine_muscle", "chicken_breast", "pork", "fish",
+                   "cultivated meat", "cultured meat"]:
         if tissue in text_lower:
             params["target_tissue"] = tissue
             break
 
-    # Cell-ag domain detection
-    cellag_cues = ["cultivated meat", "cultured meat", "cellular agriculture",
-                   "cell ag", "satellite cell", "myoblast", "myotube",
-                   "bovine satellite", "chicken myoblast"]
-    if any(cue in text_lower for cue in cellag_cues):
+    if any(cue in text_lower for cue in ["cultivated meat", "cultured meat", "cellular agriculture",
+                                          "cell ag", "satellite cell", "myoblast", "bovine satellite"]):
         params["application_domain"] = "cellular_agriculture"
 
-    # Scaffold material (includes cell-ag edible scaffolds)
-    materials = [
-        "GelMA", "collagen", "alginate", "fibrin", "PEGDA",
-        "hyaluronic acid", "Matrigel", "silk", "PDMS",
-        "textured soy protein", "cellulose", "chitosan", "starch",
-        "zein", "konjac", "plant protein", "decellularized plant",
-    ]
-    for mat in materials:
+    for mat in ["GelMA", "collagen", "alginate", "fibrin", "PEGDA", "hyaluronic acid",
+                "Matrigel", "silk", "PDMS", "textured soy protein", "cellulose",
+                "chitosan", "starch", "zein", "konjac", "plant protein"]:
         if mat.lower() in text_lower:
             params["scaffold_material"] = mat
             break
 
-    # Stiffness
-    stiffness_match = re.search(r"(\d+\.?\d*)\s*kPa", conversation_history)
-    if stiffness_match:
-        params["stiffness_kpa"] = float(stiffness_match.group(1))
+    m = re.search(r"(\d+\.?\d*)\s*kPa", conversation_history)
+    if m:
+        params["stiffness_kpa"] = float(m.group(1))
 
-    # Cell density
-    density_match = re.search(
-        r"(\d+\.?\d*)\s*(?:x\s*10\^?6|million|M)\s*(?:cells?)?(?:/mL|/ml)?",
-        conversation_history, re.IGNORECASE
-    )
-    if density_match:
-        params["cell_density_per_ml"] = float(density_match.group(1)) * 1e6
+    m = re.search(r"(\d+\.?\d*)\s*(?:x\s*10\^?6|million|M)\s*(?:cells?)?(?:/mL)?", conversation_history, re.I)
+    if m:
+        params["cell_density_per_ml"] = float(m.group(1)) * 1e6
 
-    # Cell types (includes cell-ag lineages)
-    cell_patterns = [
-        "cardiomyocytes", "fibroblasts", "HUVEC", "HepG2", "MCF-7",
-        "iPSC", "neurons", "astrocytes", "Caco-2", "A549",
-        "MSC", "chondrocytes", "osteoblasts", "keratinocytes",
-        "C2C12", "satellite cells", "myoblasts", "myotubes",
-        "preadipocytes", "adipocytes", "bovine satellite cells",
-        "chicken myoblasts", "porcine satellite cells",
-    ]
-    found_cells = [c for c in cell_patterns if c.lower() in text_lower]
-    if found_cells:
-        params["cell_types"] = found_cells
+    found = [c for c in ["cardiomyocytes", "fibroblasts", "HUVEC", "HepG2", "iPSC", "MSC",
+                          "chondrocytes", "osteoblasts", "C2C12", "satellite cells", "myoblasts",
+                          "bovine satellite cells", "chicken myoblasts", "preadipocytes"]
+             if c.lower() in text_lower]
+    if found:
+        params["cell_types"] = found
 
-    # Culture format
-    format_patterns = {
-        "wellplate": ["wellplate", "well plate", "well-plate", "96-well", "24-well", "6-well"],
-        "bioreactor": ["bioreactor", "spinner flask", "perfusion"],
-        "transwell": ["transwell", "trans-well", "insert"],
-        "bioprinter": ["bioprint", "bio-print", "extrusion"],
-        "microfluidic": ["microfluidic", "organ-on-chip", "organ on chip"],
-    }
-    for fmt, keywords in format_patterns.items():
-        if any(kw in text_lower for kw in keywords):
-            params["biofab_method"] = fmt
-            break
-
-    # Scaffold type
-    for st in ("degradable", "rigid", "hybrid"):
-        if st in text_lower:
-            params["scaffold_type"] = st
-            break
-
-    # Construct dimensions (e.g. "4x4x2 mm" or "4 x 4 x 2")
-    dim_match = re.search(
-        r"(\d+\.?\d*)\s*[x×]\s*(\d+\.?\d*)\s*[x×]\s*(\d+\.?\d*)\s*mm",
-        conversation_history, re.IGNORECASE,
-    )
-    if dim_match:
-        params["scaffold_dimensions_mm"] = [
-            float(dim_match.group(1)),
-            float(dim_match.group(2)),
-            float(dim_match.group(3)),
-        ]
-
-    # Culture duration
-    dur_match = re.search(r"(\d+)\s*(?:day|d)\b", conversation_history, re.IGNORECASE)
-    if dur_match:
-        params["culture_duration_days"] = int(dur_match.group(1))
-
-    # Pore size
-    pore_match = re.search(r"(\d+\.?\d*)\s*(?:um|µm|micron)", conversation_history, re.IGNORECASE)
-    if pore_match:
-        params["pore_size_um"] = float(pore_match.group(1))
-
-    if not params:
-        return None
-
-    return ConstructProfile(**params)
+    return ConstructProfile(**params) if params else None

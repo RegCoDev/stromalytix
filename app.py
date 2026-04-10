@@ -861,21 +861,21 @@ with tab_assessment:
                 st.progress(min(1.0, n / 8.0) if n else 0.0)
                 st.caption(f"**{n}/8 messages** -- analysis starts automatically when enough detail is gathered.")
 
-                # Initialize chat chain
+                # Initialize chat session
                 if st.session_state.chain is None:
                     with st.spinner("Starting up..."):
                         st.session_state.chain = initialize_chat(
                             domain=st.session_state.get("application_domain", "tissue_engineering")
                         )
                         if len(st.session_state.messages) == 0:
-                            from core.chat import _clean_response
-                            memory_vars = st.session_state.chain.memory.load_memory_variables({})
-                            if "history" in memory_vars and len(memory_vars["history"]) > 0:
-                                initial_response = _clean_response(memory_vars["history"][-1])
-                                st.session_state.messages.append({
-                                    "role": "assistant",
-                                    "content": initial_response,
-                                })
+                            # Get greeting from session's last assistant message
+                            for m in reversed(st.session_state.chain.messages):
+                                if m["role"] == "assistant":
+                                    st.session_state.messages.append({
+                                        "role": "assistant",
+                                        "content": m["content"],
+                                    })
+                                    break
 
                 # Render chat history
                 for message in st.session_state.messages:
