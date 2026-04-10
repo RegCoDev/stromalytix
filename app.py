@@ -267,6 +267,7 @@ def fetch_protocols(
 
 
 @st.cache_data(ttl=300)
+@st.cache_data(ttl=600)
 def fetch_protocol_detail(protocol_id: int) -> dict | None:
     return vault_get(f"/protocols/{protocol_id}")
 
@@ -297,6 +298,24 @@ def _doi_url(doi: str) -> str:
     if doi.startswith("http"):
         return doi
     return f"https://doi.org/{doi}"
+
+
+def _source_url(p: dict) -> str:
+    """Get the best available source URL — DOI first, then PMID link."""
+    doi = p.get("doi") or ""
+    if doi:
+        return _doi_url(doi)
+    pmid = p.get("pmid") or ""
+    if pmid:
+        return f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
+    return ""
+
+
+def _source_label(source: str) -> str:
+    """Clean up source display text."""
+    if not source:
+        return "-"
+    return source.replace("_", " ").title()
 
 
 # ---------------------------------------------------------------------------
@@ -455,8 +474,7 @@ with tab_params:
             # Build dataframe for display
             df_rows = []
             for p in filtered:
-                doi_raw = p.get("doi") or ""
-                doi_val = _doi_url(doi_raw) if doi_raw else ""
+                source_link = _source_url(p)
                 df_rows.append({
                     "Parameter": p.get("parameter", ""),
                     "Value": p.get("value", ""),
@@ -466,8 +484,8 @@ with tab_params:
                     "Category": _cat_labels.get(p.get("table_name", ""), p.get("table_name", "")),
                     "Conditions": p.get("conditions") or "-",
                     "Confidence": (p.get("confidence") or "").title(),
-                    "DOI": doi_val,
-                    "Source": (p.get("source") or "").title(),
+                    "Reference": source_link,
+                    "Source": _source_label(p.get("source", "")),
                 })
 
             df = pd.DataFrame(df_rows)
@@ -475,10 +493,10 @@ with tab_params:
             st.dataframe(
                 df,
                 column_config={
-                    "DOI": st.column_config.LinkColumn(
-                        "DOI",
-                        display_text=r"https://doi\.org/(.*)",
-                        help="Click to open publication",
+                    "Reference": st.column_config.LinkColumn(
+                        "Reference",
+                        display_text=r"https://(?:doi\.org/|pubmed\.ncbi\.nlm\.nih\.gov/)(.+?)/?$",
+                        help="Click to open publication (DOI or PubMed)",
                     ),
                     "Value": st.column_config.NumberColumn("Value", format="%.4g"),
                     "Confidence": st.column_config.TextColumn("Confidence", width="small"),
@@ -596,70 +614,72 @@ with tab_protocols:
                 conf = (proto.get("confidence") or "low").title()
                 extr = proto.get("extraction_method") or "regex"
 
+                pmid_link = f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/" if pmid and pmid != "N/A" else ""
                 with st.expander(
                     f"**{title[:80]}** | {tissue} | {biofab} | {step_count} steps | {conf}"
                 ):
                     mc1, mc2, mc3, mc4 = st.columns(4)
-                    mc1.markdown(f"**PMID:** {pmid}")
+                    mc1.markdown(f"**PMID:** [{pmid}]({pmid_link})" if pmid_link else f"**PMID:** {pmid}")
                     mc2.markdown(f"**Tissue:** {tissue}")
                     mc3.markdown(f"**Method:** {biofab}")
                     mc4.markdown(f"**Extraction:** {extr}")
 
-                    # Fetch full protocol on expand
-                    if st.button(f"Load full protocol", key=f"load_proto_{pid}"):
-                        detail = fetch_protocol_detail(pid)
-                        if detail and detail.get("steps"):
-                            for step in detail["steps"]:
-                                seq = step.get("seq", "?")
-                                action = step.get("action_type", "unknown")
-                                desc = step.get("description", "")
-                                dur = step.get("duration") or ""
-                                temp = step.get("temperature") or ""
+                    # Load protocol detail directly (cached)
+                    detail = fetch_protocol_detail(pid)
+                    if detail and detail.get("steps"):
+                        for step in detail["steps"]:
+                            seq = step.get("seq", "?")
+                            action = step.get("action_type", "unknown")
+                            desc = step.get("description", "")
+                            dur = step.get("duration") or ""
+                            temp = step.get("temperature") or ""
 
-                                step_header = f"**Step {seq}: {action}**"
-                                if dur:
-                                    step_header += f" ({dur})"
-                                if temp:
-                                    step_header += f" @ {temp}"
-                                st.markdown(step_header)
-                                st.markdown(f"> {desc}")
+                            action_label = action.replace("_", " ").title()
+                            step_header = f"**Step {seq}: {action_label}**"
+                            if dur:
+                                step_header += f" ({dur})"
+                            if temp:
+                                step_header += f" @ {temp}"
+                            st.markdown(step_header)
+                            if desc:
+                                st.markdown(f"> {desc[:300]}")
 
-                                # Materials
-                                mats = step.get("materials", [])
-                                if mats:
-                                    mat_strs = []
-                                    for m in mats:
-                                        s = m.get("material_name", "")
-                                        if m.get("concentration"):
-                                            s += f" ({m['concentration']})"
-                                        mat_strs.append(s)
-                                    st.caption(f"Materials: {', '.join(mat_strs)}")
+                            # Materials
+                            mats = step.get("materials", [])
+                            if mats:
+                                mat_strs = []
+                                for m in mats:
+                                    s = m.get("material_name", "")
+                                    if m.get("concentration"):
+                                        s += f" ({m['concentration']})"
+                                    mat_strs.append(s)
+                                st.caption(f"Materials: {', '.join(mat_strs)}")
 
-                                # Cells
-                                cells = step.get("cells", [])
-                                if cells:
-                                    cell_strs = []
-                                    for c in cells:
-                                        s = c.get("cell_type", "")
-                                        if c.get("density"):
-                                            s += f" @ {c['density']}"
-                                        cell_strs.append(s)
-                                    st.caption(f"Cells: {', '.join(cell_strs)}")
+                            # Cells
+                            cells = step.get("cells", [])
+                            if cells:
+                                cell_strs = []
+                                for c in cells:
+                                    s = c.get("cell_type", "")
+                                    if c.get("density"):
+                                        s += f" @ {c['density']}"
+                                    cell_strs.append(s)
+                                st.caption(f"Cells: {', '.join(cell_strs)}")
 
-                                # Parameters
-                                step_params = step.get("parameters", [])
-                                if step_params:
-                                    for sp in step_params:
-                                        name = sp.get("parameter_name", "")
-                                        val = sp.get("value", "")
-                                        unit = sp.get("unit", "")
-                                        st.caption(f"  {name}: {val} {unit}")
+                            # Parameters
+                            step_params = step.get("parameters", [])
+                            if step_params:
+                                for sp in step_params:
+                                    name = sp.get("parameter_name", "")
+                                    val = sp.get("value", "")
+                                    unit = sp.get("unit", "")
+                                    st.caption(f"  {name}: {val} {unit}")
 
-                                st.markdown("---")
-                        elif detail:
-                            st.info("Protocol loaded but contains no steps.")
-                        else:
-                            st.error("Could not load protocol details.")
+                            st.markdown("---")
+                    elif detail:
+                        st.info("Protocol loaded but contains no steps.")
+                    else:
+                        st.warning("Expand to load protocol details.")
 
         elif result is not None:
             st.info("No protocols match the current filters.")
