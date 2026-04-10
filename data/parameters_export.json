@@ -12,7 +12,7 @@
     "doi": "10.1007/978-1-61779-510-7_13",
     "pmid": "22482955",
     "notes": "Swat et al. 2012 CC3D tutorial. Moderate homotypic adhesion. Range 3-8.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_009",
@@ -27,7 +27,7 @@
     "doi": "10.1016/j.ydbio.2004.11.012",
     "pmid": null,
     "notes": "Foty & Steinberg 2005. Strong homotypic adhesion via cadherins. Range 1-3. Measured by tissue surface tensiometry.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_010",
@@ -42,7 +42,7 @@
     "doi": "10.1016/j.ydbio.2004.11.012",
     "pmid": null,
     "notes": "Foty & Steinberg 2005. Weaker than epithelial. Range 5-8.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_017",
@@ -57,7 +57,7 @@
     "doi": "10.1016/j.ydbio.2004.11.012",
     "pmid": null,
     "notes": "Foty & Steinberg 2005. Endothelial cells form adherens junctions. Range 3-6.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_018",
@@ -72,7 +72,7 @@
     "doi": "10.1103/PhysRevE.47.2128",
     "pmid": null,
     "notes": "Glazier & Graner 1993. Heterotypic adhesion weaker than homotypic. Drives cell sorting. Range 8-14.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_011",
@@ -87,7 +87,7 @@
     "doi": "10.1103/PhysRevE.47.2128",
     "pmid": null,
     "notes": "Glazier & Graner 1993, GGH model convention. High J = unfavorable = cells avoid floating in void. Range 12-20.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_002",
@@ -102,7 +102,7 @@
     "doi": "10.1007/978-1-61779-510-7_13",
     "pmid": "22482955",
     "notes": "Swat et al. 2012. Strong adhesion (low J). Fibroblasts are collagen-native. Range 2-5.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_003",
@@ -117,7 +117,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Estimated. GelMA retains RGD motifs from gelatin; fibroblast adhesion comparable to collagen. Range 3-6.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "adh_004",
@@ -132,7 +132,7 @@
     "doi": "10.1016/j.ydbio.2004.11.012",
     "pmid": null,
     "notes": "Foty & Steinberg 2005. MSCs show strong integrin-mediated adhesion to collagen. Range 2-5.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_005",
@@ -147,7 +147,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Estimated. MSCs adhere to GelMA via RGD but less avidly than to native collagen. Range 5-10.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "adh_006",
@@ -162,7 +162,7 @@
     "doi": "10.1186/s12915-015-0150-4",
     "pmid": null,
     "notes": "Paluch et al. 2015. Endothelial cells strongly adhere to fibronectin via \u03b15\u03b21 integrin. Range 2-4.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_007",
@@ -177,7 +177,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Estimated. HUVECs prefer fibronectin over gelatin-derived matrices. Range 6-10.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "adh_008",
@@ -192,7 +192,7 @@
     "doi": null,
     "pmid": null,
     "notes": "HepG2 moderately adherent to collagen. Range 5-10. Less integrin expression than mesenchymal cells.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "adh_012",
@@ -207,7 +207,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Estimated. PCL is hydrophobic; cells attach but weakly without surface treatment. Range 8-14. Plasma treatment or protein coating improves adhesion.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "adh_013",
@@ -222,7 +222,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Estimated. PDMS is highly hydrophobic; very weak cell adhesion without surface modification. Range 14-20.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "adh_014",
@@ -237,7 +237,7 @@
     "doi": "10.1038/nmeth.3839",
     "pmid": null,
     "notes": "Caliari & Burdick 2016. Unmodified alginate is biologically inert \u2014 no cell adhesion ligands. Cells form spheroids instead of attaching. Range 12-18.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_015",
@@ -252,7 +252,7 @@
     "doi": "10.1038/nmeth.3839",
     "pmid": null,
     "notes": "RGD-modified alginate restores integrin-mediated adhesion. Range 4-8 depending on RGD density.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_016",
@@ -267,7 +267,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Matrigel is rich in laminin and collagen IV \u2014 excellent for epithelial cell adhesion. Range 3-7.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "adh_019",
@@ -282,7 +282,7 @@
     "doi": "10.1007/s10856-010-4199-8",
     "pmid": null,
     "notes": "Murphy & O'Brien 2010. Moderate-strong adhesion. Range 4-8.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_020",
@@ -297,7 +297,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Fibroblasts strongly adhere to fibrin and actively remodel it. Range 2-5.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "adh_024",
@@ -312,7 +312,7 @@
     "doi": null,
     "pmid": null,
     "notes": "MSCs express CD44 and bind HA. Moderate adhesion without integrin ligands. Range 4-8.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "adh_021",
@@ -327,7 +327,7 @@
     "doi": "10.1016/j.ydbio.2004.11.012",
     "pmid": null,
     "notes": "Foty & Steinberg 2005. Direct measurement. Surface tension \u03c3 = 22.8 \u00b1 3.5 mJ/m\u00b2. Higher \u03c3 = stronger cohesion.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_022",
@@ -342,7 +342,7 @@
     "doi": "10.1016/j.ydbio.2004.11.012",
     "pmid": null,
     "notes": "Foty & Steinberg 2005. \u03c3 = 14.0 \u00b1 1.9 mJ/m\u00b2. Weaker than fibroblasts.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "adh_023",
@@ -357,2137 +357,7 @@
     "doi": "10.1016/j.ydbio.2004.11.012",
     "pmid": null,
     "notes": "Foty & Steinberg 2005. \u03c3 = 56.0 mJ/m\u00b2. Very strong epithelial cohesion. Drives enveloping during gastrulation.",
-    "source": "curated"
-  },
-  {
-    "id": "auto_0001",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 7.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "12079522",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0002",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "12079522",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0004",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 58.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "12079522",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0006",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "12079522",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0008",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 7.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "12079522",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0011",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 70.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "18644132",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0013",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 95.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "18644132",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0014",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 80.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "19138391",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0015",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 20.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "19138391",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0016",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 50.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "19138391",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0018",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 25.0,
-    "unit": "\u00b0C",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "20617161",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0020",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "20580798",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0023",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 2.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "21490722",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0024",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 10.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "21373705",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0025",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "21373705",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0026",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 1.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "21373705",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0028",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 20.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "21340606",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0030",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 14.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "21679421",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0031",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 12.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "22461894",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0033",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 190.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23493102",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0034",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 150.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23493102",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0035",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 118.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23493102",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0039",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 3.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23493102",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0041",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 2.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23919498",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0042",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 70.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23919498",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0046",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 80.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23982416",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0047",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 30.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23982416",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0048",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 94.0,
-    "unit": "\u00b0C",
-    "material": "agarose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "24028570",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0049",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 93.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "24028570",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0056",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 25.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "24307605",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0063",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 60.0,
-    "unit": "\u00b0C",
-    "material": "gelatin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "24695367",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0071",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "fibrin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "25641220",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0072",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "25641220",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0073",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 40.0,
-    "unit": "\u00b0C",
-    "material": "gelatin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "25641220",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0074",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "25641220",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0078",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 45.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "26763798",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0081",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 1.0,
-    "unit": "\u00b0C",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "26897094",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0082",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 13.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "26897094",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0083",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 6.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "26897094",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0084",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 8.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "27135972",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0087",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 18.0,
-    "unit": "\u00b0C",
-    "material": "Matrigel",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "27638155",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0088",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "agarose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "27638155",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0090",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 65.0,
-    "unit": "\u00b0C",
-    "material": "PDMS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "27941867",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0092",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "PDMS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "27941867",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0093",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "Matrigel",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "28246128",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0096",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "28167635",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0100",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 250.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "28320254",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0104",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "28464555",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0108",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 23.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "29021296",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0110",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 1.0,
-    "unit": "\u00b0C",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "29737048",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0114",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 60.0,
-    "unit": "\u00b0C",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "29737048",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0115",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 85.0,
-    "unit": "\u00b0C",
-    "material": "PDMS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "29737048",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0121",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 0.1,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30002435",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0123",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 80.0,
-    "unit": "\u00b0C",
-    "material": "gelatin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30224659",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0124",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "alginate",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30224659",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0130",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "dECM",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30265900",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0131",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "dECM",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30265900",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0132",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "fibronectin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30265900",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0134",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 80.0,
-    "unit": "\u00b0C",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30265900",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0136",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 11.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30223011",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0137",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 5.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30445728",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0138",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 500.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30279498",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0139",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 20.0,
-    "unit": "\u00b0C",
-    "material": "dECM",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30725520",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0140",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 35.0,
-    "unit": "\u00b0C",
-    "material": "hyaluronic acid",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30725520",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0142",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 18.0,
-    "unit": "\u00b0C",
-    "material": "dECM",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30725520",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0143",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 18.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30725520",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0149",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30725520",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0151",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 50.0,
-    "unit": "\u00b0C",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30860678",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0153",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "Matrigel",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30616234",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0162",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 2000.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "31759947",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0167",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 50.0,
-    "unit": "\u00b0C",
-    "material": "gelatin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "32548961",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0176",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 20.0,
-    "unit": "\u00b0C",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33244046",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0178",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 121.0,
-    "unit": "\u00b0C",
-    "material": "alginate",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33244046",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0181",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "titanium",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33255686",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0182",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 25.0,
-    "unit": "\u00b0C",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33391460",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0184",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 280.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33627108",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0188",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "cellulose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33484281",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0192",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "gelatin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33841881",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0199",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 1.53,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33916870",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0213",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 1.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34439916",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0216",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 280.0,
-    "unit": "\u00b0C",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34485944",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0217",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 59418.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34555029",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0220",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 50.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34614486",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0222",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 120.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34686668",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0232",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 27.0,
-    "unit": "\u00b0C",
-    "material": "gelatin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35008902",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0234",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "titanium",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35129119",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0235",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 110.0,
-    "unit": "\u00b0C",
-    "material": "silk fibroin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35055092",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0236",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 80.0,
-    "unit": "\u00b0C",
-    "material": "silk fibroin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35055092",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0239",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 637.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35322667",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0242",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 22.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35872650",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0253",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 800.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36319793",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0254",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 210.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36319793",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0255",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 13.0,
-    "unit": "\u00b0C",
-    "material": "PCL",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36319793",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0256",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 50.0,
-    "unit": "\u00b0C",
-    "material": "PCL",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36319793",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0257",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 50.0,
-    "unit": "\u00b0C",
-    "material": "alginate",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36191458",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0258",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "alginate",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36191458",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0260",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 42.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36541779",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0264",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 310.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36544430",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0270",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 753.12,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36801914",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0271",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 3.0,
-    "unit": "\u00b0C",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36812321",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0282",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 22.0,
-    "unit": "\u00b0C",
-    "material": "PCL",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "37163978",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0283",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 344.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "37061738",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0286",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 115.0,
-    "unit": "\u00b0C",
-    "material": "cellulose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "37341704",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0287",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 90.0,
-    "unit": "\u00b0C",
-    "material": "cellulose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "37341704",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0292",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "agarose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "37544203",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0296",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "PDMS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38032118",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0297",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 37.0,
-    "unit": "\u00b0C",
-    "material": "fibronectin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38032118",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0304",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 50.0,
-    "unit": "\u00b0C",
-    "material": "PDMS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38749006",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0305",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 80.0,
-    "unit": "\u00b0C",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38749006",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0314",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 5851.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38768074",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0326",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 80.0,
-    "unit": "\u00b0C",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38904068",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0327",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 2.0,
-    "unit": "\u00b0C",
-    "material": "fibronectin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39038038",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0331",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 20.0,
-    "unit": "\u00b0C",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39003266",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0334",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 70.0,
-    "unit": "\u00b0C",
-    "material": "agarose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39165920",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0337",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 2.0,
-    "unit": "\u00b0C",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39084496",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0339",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 950.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39211038",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0343",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 402.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39239561",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0351",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 5.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39313617",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0354",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 100.0,
-    "unit": "\u00b0C",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39369014",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0369",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 8000.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39413786",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0374",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 200.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39501109",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0375",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 20.0,
-    "unit": "\u00b0C",
-    "material": "fibronectin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39501109",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0391",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 60.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39730374",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0396",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 1.53,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39733145",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0400",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 30.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39888317",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0403",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 16.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40028843",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0404",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 3.0,
-    "unit": "\u00b0C",
-    "material": "hydroxyapatite",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40220897",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0406",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 2023.0,
-    "unit": "\u00b0C",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40243291",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0422",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 1156.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40948388",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0423",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 28.6,
-    "unit": "\u00b0C",
-    "material": "agarose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40995679",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0425",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 18.0,
-    "unit": "\u00b0C",
-    "material": "agarose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40995679",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0426",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 110.0,
-    "unit": "\u00b0C",
-    "material": "PDMS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "41042864",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0427",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 40230.0,
-    "unit": "\u00b0C",
-    "material": "Matrigel",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "41027873",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0432",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 4.0,
-    "unit": "\u00b0C",
-    "material": "fibrin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "41322985",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0439",
-    "table_name": "culture_conditions",
-    "parameter": "temperature",
-    "value": 135.0,
-    "unit": "\u00b0C",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "41611727",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0064",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 0.5,
-    "unit": "mL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "24695367",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0077",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 5.0,
-    "unit": "mL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "26763798",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0098",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 50.0,
-    "unit": "mL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "28320254",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0102",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 1.0,
-    "unit": "ml/h",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "28801548",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0109",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 0.3,
-    "unit": "mL/h",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "29214803",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0172",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 2.0,
-    "unit": "mL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "32697997",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0190",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 6.0,
-    "unit": "\u03bcL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33532574",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0200",
@@ -2497,12 +367,12 @@
     "unit": "\u00b5L/min",
     "material": "SIS",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "RPMI",
     "confidence": "low",
     "doi": null,
     "pmid": "34162990",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0201",
@@ -2517,157 +387,7 @@
     "doi": null,
     "pmid": "34162990",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0244",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 24.0,
-    "unit": "\u03bcl/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35872650",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0245",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 0.15,
-    "unit": "ml/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35872650",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0272",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 0.2,
-    "unit": "ml/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36812321",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0303",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 100.0,
-    "unit": "mL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38702558",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0309",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 1.2,
-    "unit": "mL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38727296",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0311",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 0.4,
-    "unit": "mL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38727296",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0371",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 30.0,
-    "unit": "\u03bcl/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39413786",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0373",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 0.1,
-    "unit": "mL/h",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39501109",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0376",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 10.0,
-    "unit": "mL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39501109",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0392",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 0.25,
-    "unit": "mL/min",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39730374",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0401",
@@ -2677,327 +397,12 @@
     "unit": "\u03bcL/min",
     "material": "SIS",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "30\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39888317",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0417",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 200.0,
-    "unit": "\u03bcL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40651477",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0418",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 300.0,
-    "unit": "\u03bcL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40651477",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0419",
-    "table_name": "fabrication",
-    "parameter": "flow_rate",
-    "value": 7.5,
-    "unit": "mL/min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40643504",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0052",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 4.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "24307605",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0055",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 6.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "24307605",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0075",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 2.5,
-    "unit": "bar",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "25641220",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0091",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 1.0,
-    "unit": "bar",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "27941867",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0099",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 99.8,
-    "unit": "KPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "28320254",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0127",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 20.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30224659",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0145",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 10.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30725520",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0148",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 60.0,
-    "unit": "kPa",
-    "material": "dECM",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30725520",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0158",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 36.0,
-    "unit": "kPa",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "31067472",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0161",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 15.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "31720646",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0169",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 80.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "32548961",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0174",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 8.73,
-    "unit": "kPa",
-    "material": "polyacrylamide",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "32697997",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0196",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 5.0,
-    "unit": "bar",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33916870",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0197",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 1.0,
-    "unit": "bar",
-    "material": "hyaluronic acid",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33916870",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0226",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 1.4,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34813898",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0238",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 70.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35306023",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0249",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 40.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35884324",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0275",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 180.0,
-    "unit": "kPa",
-    "material": "alginate",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36927673",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0277",
@@ -3007,12 +412,12 @@
     "unit": "kPa",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "36927673",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0279",
@@ -3022,12 +427,12 @@
     "unit": "kPa",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "36927673",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0280",
@@ -3037,87 +442,12 @@
     "unit": "kPa",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "36927673",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0290",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 7.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "37341704",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0310",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 600.0,
-    "unit": "bar",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38727296",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0329",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 440.0,
-    "unit": "kPa",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39003266",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0332",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 540.0,
-    "unit": "kPa",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39003266",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0341",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 5100.0,
-    "unit": "KPA",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39227896",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0348",
@@ -3132,67 +462,7 @@
     "doi": null,
     "pmid": "39236979",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0357",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 24.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39369014",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0364",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 8.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39467547",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0372",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 0.5,
-    "unit": "bar",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39505903",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0381",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 13.4,
-    "unit": "kPa",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39684779",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0388",
@@ -3207,7 +477,7 @@
     "doi": null,
     "pmid": "39744939",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0390",
@@ -3217,27 +487,12 @@
     "unit": "kPa",
     "material": "collagen",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "95\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39744939",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0409",
-    "table_name": "fabrication",
-    "parameter": "pressure",
-    "value": 250.0,
-    "unit": "kPa",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40357760",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by confocal microscopy",
+    "source": "literature"
   },
   {
     "id": "auto_0434",
@@ -3252,7 +507,7 @@
     "doi": null,
     "pmid": "41226748",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0436",
@@ -3267,7 +522,7 @@
     "doi": null,
     "pmid": "41226748",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "migr_007",
@@ -3282,7 +537,7 @@
     "doi": null,
     "pmid": null,
     "notes": "MMP-2 (gelatinase A). Range 1-15 pg/cell/day. Upregulated by mechanical stress and growth factors (TGF-\u03b2). Major ECM remodeling enzyme.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "migr_008",
@@ -3297,7 +552,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Lower than activated fibroblasts. Range 0.5-5 pg/cell/day. Increases during chondrogenic differentiation.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "migr_009",
@@ -3312,7 +567,7 @@
     "doi": "10.1073/pnas.0606087103",
     "pmid": null,
     "notes": "Zaman et al. 2006. Highly invasive cancer line; high MMP secretion. Range 10-50 pg/cell/day combined MMP-2/MMP-9.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "migr_014",
@@ -3327,7 +582,7 @@
     "doi": "10.1083/jcb.201210152",
     "pmid": null,
     "notes": "Wolf et al. 2013. Below ~7 \u00b5m pore size, cells require MMP activity to enlarge pores. Above this, amoeboid migration possible without proteolysis.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "migr_001",
@@ -3342,7 +597,7 @@
     "doi": "10.1073/pnas.0606087103",
     "pmid": null,
     "notes": "Zaman et al. 2006. Range 5-20 \u00b5m/h depending on collagen density. Biphasic: optimal speed at intermediate stiffness (~1 mg/mL).",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "migr_002",
@@ -3357,7 +612,7 @@
     "doi": "10.1083/jcb.201210152",
     "pmid": null,
     "notes": "Wolf et al. 2013. Range 2-15 \u00b5m/h. Speed depends on pore size relative to nuclear diameter. Below ~3 \u00b5m pores, nuclear deformation becomes rate-limiting.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "migr_003",
@@ -3372,7 +627,7 @@
     "doi": "10.1016/j.bpj.2010.11.082",
     "pmid": null,
     "notes": "Ehrbar et al. 2011. Range 10-40 \u00b5m/h in loose gels. Fibroblasts are fast migrators in permissive matrices.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "migr_004",
@@ -3387,7 +642,7 @@
     "doi": "10.1016/j.bpj.2010.11.082",
     "pmid": null,
     "notes": "Ehrbar et al. 2011. Dense collagen slows migration by restricting pore space.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "migr_005",
@@ -3402,7 +657,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Collective migration (tip-stalk). Range 5-15 \u00b5m/h. Sprout elongation rate rather than single-cell speed.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "migr_006",
@@ -3417,7 +672,7 @@
     "doi": null,
     "pmid": null,
     "notes": "MSCs migrate readily in fibrin due to plasmin-mediated degradation. Range 8-25 \u00b5m/h.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "migr_012",
@@ -3432,7 +687,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Estimated. GelMA at 5% has smaller pore sizes (~50 \u00b5m) than dilute collagen, limiting migration. Cells must degrade GelMA via MMPs to move.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "migr_013",
@@ -3447,7 +702,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Alginate is non-degradable and lacks adhesion ligands. Cells cannot migrate through intact alginate \u2014 they are trapped. Migration ~0 unless alginate is modified or degrading.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "migr_011",
@@ -3462,7 +717,7 @@
     "doi": "10.1083/jcb.201210152",
     "pmid": null,
     "notes": "Wolf et al. 2013. Range 10-15 \u00b5m. Critical parameter for migration through confined spaces. Nuclear stiffness is rate-limiting below ~7 \u00b5m pore size.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "migr_010",
@@ -3477,7 +732,7 @@
     "doi": "10.1073/pnas.0606087103",
     "pmid": null,
     "notes": "Zaman et al. 2006. Biphasic relationship: too sparse = insufficient traction, too dense = physical obstruction. Optimal ~1-2 mg/mL for most mesenchymal cells.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_001",
@@ -3492,7 +747,7 @@
     "doi": "10.1089/ten.tec.2015.0375",
     "pmid": null,
     "notes": "McMurtrey 2016, Table 1. Canonical reference value. Multiple independent measurements converge on 2.8\u20133.2e-5. Used as baseline for fractional reduction in hydrogels.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_002",
@@ -3507,7 +762,7 @@
     "doi": "10.1002/term.402",
     "pmid": "21312340",
     "notes": "Cheema et al. 2012. Exact value from abstract: 4.5e-6 cm\u00b2/s. Measured with optical fibre-based O\u2082 sensor embedded in core + Fick's law model.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_003",
@@ -3522,7 +777,7 @@
     "doi": "10.1002/term.402",
     "pmid": "21312340",
     "notes": "Cheema et al. 2012. Exact value from abstract: 1.7e-6 cm\u00b2/s. Same method as do2_002.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_004",
@@ -3537,7 +792,7 @@
     "doi": "10.1002/term.402",
     "pmid": "21312340",
     "notes": "Cheema et al. 2012. Exact value from abstract: 3.4e-6 cm\u00b2/s. Crosslinking reduced D vs uncrosslinked 11% (4.5e-6).",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_005",
@@ -3552,7 +807,7 @@
     "doi": "10.1002/jbm.a.34946",
     "pmid": "24027235",
     "notes": "Colom et al. 2014. Measured D_O2 in collagen, fibrin, and Matrigel. 'Oxygen diffusivity in acellular gels was up to 40% smaller than that of water.' Range for dilute collagen ~1.8\u20132.4e-5 cm\u00b2/s.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_006",
@@ -3567,7 +822,7 @@
     "doi": "10.1002/jbm.a.34946",
     "pmid": "24027235",
     "notes": "Colom et al. 2014. Denser ECM gels showed lower diffusivity. Up to 40% reduction from water for densest gels. Matrigel is denser than dilute collagen.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_007",
@@ -3582,7 +837,7 @@
     "doi": "10.3109/10731199609118877",
     "pmid": "8907689",
     "notes": "Mehmetoglu et al. 1996. Range 2.54\u20132.58e-5 cm\u00b2/s in alginate gel beads. Close to water, indicating alginate at low concentration is highly permeable to O\u2082.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_008",
@@ -3597,7 +852,7 @@
     "doi": "10.1002/bit.70095",
     "pmid": "41220227",
     "notes": "Orimi et al. 2025/2026. Range ~1.5\u20132.0e-5. Alginate source (Manugel vs Protanal) affects D significantly due to guluronate/mannuronate ratio differences.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_009",
@@ -3612,7 +867,7 @@
     "doi": "10.1002/bit.70095",
     "pmid": "41220227",
     "notes": "Orimi et al. 2025/2026. Range ~2.5\u20133.0e-5. Higher than Manugel variant \u2014 near water-like diffusivity.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_010",
@@ -3627,7 +882,7 @@
     "doi": "10.1002/bit.70095",
     "pmid": "41220227",
     "notes": "Orimi et al. 2025/2026. Measured 3.2 \u00b1 0.5e-5 cm\u00b2/s. Confirms historical reference values.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_011",
@@ -3642,7 +897,7 @@
     "doi": null,
     "pmid": "18377199",
     "notes": "Valentin et al. Range 1.9\u20133.1e-5 cm\u00b2/s. Decellularized dermal ECM retains near-water diffusivity.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_012",
@@ -3657,7 +912,7 @@
     "doi": null,
     "pmid": "18377199",
     "notes": "Valentin et al. Range 0.7\u20132.0e-5 cm\u00b2/s. More variable than Alloderm due to multilayer structure.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_013",
@@ -3672,7 +927,7 @@
     "doi": "10.1007/BF01875620",
     "pmid": null,
     "notes": "Hulst et al. 1989. Range 1.5\u20132.1e-5 across 0.5\u20135% w/v. Decreases with concentration.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "do2_014",
@@ -3687,7 +942,7 @@
     "doi": null,
     "pmid": null,
     "notes": "NO PUBLISHED MEASUREMENT EXISTS for GelMA D_O2. Estimated: >90% water content at 5% GelMA suggests D close to water. Range estimate 2.0\u20132.5e-5. CRITICAL GAP \u2014 measurement needed.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "do2_015",
@@ -3702,7 +957,7 @@
     "doi": null,
     "pmid": null,
     "notes": "NO PUBLISHED MEASUREMENT EXISTS. Estimated: ~85% water at 10% GelMA, denser network. Range estimate 1.5\u20132.0e-5. Needs direct measurement.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "km_001",
@@ -3717,7 +972,7 @@
     "doi": "10.1016/j.freeradbiomed.2011.05.024",
     "pmid": "21664270",
     "notes": "Wagner et al. 2011 consensus. Range 0.5\u20135.0e-3 mol/m\u00b3. Use Michaelis-Menten kinetics (Q = Vmax \u00d7 [O\u2082] / (Km + [O\u2082])) for thick constructs where local pO\u2082 may drop below ~5 mmHg.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_001",
@@ -3732,7 +987,7 @@
     "doi": "10.1016/j.freeradbiomed.2011.05.024",
     "pmid": "21664270",
     "notes": "Wagner et al. 2011. Range 200\u2013400 amol/cell/s. Confirmed independently by Place et al. 2017 (DOI 10.1016/j.freeradbiomed.2017.10.003): 'Primary hepatocytes ... consuming 200\u2013400 attomoles (amol)/cell/s.' One of the highest OCR values of any mammalian cell type.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_002",
@@ -3747,7 +1002,7 @@
     "doi": "10.1016/j.freeradbiomed.2011.05.024",
     "pmid": "21664270",
     "notes": "Wagner et al. 2011. Cross-validated: Clark electrode (25\u00b0C) ~32.5 and Seahorse XF96 (37\u00b0C) ~35. Range 28\u201338 amol/cell/s.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_003",
@@ -3762,7 +1017,7 @@
     "doi": "10.1016/j.freeradbiomed.2011.05.024",
     "pmid": "21664270",
     "notes": "Wagner et al. 2011. Seahorse XF24.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_004",
@@ -3777,7 +1032,7 @@
     "doi": "10.1016/j.freeradbiomed.2011.05.024",
     "pmid": "21664270",
     "notes": "Wagner et al. 2011. Range 63\u201388 amol/cell/s measured by EPR oximetry and respirometer.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_005",
@@ -3792,7 +1047,7 @@
     "doi": "10.1016/j.freeradbiomed.2011.05.024",
     "pmid": "21664270",
     "notes": "Wagner et al. 2011. Range 17\u201328 amol/cell/s. Method-dependent: optical O\u2082 quenching vs Seahorse XF24.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_006",
@@ -3807,7 +1062,7 @@
     "doi": "10.1016/j.freeradbiomed.2011.05.024",
     "pmid": "21664270",
     "notes": "Wagner et al. 2011. Clark electrode. Range 12.5\u201327 amol/cell/s.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_007",
@@ -3822,7 +1077,7 @@
     "doi": "10.1016/j.freeradbiomed.2011.05.024",
     "pmid": "21664270",
     "notes": "Wagner et al. 2011. 3.06e-17 mol/s/cell = 30.6 amol/cell/s.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_008",
@@ -3837,7 +1092,7 @@
     "doi": "10.1002/jcp.22605",
     "pmid": "21792913",
     "notes": "~98 fmol/cell/hr \u00d7 0.278 = ~27.2 amol/cell/s. Respirometry measurement.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_009",
@@ -3852,7 +1107,7 @@
     "doi": "10.1002/jcp.22061",
     "pmid": "20143333",
     "notes": "Deep zone Vmax ~6.6 fmol/cell/hr = ~1.8 amol/cell/s. Superficial zone ~3.2 fmol/cell/hr = ~0.9 amol/cell/s. Range 0.3\u20131.8. Highly glycolytic cells. Clark electrode.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_010",
@@ -3867,7 +1122,7 @@
     "doi": "10.1016/j.freeradbiomed.2011.05.024",
     "pmid": "21664270",
     "notes": "Wagner et al. 2011. From abstract: 'average rate of oxygen utilization of 2.5 \u00d7 10\u207b\u00b9\u2078 mol cell\u207b\u00b9 s\u207b\u00b9, i.e., 2.5 amol cell\u207b\u00b9 s\u207b\u00b9' based on 10\u00b9\u2074 cells consuming 22 mol O\u2082/day.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_011",
@@ -3882,7 +1137,7 @@
     "doi": "10.1016/j.freeradbiomed.2011.05.024",
     "pmid": "21664270",
     "notes": "Wagner et al. 2011. Originally reported as protein-normalized; converted to per-cell using estimated protein content. Range 30\u201380 amol/cell/s. Lower than primary hepatocytes.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_012",
@@ -3897,7 +1152,7 @@
     "doi": null,
     "pmid": "35263790",
     "notes": "Reported as 37 \u00b1 12 amol/cell/s from meta-analysis (n=2630 wells). Seahorse XF96 at 37\u00b0C.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_013",
@@ -3912,7 +1167,7 @@
     "doi": null,
     "pmid": "34124013",
     "notes": "43.2 \u00b1 6.2 amol/cell/s. OCR drops to 13.1 \u00b1 0.6 amol/cell/s by day 24 of chondrogenic differentiation (TGF-\u03b23).",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_014",
@@ -3927,7 +1182,7 @@
     "doi": null,
     "pmid": "34124013",
     "notes": "13.1 \u00b1 0.6 amol/cell/s. Dramatic decline from 43 at day 0 \u2014 reflects metabolic shift during chondrogenic differentiation.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "qo2_015",
@@ -3942,37 +1197,7 @@
     "doi": "10.1021/acssensors.0c02282",
     "pmid": null,
     "notes": "Range 2.1\u20134.8 amol/cell/s. Immature iPSC-CMs rely on glycolysis. Much lower than primary neonatal rat CMs (40\u2013100 amol/cell/s). Maturation shifts OCR upward.",
-    "source": "curated"
-  },
-  {
-    "id": "auto_0017",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 600000.0,
-    "unit": "cells/mL",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "19698189",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0029",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 200000.0,
-    "unit": "cells/mL",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "21679421",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0037",
@@ -3982,12 +1207,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1.\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "23493102",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0043",
@@ -3997,12 +1222,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1\u00b0C; RPMI",
     "confidence": "low",
     "doi": null,
     "pmid": "23919498",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0044",
@@ -4012,12 +1237,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; RPMI",
     "confidence": "low",
     "doi": null,
     "pmid": "23982416",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Cells seeded in construct",
+    "source": "literature"
   },
   {
     "id": "auto_0057",
@@ -4032,7 +1257,7 @@
     "doi": null,
     "pmid": "24307605",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0058",
@@ -4042,12 +1267,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "24495391",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0059",
@@ -4057,12 +1282,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "24495391",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0060",
@@ -4072,12 +1297,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "24495391",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0061",
@@ -4087,12 +1312,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "24495391",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0062",
@@ -4102,12 +1327,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "24495391",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0066",
@@ -4117,12 +1342,12 @@
     "unit": "cells/mL",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "60\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "24695367",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0067",
@@ -4132,12 +1357,12 @@
     "unit": "cells/mL",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "60\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "24695367",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0068",
@@ -4147,12 +1372,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "24786604",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0069",
@@ -4162,12 +1387,12 @@
     "unit": "cells/mL",
     "material": "SIS",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "24786604",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0079",
@@ -4177,12 +1402,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "25\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "26763798",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0080",
@@ -4192,12 +1417,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "25\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "26763798",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0086",
@@ -4207,42 +1432,12 @@
     "unit": "cells/mL",
     "material": "SIS",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "27791206",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0094",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 100000.0,
-    "unit": "cells/mL",
-    "material": "Matrigel",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "28167635",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0107",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 50000.0,
-    "unit": "cells/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "29021296",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0116",
@@ -4252,12 +1447,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; 2 mg/mL; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "29789674",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0120",
@@ -4267,12 +1462,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "2\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "29693652",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0122",
@@ -4282,12 +1477,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "30106121",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by qPCR",
+    "source": "literature"
   },
   {
     "id": "auto_0129",
@@ -4297,12 +1492,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "80\u00b0C; 4.5% w/v; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "30224659",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0152",
@@ -4312,27 +1507,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "19\u00b0C; RPMI",
     "confidence": "low",
     "doi": null,
     "pmid": "30860678",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0154",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 2000000.0,
-    "unit": "cells/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30616234",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Cells seeded in construct",
+    "source": "literature"
   },
   {
     "id": "auto_0155",
@@ -4347,22 +1527,7 @@
     "doi": null,
     "pmid": "31186048",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0164",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 2000000.0,
-    "unit": "cells/mL",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "31780803",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0165",
@@ -4372,12 +1537,12 @@
     "unit": "cells/mL",
     "material": "SIS",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; RPMI",
     "confidence": "low",
     "doi": null,
     "pmid": "32293355",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0166",
@@ -4387,12 +1552,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "32242081",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0186",
@@ -4407,7 +1572,7 @@
     "doi": null,
     "pmid": "33484281",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0189",
@@ -4417,12 +1582,12 @@
     "unit": "cells/mL",
     "material": "SIS",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "4\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "33532574",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by flow cytometry",
+    "source": "literature"
   },
   {
     "id": "auto_0191",
@@ -4432,12 +1597,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1.\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "33805011",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Cells seeded in construct",
+    "source": "literature"
   },
   {
     "id": "auto_0204",
@@ -4452,7 +1617,7 @@
     "doi": null,
     "pmid": "34398883",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0223",
@@ -4462,12 +1627,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "9.\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "34813898",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by Western blot",
+    "source": "literature"
   },
   {
     "id": "auto_0227",
@@ -4477,27 +1642,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "34789798",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0230",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 100000.0,
-    "unit": "cells/mL",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34789798",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0240",
@@ -4512,7 +1662,7 @@
     "doi": null,
     "pmid": "35872650",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0241",
@@ -4527,7 +1677,7 @@
     "doi": null,
     "pmid": "35872650",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0247",
@@ -4537,12 +1687,12 @@
     "unit": "cells/mL",
     "material": "PEG",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "4\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "35884324",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0250",
@@ -4557,7 +1707,7 @@
     "doi": null,
     "pmid": "35834072",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0262",
@@ -4567,12 +1717,12 @@
     "unit": "cells/mL",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "20\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "36542545",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0268",
@@ -4586,23 +1736,8 @@
     "confidence": "low",
     "doi": null,
     "pmid": "36768524",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0284",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 2000000.0,
-    "unit": "cells/mL",
-    "material": "Matrigel",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "37122212",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Cells seeded in construct",
+    "source": "literature"
   },
   {
     "id": "auto_0291",
@@ -4617,7 +1752,7 @@
     "doi": null,
     "pmid": "37544203",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0293",
@@ -4627,12 +1762,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "37867234",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0295",
@@ -4642,12 +1777,12 @@
     "unit": "cells/mL",
     "material": "collagen",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "38032118",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by SEM imaging",
+    "source": "literature"
   },
   {
     "id": "auto_0298",
@@ -4661,23 +1796,8 @@
     "confidence": "low",
     "doi": null,
     "pmid": "38032118",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0299",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 200000.0,
-    "unit": "cells/mL",
-    "material": "PCL",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38278152",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by SEM imaging",
+    "source": "literature"
   },
   {
     "id": "auto_0300",
@@ -4687,27 +1807,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; 0.5 mg/mL; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "38297132",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0301",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 72000.0,
-    "unit": "cells/mL",
-    "material": "Matrigel",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38297132",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Cells seeded in construct",
+    "source": "literature"
   },
   {
     "id": "auto_0302",
@@ -4722,7 +1827,7 @@
     "doi": null,
     "pmid": "38502905",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0307",
@@ -4732,12 +1837,12 @@
     "unit": "cells/mL",
     "material": "PEG",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "80\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "38749006",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0315",
@@ -4747,27 +1852,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "2.\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "38768074",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0318",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 300000.0,
-    "unit": "cells/mL",
-    "material": "Matrigel",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38768074",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0323",
@@ -4777,12 +1867,12 @@
     "unit": "cells/mL",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "55\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "38830883",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0333",
@@ -4797,7 +1887,7 @@
     "doi": null,
     "pmid": "39003266",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0335",
@@ -4807,12 +1897,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37.5\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "39165920",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0349",
@@ -4822,27 +1912,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; 1 mg/mL",
     "confidence": "low",
     "doi": null,
     "pmid": "39277544",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0359",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 1000000.0,
-    "unit": "cells/mL",
-    "material": "agarose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39402206",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0365",
@@ -4852,12 +1927,12 @@
     "unit": "cells/mL",
     "material": "collagen",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "4\u00b0C; 25 mg/mL; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39467547",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0367",
@@ -4867,27 +1942,12 @@
     "unit": "cells/mL",
     "material": "agarose",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; 5 mg/mL",
     "confidence": "low",
     "doi": null,
     "pmid": "39413786",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0370",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 100000.0,
-    "unit": "cells/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39413786",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Cells suspended in construct",
+    "source": "literature"
   },
   {
     "id": "auto_0384",
@@ -4897,12 +1957,12 @@
     "unit": "cells/mL",
     "material": "Matrigel",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "354230\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "39600948",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Cells plated in construct",
+    "source": "literature"
   },
   {
     "id": "auto_0385",
@@ -4912,12 +1972,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "2.1\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "39600948",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Cells plated in construct",
+    "source": "literature"
   },
   {
     "id": "auto_0395",
@@ -4927,12 +1987,12 @@
     "unit": "cells/mL",
     "material": "dECM",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "16 mg/mL; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39733145",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0397",
@@ -4947,22 +2007,7 @@
     "doi": null,
     "pmid": "39840547",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0398",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 30000.0,
-    "unit": "cells/mL",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39929812",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0402",
@@ -4972,12 +2017,12 @@
     "unit": "cells/mL",
     "material": "SIS",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "30\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39888317",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0405",
@@ -4991,8 +2036,8 @@
     "confidence": "low",
     "doi": null,
     "pmid": "40315330",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by flow cytometry",
+    "source": "literature"
   },
   {
     "id": "auto_0412",
@@ -5007,7 +2052,7 @@
     "doi": null,
     "pmid": "40562874",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0421",
@@ -5017,12 +2062,12 @@
     "unit": "cells/mL",
     "material": "Matrigel",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "RPMI",
     "confidence": "low",
     "doi": null,
     "pmid": "40713745",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0438",
@@ -5032,27 +2077,12 @@
     "unit": "cells/mL",
     "material": "Matrigel",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "41379537",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0440",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 6250000.0,
-    "unit": "cells/mL",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "41611727",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Cells suspended in construct",
+    "source": "literature"
   },
   {
     "id": "auto_0441",
@@ -5062,27 +2092,12 @@
     "unit": "cells/mL",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "culture medium",
     "confidence": "low",
     "doi": null,
     "pmid": "41392657",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0442",
-    "table_name": "proliferation",
-    "parameter": "cell_density",
-    "value": 35000.0,
-    "unit": "cells/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "41392657",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "prolif_016",
@@ -5097,7 +2112,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Freshney 'Culture of Animal Cells'. Range 3-5 \u00d7 10^4 cells/cm\u00b2. Classic contact-inhibited line.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_017",
@@ -5112,7 +2127,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Freshney. Range 1-2 \u00d7 10^5. Transformed line, weak contact inhibition, can pile up.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_018",
@@ -5127,7 +2142,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Range 5-8 \u00d7 10^5. Forms tight polarized monolayer at confluence. Differentiates post-confluence.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_019",
@@ -5142,7 +2157,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Range 5-8 \u00d7 10^4. Contact-inhibited endothelial monolayer.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_025",
@@ -5157,7 +2172,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Estimated from typical confluent density. HEK293 are loosely adherent and can detach at high density.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_001",
@@ -5172,7 +2187,7 @@
     "doi": null,
     "pmid": null,
     "notes": "ATCC product sheet CRL-1573. Suspension-adapted variant. Adherent HEK293 in 10% FBS/DMEM can be faster (18-24h).",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_002",
@@ -5187,7 +2202,7 @@
     "doi": null,
     "pmid": null,
     "notes": "ResearchGate user reports; consistent with Sen Lab protocol. HEK293T grows faster than parental HEK293 due to SV40 T antigen.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_003",
@@ -5202,7 +2217,7 @@
     "doi": null,
     "pmid": null,
     "notes": "ATCC CCL-2 product sheet. Well-established canonical value. Range 20-28h depending on media and passage.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_004",
@@ -5217,7 +2232,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Cytiva/HyClone study measured 40-60h. ATCC ACC-115 consistent. Clumpy growth complicates counting.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_005",
@@ -5232,7 +2247,7 @@
     "doi": null,
     "pmid": null,
     "notes": "ATCC CRL-1658. DSMZ ACC-59. Range 20-26h. Contact-inhibited; must passage before confluence.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_006",
@@ -5247,7 +2262,7 @@
     "doi": "10.1002/jcp.22010",
     "pmid": null,
     "notes": "Pattappa et al. 2011. Range 30-40h varies with donor, passage, and FBS lot. bFGF supplementation accelerates.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "prolif_007",
@@ -5262,7 +2277,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Terminally differentiated CMs rarely divide. Proliferation index <1% in mature cultures. For CC3D, set proliferation probability to ~0.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_008",
@@ -5277,7 +2292,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Primary hepatocytes are quiescent in standard culture. No meaningful doubling time. HGF/EGF can induce limited proliferation. For CC3D, set division rate to 0.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_009",
@@ -5292,7 +2307,7 @@
     "doi": null,
     "pmid": null,
     "notes": "ATCC HB-8065. Range 24-30h. Grows in clusters; enzymatic dissociation needed for accurate counts.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_010",
@@ -5307,7 +2322,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Lonza/PromoCell specifications. Range 18-24h. Highly passage-dependent; senescence onset P6-P8.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_011",
@@ -5322,7 +2337,7 @@
     "doi": null,
     "pmid": null,
     "notes": "ATCC HTB-37. Range 40-62h. Requires 20% FBS. Differentiates to enterocyte-like phenotype at confluence.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_012",
@@ -5337,7 +2352,7 @@
     "doi": null,
     "pmid": null,
     "notes": "ATCC CCL-185. Range 20-24h. Robust grower.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_013",
@@ -5352,7 +2367,7 @@
     "doi": null,
     "pmid": null,
     "notes": "ATCC CCL-61. Range 14-20h depending on media. CHO-S suspension variant may differ.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_014",
@@ -5367,7 +2382,7 @@
     "doi": "10.3389/fbioe.2017.00065",
     "pmid": null,
     "notes": "ATCC HTB-14 reports ~34h. Measured at 30.8 \u00b1 2.5h by Tzedakis et al. 2017.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "prolif_015",
@@ -5382,7 +2397,7 @@
     "doi": null,
     "pmid": null,
     "notes": "ATCC CCL-34. Range 20-26h. Epithelial, contact-inhibited.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_020",
@@ -5397,7 +2412,7 @@
     "doi": "10.1016/j.drudis.2012.10.003",
     "pmid": null,
     "notes": "Breslin & O'Driscoll 2013. 3D spheroid growth rate about 2\u00d7 slower than 2D monolayer. Outer proliferative rim, quiescent core.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "prolif_021",
@@ -5412,7 +2427,7 @@
     "doi": "10.1016/j.biomaterials.2010.01.018",
     "pmid": null,
     "notes": "Nichol et al. 2010. Estimated from viability/proliferation data in GelMA. ~2\u00d7 longer than 2D MSC doubling.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "prolif_022",
@@ -5427,7 +2442,7 @@
     "doi": null,
     "pmid": null,
     "notes": "ATCC CCL-81. Range 12-18h. Important for vaccine production.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "prolif_023",
@@ -5442,7 +2457,7 @@
     "doi": "10.1002/jcp.22061",
     "pmid": "20143333",
     "notes": "Highly variable by donor age and zone of origin. Range 48-96h in monolayer. De-differentiate rapidly in 2D.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "prolif_024",
@@ -5457,67 +2472,7 @@
     "doi": null,
     "pmid": null,
     "notes": "ATCC CRL-2539. Fast-growing, aggressive triple-negative breast cancer model. Range 18-24h.",
-    "source": "curated"
-  },
-  {
-    "id": "auto_0003",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 2.5,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "12079522",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0005",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 1.0,
-    "unit": "mg/mL",
-    "material": "agarose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "12079522",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0007",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.5,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "12079522",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0009",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.01,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "16464254",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "model_estimate"
   },
   {
     "id": "auto_0010",
@@ -5527,162 +2482,12 @@
     "unit": "mg/mL",
     "material": "fibronectin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "18802455",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0012",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.0005,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "18644132",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0019",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 3.5,
-    "unit": "mg/mL",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "20580798",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0021",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 4.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "20580798",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0027",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 3.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "21340606",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0032",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 1.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23238683",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0036",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 10.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23493102",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0038",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 2.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23493102",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0040",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 5.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23555262",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0045",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 20.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "23982416",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0050",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 6.0,
-    "unit": "mg/mL",
-    "material": "Matrigel",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "24277996",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0053",
@@ -5696,23 +2501,8 @@
     "confidence": "low",
     "doi": null,
     "pmid": "24307605",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0070",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 6.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "25649768",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by SEM imaging",
+    "source": "literature"
   },
   {
     "id": "auto_0085",
@@ -5722,42 +2512,12 @@
     "unit": "mg/mL",
     "material": "collagen",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "27091175",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0089",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.1,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "27769299",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0095",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 2.0,
-    "unit": "mg/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "28167635",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0101",
@@ -5767,12 +2527,12 @@
     "unit": "mg/mL",
     "material": "fibronectin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "28801548",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0103",
@@ -5782,42 +2542,12 @@
     "unit": "mg/mL",
     "material": "fibronectin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "28801548",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0106",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 3.0,
-    "unit": "mg/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "29021296",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0128",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.2,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30224659",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0133",
@@ -5827,12 +2557,12 @@
     "unit": "mg/mL",
     "material": "collagen",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "30265900",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0135",
@@ -5842,177 +2572,12 @@
     "unit": "mg/mL",
     "material": "collagen",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "30265900",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0141",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 30.0,
-    "unit": "mg/mL",
-    "material": "dECM",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30725520",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0150",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 30.0,
-    "unit": "mg/mL",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30725520",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0156",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.01,
-    "unit": "mg/mL",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "31067472",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0170",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 75.0,
-    "unit": "mg/mL",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "32698471",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0177",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 50.0,
-    "unit": "mg/mL",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33244046",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0179",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 1.0,
-    "unit": "mg/mL",
-    "material": "Matrigel",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33255686",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0180",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.9,
-    "unit": "mg/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33255686",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0183",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.6,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33391460",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0185",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.7,
-    "unit": "mg/mL",
-    "material": "fibrin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33484281",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0187",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 3.0,
-    "unit": "mg/mL",
-    "material": "fibrin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33484281",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0193",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 4.0,
-    "unit": "mg/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33841881",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0194",
@@ -6022,27 +2587,12 @@
     "unit": "mg/mL",
     "material": "SIS",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "33916870",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0195",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 10.0,
-    "unit": "mg/mL",
-    "material": "hyaluronic acid",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33916870",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0198",
@@ -6052,72 +2602,12 @@
     "unit": "mg/mL",
     "material": "SIS",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "33916870",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0202",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.135,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34210052",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0203",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.00026,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34210052",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0205",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 50.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34439916",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0207",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 25.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34439916",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0209",
@@ -6127,57 +2617,12 @@
     "unit": "mg/mL",
     "material": "fibrin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1.\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "34439916",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0210",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 20.0,
-    "unit": "mg/mL",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34439916",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0212",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 25.0,
-    "unit": "mg/mL",
-    "material": "chitosan",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34439916",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0215",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 100.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34485944",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0224",
@@ -6191,53 +2636,8 @@
     "confidence": "low",
     "doi": null,
     "pmid": "34813898",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0231",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 1.6,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34789798",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0233",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 8.5,
-    "unit": "mg/mL",
-    "material": "Matrigel",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35013350",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0243",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 11.4,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "35872650",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by confocal microscopy",
+    "source": "literature"
   },
   {
     "id": "auto_0246",
@@ -6247,12 +2647,12 @@
     "unit": "mg/mL",
     "material": "PEG",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "4\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "35884324",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0251",
@@ -6262,117 +2662,12 @@
     "unit": "mg/mL",
     "material": "Matrigel",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "RPMI",
     "confidence": "low",
     "doi": null,
     "pmid": "36018047",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0259",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.3,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36152627",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0269",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 1.0,
-    "unit": "mg/mL",
-    "material": "fibrin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36801914",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0285",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 270.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "37234808",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0288",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 2.5,
-    "unit": "mg/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "37341704",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0313",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 213.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38768074",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0316",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 6.5,
-    "unit": "mg/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38768074",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0317",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 1.25,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38768074",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0319",
@@ -6387,7 +2682,7 @@
     "doi": null,
     "pmid": "38778159",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0324",
@@ -6397,42 +2692,12 @@
     "unit": "mg/mL",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "55\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "38830883",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0325",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.1,
-    "unit": "mg/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38904068",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0336",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 10.0,
-    "unit": "mg/mL",
-    "material": "fibrin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39143095",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0346",
@@ -6447,7 +2712,7 @@
     "doi": null,
     "pmid": "39236979",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0352",
@@ -6457,12 +2722,12 @@
     "unit": "mg/mL",
     "material": "fibrin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39413287",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0358",
@@ -6472,12 +2737,12 @@
     "unit": "mg/mL",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "60\u00b0C; 6.67% w/v; MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "39369014",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0360",
@@ -6487,42 +2752,12 @@
     "unit": "mg/mL",
     "material": "collagen",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "4\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39467547",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0361",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 25.0,
-    "unit": "mg/mL",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39467547",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0362",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 15.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39467547",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0366",
@@ -6532,12 +2767,12 @@
     "unit": "mg/mL",
     "material": "collagen",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "4\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39467547",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0368",
@@ -6547,27 +2782,12 @@
     "unit": "mg/mL",
     "material": "fibrin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "39413786",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0377",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.08,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39501109",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0379",
@@ -6577,12 +2797,12 @@
     "unit": "mg/mL",
     "material": "PEG",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1.\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "39684779",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0383",
@@ -6592,12 +2812,12 @@
     "unit": "mg/mL",
     "material": "fibrin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "39684779",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0393",
@@ -6607,12 +2827,12 @@
     "unit": "mg/mL",
     "material": "collagen",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39733145",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0394",
@@ -6622,27 +2842,12 @@
     "unit": "mg/mL",
     "material": "dECM",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39733145",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0399",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.05,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39946239",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0410",
@@ -6657,7 +2862,7 @@
     "doi": null,
     "pmid": "40462147",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0415",
@@ -6672,22 +2877,7 @@
     "doi": null,
     "pmid": "40619379",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0420",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 0.5,
-    "unit": "mg/mL",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40643504",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0424",
@@ -6701,8 +2891,8 @@
     "confidence": "low",
     "doi": null,
     "pmid": "40995679",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by confocal microscopy",
+    "source": "literature"
   },
   {
     "id": "auto_0428",
@@ -6712,12 +2902,12 @@
     "unit": "mg/mL",
     "material": "Matrigel",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "40230\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "41027873",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0429",
@@ -6732,22 +2922,7 @@
     "doi": null,
     "pmid": "41027873",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0430",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 2.0,
-    "unit": "mg/mL",
-    "material": "agarose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "41027873",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0431",
@@ -6757,72 +2932,12 @@
     "unit": "mg/mL",
     "material": "SIS",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "41091766",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0437",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 500.0,
-    "unit": "mg/mL",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "41379537",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0443",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_mg_ml",
-    "value": 1.0,
-    "unit": "mg/mL",
-    "material": "fibronectin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "41392657",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0022",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 10.0,
-    "unit": "% w/v",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "20580798",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0111",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 0.01,
-    "unit": "% w/v",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "29737048",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0112",
@@ -6832,12 +2947,12 @@
     "unit": "% w/v",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "80\u00b0C; 0.01% w/v; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "29737048",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0113",
@@ -6847,57 +2962,12 @@
     "unit": "% w/v",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "80\u00b0C; 0.01% w/v; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "29737048",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0117",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 30.0,
-    "unit": "% w/v",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "29693652",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0118",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 0.2,
-    "unit": "% w/v",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "29693652",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0119",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 0.2,
-    "unit": "% w/v",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "29693652",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0125",
@@ -6907,72 +2977,12 @@
     "unit": "% w/v",
     "material": "alginate",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "80\u00b0C; 4.5% w/v; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "30224659",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0147",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 3.0,
-    "unit": "% w/v",
-    "material": "dECM",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30725520",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0159",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 1.0,
-    "unit": "% w/v",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "31067472",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0163",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 90.0,
-    "unit": "% w/v",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "31759947",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0206",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 2.0,
-    "unit": "% w/v",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34439916",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0208",
@@ -6982,27 +2992,12 @@
     "unit": "% w/v",
     "material": "fibrin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1.\u00b0C; 50 mg/mL; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "34439916",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0211",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 0.075,
-    "unit": "% w/v",
-    "material": "chitosan",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34439916",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0218",
@@ -7012,87 +3007,12 @@
     "unit": "% w/v",
     "material": "gelatin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "10% w/v; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "34614486",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0219",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 5.0,
-    "unit": "% w/v",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34614486",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0221",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 3.0,
-    "unit": "% w/v",
-    "material": "GelMA",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34614486",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0228",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 0.05,
-    "unit": "% w/v",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34789798",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0229",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 5.0,
-    "unit": "% w/v",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "34789798",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0252",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 10.0,
-    "unit": "% w/v",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36085440",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0263",
@@ -7102,57 +3022,12 @@
     "unit": "% w/v",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "36544430",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0266",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 40.0,
-    "unit": "% w/v",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36544430",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0273",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 2.0,
-    "unit": "% w/v",
-    "material": "alginate",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36927673",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0281",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 2.0,
-    "unit": "% w/v",
-    "material": "xanthan gum",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36927673",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0320",
@@ -7162,12 +3037,12 @@
     "unit": "% w/v",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "55\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "38830883",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0321",
@@ -7177,12 +3052,12 @@
     "unit": "% w/v",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "55\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "38830883",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0322",
@@ -7192,27 +3067,12 @@
     "unit": "% w/v",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "55\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "38830883",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0342",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 1.5,
-    "unit": "% w/v",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39239561",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0353",
@@ -7222,12 +3082,12 @@
     "unit": "% w/v",
     "material": "gelatin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "60\u00b0C; 6.67% w/v; MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "39369014",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0378",
@@ -7237,12 +3097,12 @@
     "unit": "% w/v",
     "material": "PEG",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1.\u00b0C; 6 mg/mL; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "39684779",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0382",
@@ -7252,132 +3112,12 @@
     "unit": "% w/v",
     "material": "fibrin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "8 mg/mL; MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "39684779",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0386",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 1.0,
-    "unit": "% w/v",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39706188",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0411",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 0.25,
-    "unit": "% w/v",
-    "material": "cellulose",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40548633",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0413",
-    "table_name": "scaffold_materials",
-    "parameter": "concentration_wv",
-    "value": 3.0,
-    "unit": "% w/v",
-    "material": "PDMS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40562874",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0105",
-    "table_name": "scaffold_materials",
-    "parameter": "crosslink_time",
-    "value": 30.0,
-    "unit": "s",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "28464555",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0171",
-    "table_name": "scaffold_materials",
-    "parameter": "crosslink_time",
-    "value": 1.0,
-    "unit": "h",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "32697997",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0175",
-    "table_name": "scaffold_materials",
-    "parameter": "crosslink_time",
-    "value": 5.0,
-    "unit": "min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "33218011",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0308",
-    "table_name": "scaffold_materials",
-    "parameter": "crosslink_time",
-    "value": 2.0,
-    "unit": "min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38749006",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0407",
-    "table_name": "scaffold_materials",
-    "parameter": "crosslink_time",
-    "value": 120.0,
-    "unit": "min",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "40357760",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "scaff_013",
@@ -7392,7 +3132,7 @@
     "doi": "10.1016/j.biomaterials.2015.08.045",
     "pmid": null,
     "notes": "Yue et al. 2015. Range 7-14 days at 3%. Higher concentrations degrade slower (28-56 days at 10%). Enzymatic degradation.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_014",
@@ -7407,7 +3147,7 @@
     "doi": "10.1038/nmeth.3839",
     "pmid": null,
     "notes": "Caliari & Burdick 2016. Range 3-7 days at 5 mg/mL. Rapid degradation by plasmin. Aprotinin slows this.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_015",
@@ -7422,7 +3162,7 @@
     "doi": "10.1089/ten.teb.2013.0399",
     "pmid": null,
     "notes": "Antoine et al. 2014. Range 7-14 days at 2 mg/mL. Cell-density dependent.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_022",
@@ -7437,7 +3177,7 @@
     "doi": "10.1016/S0142-9612(03)00340-5",
     "pmid": null,
     "notes": "Drury & Mooney 2003. Range 4-8 weeks. Bulk erosion. Acidic degradation products can affect cell viability.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_018",
@@ -7452,7 +3192,7 @@
     "doi": "10.1016/j.biomaterials.2015.08.045",
     "pmid": null,
     "notes": "Yue et al. 2015. Range 30-80 \u00b5m at 5%. Decreases with concentration. Relevant for cell migration.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_021",
@@ -7467,7 +3207,7 @@
     "doi": "10.1007/s10856-010-4199-8",
     "pmid": null,
     "notes": "Murphy & O'Brien 2010. Optimal pore size 85-120 \u00b5m for osteoblast/MSC attachment. Larger pores (325 \u00b5m) showed less initial attachment but better long-term infiltration.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "auto_0294",
@@ -7477,12 +3217,12 @@
     "unit": "\u03bcm",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "80\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "37904135",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0312",
@@ -7492,27 +3232,12 @@
     "unit": "\u03bcm",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "45\u00b0C; PBS; crosslinked (UV)",
     "confidence": "low",
     "doi": null,
     "pmid": "38749419",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0338",
-    "table_name": "scaffold_materials",
-    "parameter": "pore_size",
-    "value": 0.2,
-    "unit": "\u03bcm",
-    "material": "polyacrylamide",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39211038",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0416",
@@ -7522,12 +3247,12 @@
     "unit": "\u03bcm",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "2637878\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "40651477",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "scaff_001",
@@ -7542,7 +3267,7 @@
     "doi": "10.1016/j.biomaterials.2015.08.045",
     "pmid": null,
     "notes": "Yue et al. 2015 comprehensive review. Range 1-3 kPa. Compressive modulus by unconfined compression.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_002",
@@ -7557,7 +3282,7 @@
     "doi": "10.1016/j.biomaterials.2010.01.018",
     "pmid": null,
     "notes": "Nichol et al. 2010. Range 3-8 kPa. Compressive modulus.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_003",
@@ -7572,7 +3297,7 @@
     "doi": "10.1016/j.biomaterials.2015.08.045",
     "pmid": null,
     "notes": "Yue et al. 2015. Range 15-30 kPa. Higher crosslink density at 10%.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_004",
@@ -7587,7 +3312,7 @@
     "doi": "10.1089/ten.teb.2013.0399",
     "pmid": null,
     "notes": "Antoine et al. 2014. Range 0.5-2 kPa. Rheometry (storage modulus G').",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_005",
@@ -7602,7 +3327,7 @@
     "doi": "10.1089/ten.teb.2013.0399",
     "pmid": null,
     "notes": "Antoine et al. 2014. Range 2-5 kPa.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_006",
@@ -7617,7 +3342,7 @@
     "doi": "10.1038/nmeth.3839",
     "pmid": null,
     "notes": "Caliari & Burdick 2016. Range 0.5-2 kPa at 5 mg/mL.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_007",
@@ -7632,7 +3357,7 @@
     "doi": "10.1038/nmeth.3839",
     "pmid": null,
     "notes": "Caliari & Burdick 2016. Range 1-3 kPa.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_008",
@@ -7647,7 +3372,7 @@
     "doi": "10.1038/nmeth.3839",
     "pmid": null,
     "notes": "Caliari & Burdick 2016. Range 5-15 kPa. Tunable by Ca\u00b2\u207a concentration and alginate MW.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_009",
@@ -7662,7 +3387,7 @@
     "doi": "10.1038/nmeth.3839",
     "pmid": null,
     "notes": "Caliari & Burdick 2016. Range 0.1-0.5 kPa. Very soft, reconstituted basement membrane.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_010",
@@ -7677,7 +3402,7 @@
     "doi": "10.1016/S0142-9612(03)00340-5",
     "pmid": null,
     "notes": "Drury & Mooney 2003. Range 300-400 MPa. 3D printed scaffolds have lower effective modulus due to porosity.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_011",
@@ -7692,7 +3417,7 @@
     "doi": "10.1016/S0142-9612(03)00340-5",
     "pmid": null,
     "notes": "Range 1-3 GPa bulk, ~1-3 MPa for porous scaffolds. Degrades via hydrolysis.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_012",
@@ -7707,7 +3432,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Standard recipe. Range 0.5-3 MPa tunable by ratio. Non-degradable.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "scaff_019",
@@ -7722,7 +3447,7 @@
     "doi": "10.1002/bit.22361",
     "pmid": null,
     "notes": "Tibbitt & Anseth 2009. Range 2-50 kPa tunable by MW and concentration. Non-degradable unless MMP-cleavable crosslinker added.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_020",
@@ -7737,7 +3462,7 @@
     "doi": "10.1038/nmeth.3839",
     "pmid": null,
     "notes": "Caliari & Burdick 2016. Range 0.5-100 kPa tunable by modification and crosslinker.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_023",
@@ -7752,7 +3477,7 @@
     "doi": null,
     "pmid": null,
     "notes": "Range 0.1-100 kPa depending on concentration and processing. Highly tunable. Beta-sheet content increases stiffness.",
-    "source": "curated"
+    "source": "model_estimate"
   },
   {
     "id": "auto_0051",
@@ -7767,7 +3492,7 @@
     "doi": null,
     "pmid": "24307605",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0054",
@@ -7782,7 +3507,7 @@
     "doi": null,
     "pmid": "24307605",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0097",
@@ -7792,12 +3517,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; 5 mg/mL",
     "confidence": "low",
     "doi": null,
     "pmid": "28320254",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by MTT assay",
+    "source": "literature"
   },
   {
     "id": "auto_0126",
@@ -7807,12 +3532,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "80\u00b0C; 4.5% w/v; DMEM",
     "confidence": "low",
     "doi": null,
     "pmid": "30224659",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0144",
@@ -7822,42 +3547,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "30725520",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0146",
-    "table_name": "scaffold_materials",
-    "parameter": "stiffness",
-    "value": 60.0,
-    "unit": "kPa",
-    "material": "dECM",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "30725520",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0157",
-    "table_name": "scaffold_materials",
-    "parameter": "stiffness",
-    "value": 36.0,
-    "unit": "kPa",
-    "material": "collagen",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "31067472",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0160",
@@ -7872,7 +3567,7 @@
     "doi": null,
     "pmid": "31720646",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0168",
@@ -7882,27 +3577,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "32548961",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0173",
-    "table_name": "scaffold_materials",
-    "parameter": "stiffness",
-    "value": 8.73,
-    "unit": "kPa",
-    "material": "polyacrylamide",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "32697997",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by Live/Dead assay",
+    "source": "literature"
   },
   {
     "id": "auto_0214",
@@ -7912,12 +3592,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "crosslinked (UV)",
     "confidence": "low",
     "doi": null,
     "pmid": "34439916",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0225",
@@ -7927,12 +3607,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "1.5 mg/mL; crosslinked (transglutaminase)",
     "confidence": "low",
     "doi": null,
     "pmid": "34813898",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by confocal microscopy",
+    "source": "literature"
   },
   {
     "id": "auto_0237",
@@ -7947,7 +3627,7 @@
     "doi": null,
     "pmid": "35306023",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0248",
@@ -7957,27 +3637,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "4\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "35884324",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0274",
-    "table_name": "scaffold_materials",
-    "parameter": "stiffness",
-    "value": 180.0,
-    "unit": "kPa",
-    "material": "alginate",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36927673",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0276",
@@ -7987,12 +3652,12 @@
     "unit": "kPa",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "36927673",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0278",
@@ -8002,12 +3667,12 @@
     "unit": "kPa",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "36927673",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0289",
@@ -8017,42 +3682,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "115\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "37341704",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0328",
-    "table_name": "scaffold_materials",
-    "parameter": "stiffness",
-    "value": 440.0,
-    "unit": "kPa",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39003266",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0330",
-    "table_name": "scaffold_materials",
-    "parameter": "stiffness",
-    "value": 540.0,
-    "unit": "kPa",
-    "material": "PEG",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39003266",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0340",
@@ -8062,12 +3697,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39227896",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0347",
@@ -8082,7 +3717,7 @@
     "doi": null,
     "pmid": "39236979",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0356",
@@ -8092,12 +3727,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "60\u00b0C; 6.67% w/v; MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "39369014",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0363",
@@ -8107,27 +3742,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "4\u00b0C; 25 mg/mL; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39467547",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0380",
-    "table_name": "scaffold_materials",
-    "parameter": "stiffness",
-    "value": 13.4,
-    "unit": "kPa",
-    "material": "SIS",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39684779",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0387",
@@ -8142,7 +3762,7 @@
     "doi": null,
     "pmid": "39744939",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0389",
@@ -8152,12 +3772,12 @@
     "unit": "kPa",
     "material": "collagen",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "95\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "39744939",
-    "notes": null,
-    "source": "auto_extracted"
+    "notes": "Measured by confocal microscopy",
+    "source": "literature"
   },
   {
     "id": "auto_0408",
@@ -8167,12 +3787,12 @@
     "unit": "kPa",
     "material": null,
     "cell_type": null,
-    "conditions": null,
+    "conditions": "MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "40357760",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0433",
@@ -8182,12 +3802,12 @@
     "unit": "kPa",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "crosslinked (UV)",
     "confidence": "low",
     "doi": null,
     "pmid": "41226748",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0435",
@@ -8197,12 +3817,12 @@
     "unit": "kPa",
     "material": "alginate",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "crosslinked (UV)",
     "confidence": "low",
     "doi": null,
     "pmid": "41226748",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "scaff_016",
@@ -8217,7 +3837,7 @@
     "doi": "10.1016/j.biomaterials.2015.08.045",
     "pmid": null,
     "notes": "Yue et al. 2015. Range 1.3-1.5 at 3%. Decreases with concentration.",
-    "source": "curated"
+    "source": "literature"
   },
   {
     "id": "scaff_017",
@@ -8232,22 +3852,7 @@
     "doi": "10.1016/j.biomaterials.2015.08.045",
     "pmid": null,
     "notes": "Yue et al. 2015. Range 1.1-1.2 at 10%.",
-    "source": "curated"
-  },
-  {
-    "id": "auto_0065",
-    "table_name": "scaffold_materials",
-    "parameter": "uv_dose",
-    "value": 6.9,
-    "unit": "mW/cm\u00b2",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "24695367",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0076",
@@ -8257,12 +3862,12 @@
     "unit": "mW/cm\u00b2",
     "material": "gelatin",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "37\u00b0C; PBS",
     "confidence": "low",
     "doi": null,
     "pmid": "25641220",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0261",
@@ -8272,102 +3877,12 @@
     "unit": "mW/cm\u00b2",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "20\u00b0C",
     "confidence": "low",
     "doi": null,
     "pmid": "36542545",
     "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0265",
-    "table_name": "scaffold_materials",
-    "parameter": "uv_dose",
-    "value": 25.0,
-    "unit": "mW/cm\u00b2",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36544430",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0267",
-    "table_name": "scaffold_materials",
-    "parameter": "uv_dose",
-    "value": 10.0,
-    "unit": "mW/cm\u00b2",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "36544430",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0306",
-    "table_name": "scaffold_materials",
-    "parameter": "uv_dose",
-    "value": 10.0,
-    "unit": "mW/cm\u00b2",
-    "material": "fibrin",
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "38749006",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0344",
-    "table_name": "scaffold_materials",
-    "parameter": "uv_dose",
-    "value": 0.2,
-    "unit": "mW/cm\u00b2",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39239561",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0345",
-    "table_name": "scaffold_materials",
-    "parameter": "uv_dose",
-    "value": 0.08,
-    "unit": "mW/cm\u00b2",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39239561",
-    "notes": null,
-    "source": "auto_extracted"
-  },
-  {
-    "id": "auto_0350",
-    "table_name": "scaffold_materials",
-    "parameter": "uv_dose",
-    "value": 3.0,
-    "unit": "mW/cm\u00b2",
-    "material": null,
-    "cell_type": null,
-    "conditions": null,
-    "confidence": "low",
-    "doi": null,
-    "pmid": "39273125",
-    "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0355",
@@ -8377,12 +3892,12 @@
     "unit": "mW/cm\u00b2",
     "material": "GelMA",
     "cell_type": null,
-    "conditions": null,
+    "conditions": "60\u00b0C; 6.67% w/v; MEM",
     "confidence": "low",
     "doi": null,
     "pmid": "39369014",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   },
   {
     "id": "auto_0414",
@@ -8397,6 +3912,6 @@
     "doi": null,
     "pmid": "40604048",
     "notes": null,
-    "source": "auto_extracted"
+    "source": "literature"
   }
 ]

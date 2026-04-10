@@ -313,9 +313,13 @@ def _source_url(p: dict) -> str:
 
 def _source_label(source: str) -> str:
     """Clean up source display text."""
-    if not source:
-        return "-"
-    return source.replace("_", " ").title()
+    labels = {
+        "literature": "Literature",
+        "model_estimate": "Model Estimate",
+        "curated": "Literature",
+        "auto_extracted": "Literature",
+    }
+    return labels.get(source, source.replace("_", " ").title() if source else "-")
 
 
 # ---------------------------------------------------------------------------
@@ -349,7 +353,9 @@ with st.sidebar:
 
     # Quick stats
     params_data = load_parameters()
-    st.caption(f"{len(params_data)} curated parameters")
+    lit_count = sum(1 for p in params_data if p.get("source") == "literature")
+    est_count = sum(1 for p in params_data if p.get("source") == "model_estimate")
+    st.caption(f"{len(params_data)} parameters ({lit_count} literature-backed, {est_count} model estimates)")
     if vault_ok:
         stats = fetch_protocol_stats()
         if stats:
@@ -1037,20 +1043,28 @@ with tab_about:
     st.markdown("#### Parameter Library")
     st.markdown(
         """
-        The parameter library contains **560 curated bioengineering constants** spanning:
+        The parameter library contains **261 bioengineering constants** from two sources:
 
-        - **Scaffold Materials** -- Young's modulus, porosity, degradation rates, swelling ratios
-        - **Cell Adhesion** -- cell-cell and cell-matrix contact energies (CC3D-calibrated)
-        - **Proliferation** -- doubling times, growth rates, carrying capacities
-        - **O2 Transport** -- diffusion coefficients, consumption rates, critical thresholds
-        - **Culture Conditions** -- media compositions, growth factor concentrations, pH ranges
-        - **Fabrication** -- print speeds, UV exposure times, crosslinker concentrations
-        - **Gel Penetration** -- permeability, hydraulic conductivity, diffusion through hydrogels
+        **Literature** (222 entries) -- extracted from published papers, each linked to a
+        DOI or PubMed ID. Values are traceable to specific experimental conditions
+        (temperature, concentration, crosslinking method, measurement technique).
 
-        Each parameter links to its source DOI and is assigned a confidence level:
-        - **High** -- directly measured, peer-reviewed, consistent across multiple studies
-        - **Medium** -- single source or derived from calibrated simulation models
-        - **Low** -- estimated, extrapolated, or from preprints
+        **Model Estimate** (39 entries) -- derived from biophysical reasoning for
+        computational simulation (e.g., CC3D adhesion energies). Clearly labeled and
+        not presented as experimental measurements.
+
+        Categories:
+        - **Scaffold Materials** -- stiffness, porosity, degradation, swelling
+        - **Cell Adhesion** -- cell-cell and cell-matrix contact energies
+        - **Proliferation** -- doubling times, contact inhibition thresholds
+        - **O2 Transport** -- diffusion coefficients, consumption rates
+        - **Fabrication** -- print speeds, pressures, nozzle diameters
+        - **Gel Penetration** -- migration speeds, MMP secretion, critical pore sizes
+
+        Confidence levels:
+        - **High** -- directly measured, multiple concordant studies
+        - **Medium** -- single source or inferred from similar systems
+        - **Low** -- estimated or limited experimental support
         """
     )
 
