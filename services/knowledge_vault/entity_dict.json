@@ -91,7 +91,17 @@
         "myotubes",
         "adipocytes",
         "preadipocytes",
-        "smooth muscle cells"
+        "smooth muscle cells",
+        "bovine MSCs",
+        "porcine chondrocytes",
+        "equine tenocytes",
+        "ovine fibroblasts",
+        "chicken embryonic fibroblasts",
+        "fish myoblasts",
+        "zebrafish cells",
+        "primary bovine cells",
+        "primary porcine cells",
+        "primary avian cells"
     ],
     "tissue_types": [
         "cardiac",
