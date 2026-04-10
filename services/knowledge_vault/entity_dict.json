@@ -30,7 +30,17 @@
         "titanium",
         "hydroxyapatite",
         "TCP",
-        "PEEK"
+        "PEEK",
+        "soy protein",
+        "plant protein",
+        "pea protein",
+        "zein",
+        "konjac",
+        "methylcellulose",
+        "starch",
+        "xanthan gum",
+        "textured vegetable protein",
+        "myoglobin"
     ],
     "cell_types": [
         "cardiomyocytes",
@@ -72,7 +82,16 @@
         "neural stem cells",
         "hepatocytes",
         "mesenchymal",
-        "4T1"
+        "4T1",
+        "myoblasts",
+        "C2C12",
+        "satellite cells",
+        "bovine satellite cells",
+        "myocytes",
+        "myotubes",
+        "adipocytes",
+        "preadipocytes",
+        "smooth muscle cells"
     ],
     "tissue_types": [
         "cardiac",
@@ -101,7 +120,15 @@
         "retinal",
         "tendon",
         "ligament",
-        "spinal"
+        "spinal",
+        "skeletal muscle",
+        "cultivated meat",
+        "cultured meat",
+        "cell-based meat",
+        "cellular agriculture",
+        "cell ag",
+        "fat",
+        "marbling"
     ],
     "biofab_patterns": [
         "bioprint(?:ing|ed|er|s)",
@@ -120,6 +147,10 @@
         "digital light processing",
         "DLP[- ](?:print|based)",
         "laser[- ]assisted",
-        "spheroid"
+        "spheroid",
+        "(?:stirred[- ]tank|spinner flask|wave[- ]bag|CSTR|hollow[- ]fiber)\\s*bioreactor",
+        "perfusion[- ](?:bioreactor|culture|system)",
+        "cultivat(?:ed|ion)\\s*meat",
+        "cell[- ](?:based|cultured)\\s*(?:meat|protein|food)"
     ]
 }

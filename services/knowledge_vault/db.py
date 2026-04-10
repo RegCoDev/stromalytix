@@ -121,6 +121,11 @@ def init_db(db_path: str = "vault.db") -> sqlite3.Connection:
     """)
 
     conn.commit()
+
+    # Protocol graph tables (depends on papers + chunks above)
+    from protocol_db import create_protocol_tables
+    create_protocol_tables(conn)
+
     return conn
 
 
