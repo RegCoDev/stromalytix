@@ -333,15 +333,6 @@ with st.sidebar:
     st.caption("Bioengineering Protocol Intelligence")
     st.divider()
 
-    domain = st.radio(
-        "Domain",
-        ["Tissue Engineering", "Cellular Agriculture"],
-        index=0,
-        key="sidebar_domain",
-    )
-
-    st.divider()
-
     # Vault connection status
     vault_ok = check_vault_health()
     dot_cls = "on" if vault_ok else "off"
@@ -701,10 +692,13 @@ with tab_assessment:
     st.markdown("### Construct Assessment")
     st.caption("AI-powered analysis of your 3D culture protocol")
 
-    # Check for LLM key
+    # Check for LLM key (any working provider — OpenRouter primary, Anthropic legacy)
     anthropic_key = _secret("ANTHROPIC_API_KEY", "")
+    openrouter_key = _secret("OPENROUTER_API_KEY", "")
+    litellm_key = _secret("LITELLM_MASTER_KEY", "")
+    has_llm = bool(anthropic_key or openrouter_key or litellm_key)
 
-    if not anthropic_key:
+    if not has_llm:
         st.markdown(
             """
             The Assessment module uses AI to analyze your tissue engineering construct against
@@ -782,13 +776,8 @@ with tab_assessment:
         if "assess_phase" not in st.session_state:
             st.session_state.assess_phase = "chat"
         if "application_domain" not in st.session_state:
-            st.session_state.application_domain = "tissue_engineering"
-
-        # Sync domain from sidebar
-        if domain == "Cellular Agriculture":
-            st.session_state.application_domain = "cellular_agriculture"
-        else:
-            st.session_state.application_domain = "tissue_engineering"
+            # Inferred from chat content + downstream cue detection — no manual selector
+            st.session_state.application_domain = None
 
         def reset_assessment():
             st.session_state.messages = []
@@ -829,44 +818,20 @@ with tab_assessment:
             if st.session_state.assess_phase == "chat":
                 # Chat phase
                 st.markdown(
-                    "Describe your 3D culture construct. After enough detail is gathered, "
-                    "the system will automatically benchmark it against published protocols."
+                    "Describe your construct — tissue-engineering or cellular-agriculture. "
+                    "After enough detail is gathered, the system will automatically benchmark "
+                    "it against published protocols."
                 )
-
-                # Domain radio
-                _dom_codes = ["tissue_engineering", "cellular_agriculture"]
-                _dom_labels = ["Tissue engineering", "Cellular agriculture"]
-                prev_dom = st.session_state.application_domain or "tissue_engineering"
-                if prev_dom not in _dom_codes:
-                    prev_dom = "tissue_engineering"
-                _ix = _dom_codes.index(prev_dom)
-                picked_lbl = st.radio(
-                    "I'm working on",
-                    _dom_labels,
-                    index=_ix,
-                    horizontal=True,
-                    key="assess_domain_radio",
-                )
-                picked_code = _dom_codes[_dom_labels.index(picked_lbl)]
-                if picked_code != prev_dom:
-                    st.session_state.application_domain = picked_code
-                    user_n = sum(1 for m in st.session_state.messages if m["role"] == "user")
-                    if user_n == 0:
-                        st.session_state.chain = None
-                        st.session_state.messages = []
-                    st.rerun()
 
                 # Progress indicator
                 n = len(st.session_state.messages)
                 st.progress(min(1.0, n / 8.0) if n else 0.0)
                 st.caption(f"**{n}/8 messages** -- analysis starts automatically when enough detail is gathered.")
 
-                # Initialize chat session
+                # Initialize chat session — unified prompt handles both domains
                 if st.session_state.chain is None:
                     with st.spinner("Starting up..."):
-                        st.session_state.chain = initialize_chat(
-                            domain=st.session_state.get("application_domain", "tissue_engineering")
-                        )
+                        st.session_state.chain = initialize_chat()
                         if len(st.session_state.messages) == 0:
                             # Get greeting from session's last assistant message
                             for m in reversed(st.session_state.chain.messages):
