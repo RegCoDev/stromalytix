@@ -369,172 +369,385 @@ tab_params, tab_protocols, tab_assessment, tab_about = st.tabs(
 
 
 # =====================================================================
-# TAB 1 — Parameter Library (landing page, works without API key)
+# TAB 1 - Parameter Library (landing page, works without API key)
+# Redesigned 2026-04-29: progressive disclosure (index -> category -> row).
+# First-time visitor lands on category cards, not a 261-row table dump.
 # =====================================================================
 
-with tab_params:
+@st.cache_data
+def load_derivations() -> dict:
+    p = Path(__file__).parent / "data" / "parameter_derivations.json"
+    if p.exists():
+        with open(p) as f:
+            d = json.load(f)
+        return {k: v for k, v in d.items() if not k.startswith("_")}
+    return {}
+
+
+_PARAM_CAT_LABELS = {
+    "adhesion": "Cell Adhesion",
+    "culture_conditions": "Culture Conditions",
+    "fabrication": "Fabrication",
+    "gel_penetration": "Migration & Gel Penetration",
+    "o2_transport": "Oxygen Transport",
+    "proliferation": "Proliferation",
+    "scaffold_materials": "Scaffold Materials",
+}
+
+_PARAM_CAT_BLURBS = {
+    "adhesion": "Homotypic and heterotypic adhesion energies for CC3D-style cellular Potts simulations and lab calibration.",
+    "culture_conditions": "Standard medium, supplement, and incubation parameters used as defaults across protocols.",
+    "fabrication": "Crosslinking, photopolymerization, and post-print curing parameters.",
+    "gel_penetration": "Cell migration speeds, persistence, and gel-penetration depths under varying matrix stiffness.",
+    "o2_transport": "Oxygen consumption rates, diffusion coefficients, and tissue-scale transport limits.",
+    "proliferation": "Doubling times, growth rates, and cell-cycle parameters across the most-cited cell lines.",
+    "scaffold_materials": "Mechanical, swelling, degradation, and porosity parameters for hydrogels and ECM analogs.",
+}
+
+
+def _render_paramlib_header(all_params: list, derivations: dict) -> None:
+    lit = sum(1 for p in all_params if p.get("source") == "literature")
+    est = sum(1 for p in all_params if p.get("source") == "model_estimate")
+    high_conf = sum(1 for p in all_params if (p.get("confidence") or "").lower() == "high")
     st.markdown("### Parameter Library")
-    st.caption("Curated bioengineering constants with DOI provenance")
+    st.caption(
+        "An open, citable reference of bioengineering constants for tissue-engineering, "
+        "organ-on-chip, and microphysiological-system models. Contributed to the field; "
+        "feedback and corrections welcome."
+    )
+    mc1, mc2, mc3, mc4 = st.columns(4)
+    mc1.metric("Parameters", f"{len(all_params)}")
+    mc2.metric("Literature-backed", f"{lit}")
+    mc3.metric(
+        "Model estimates",
+        f"{est}",
+        help="Each model-estimate entry has a structured derivation: method, basis, assumptions, uncertainty range, invalidating conditions.",
+    )
+    mc4.metric("High confidence", f"{high_conf}")
 
+
+def _render_category_cards(all_params: list) -> None:
+    cats = {}
+    for p in all_params:
+        k = p.get("table_name") or "other"
+        c = cats.setdefault(k, {"total": 0, "high": 0, "est": 0})
+        c["total"] += 1
+        if (p.get("confidence") or "").lower() == "high":
+            c["high"] += 1
+        if p.get("source") == "model_estimate":
+            c["est"] += 1
+
+    ordered = sorted(cats.items(), key=lambda kv: -kv[1]["total"])
+    st.markdown("#### Browse by category")
+    for row_start in range(0, len(ordered), 3):
+        row = ordered[row_start:row_start + 3]
+        cols = st.columns(3)
+        for col, (key, stats) in zip(cols, row):
+            with col:
+                label = _PARAM_CAT_LABELS.get(key, key.replace("_", " ").title())
+                blurb = _PARAM_CAT_BLURBS.get(key, "")
+                t = stats["total"]
+                h = stats["high"]
+                e = stats["est"]
+                meta_bits = [f"{t} parameters", f"{h} high-confidence"]
+                if e:
+                    meta_bits.append(f"{e} model estimates")
+                meta_html = " &middot; ".join(meta_bits)
+                card_html = (
+                    f'<div style="background:#111111;border:1px solid #222222;border-radius:0.5rem;'
+                    f'padding:1rem 1.1rem;margin-bottom:0.5rem;min-height:150px;">'
+                    f'<div style="color:#34d399;font-weight:600;font-size:1.05rem;margin-bottom:0.35rem;">{label}</div>'
+                    f'<div style="color:#888;font-size:0.78rem;margin-bottom:0.5rem;'
+                    f"font-family:'JetBrains Mono',monospace;\">{meta_html}</div>"
+                    f'<div style="color:#bbb;font-size:0.85rem;line-height:1.35;">{blurb}</div>'
+                    f'</div>'
+                )
+                st.markdown(card_html, unsafe_allow_html=True)
+                if st.button(f"Browse {label}", key=f"paramlib_open_{key}", use_container_width=True):
+                    st.session_state["paramlib_view"] = f"category:{key}"
+                    st.session_state.pop("paramlib_selected_id", None)
+                    st.rerun()
+
+
+def _render_param_table(rows: list, key_prefix: str) -> None:
+    if not rows:
+        st.info("No parameters match your current filters. Try broadening your search.")
+        return
+    df_rows = []
+    for p in rows:
+        df_rows.append({
+            "ID": p.get("id", ""),
+            "Parameter": p.get("parameter", ""),
+            "Value": p.get("value", ""),
+            "Unit": p.get("unit", ""),
+            "Material": p.get("material") or "-",
+            "Cell Type": p.get("cell_type") or "-",
+            "Conditions": p.get("conditions") or "-",
+            "Confidence": (p.get("confidence") or "").title(),
+            "Reference": _source_url(p),
+            "Source": _source_label(p.get("source", "")),
+        })
+    df = pd.DataFrame(df_rows)
+    st.dataframe(
+        df,
+        column_config={
+            "ID": st.column_config.TextColumn("ID", width="small"),
+            "Reference": st.column_config.LinkColumn(
+                "Reference",
+                display_text=r"https://(?:doi\.org/|pubmed\.ncbi\.nlm\.nih\.gov/)(.+?)/?$",
+                help="Open publication (DOI or PubMed)",
+            ),
+            "Value": st.column_config.NumberColumn("Value", format="%.4g"),
+            "Confidence": st.column_config.TextColumn("Confidence", width="small"),
+            "Source": st.column_config.TextColumn("Source", width="small"),
+        },
+        use_container_width=True,
+        hide_index=True,
+        height=min(560, 80 + 35 * max(1, len(rows))),
+    )
+
+    est_rows = [p for p in rows if p.get("source") == "model_estimate"]
+    if est_rows:
+        st.markdown("##### Inspect a model-estimate derivation")
+        st.caption(
+            "Each model estimate has a structured derivation: method, basis, assumptions, "
+            "uncertainty range, and conditions that would invalidate it."
+        )
+        opts = ["(select an entry)"]
+        for p in est_rows:
+            tag = p.get("material") or p.get("cell_type") or "-"
+            opts.append(f"{p['id']} - {p.get('parameter','')} ({tag})")
+        chosen = st.selectbox(
+            "Model-estimate entry",
+            opts,
+            key=f"{key_prefix}_est_picker",
+            label_visibility="collapsed",
+        )
+        if chosen and not chosen.startswith("("):
+            sel_id = chosen.split(" - ", 1)[0].strip()
+            _render_derivation_panel(sel_id, est_rows)
+
+
+def _render_derivation_panel(sel_id: str, est_rows: list) -> None:
+    derivations = load_derivations()
+    deriv = derivations.get(sel_id)
+    entry = next((p for p in est_rows if p.get("id") == sel_id), None)
+    e_param = (entry or {}).get("parameter", "")
+    e_value = (entry or {}).get("value", "")
+    e_unit = (entry or {}).get("unit", "")
+    panel_html = (
+        '<div style="background:#0e1a14;border:1px solid #1f3a2c;border-left:3px solid #34d399;'
+        'border-radius:0.5rem;padding:1rem 1.25rem;margin-top:0.75rem;">'
+        '<div style="color:#34d399;font-weight:600;font-size:0.95rem;margin-bottom:0.25rem;'
+        "font-family:'JetBrains Mono',monospace;\">"
+        f'{sel_id}</div>'
+        '<div style="color:#e0e0e0;font-size:1.05rem;font-weight:500;">'
+        f'{e_param} = <span style="color:#34d399">{e_value} {e_unit}</span></div>'
+        '</div>'
+    )
+    st.markdown(panel_html, unsafe_allow_html=True)
+
+    if not deriv:
+        st.caption("No structured derivation on file for this entry.")
+        return
+
+    method = (deriv.get("method") or "").replace("_", " ").title()
+    st.markdown(f"**Method.** {method}")
+    if deriv.get("basis"):
+        st.markdown(f"**Basis.** {deriv['basis']}")
+    if deriv.get("uncertainty_range"):
+        st.markdown(f"**Uncertainty range.** {deriv['uncertainty_range']}")
+    for label, key in [("Assumptions", "assumptions"),
+                       ("Invalidating conditions", "invalidating_conditions"),
+                       ("Supporting literature", "supporting_lit")]:
+        items = deriv.get(key) or []
+        if items:
+            st.markdown(f"**{label}.**")
+            for a in items:
+                st.markdown(f"- {a}")
+
+
+with tab_params:
     all_params = load_parameters()
-
     if not all_params:
+        st.markdown("### Parameter Library")
         st.warning(
             "Parameter data not found. Ensure `data/parameters_export.json` is present in the repository."
         )
     else:
-        # Build filter options from data
-        all_materials = sorted({p["material"] for p in all_params if p.get("material")})
-        all_cell_types = sorted({p["cell_type"] for p in all_params if p.get("cell_type")})
-        all_categories = sorted({p["table_name"] for p in all_params if p.get("table_name")})
-        all_confidences = sorted({p["confidence"] for p in all_params if p.get("confidence")})
+        derivations = load_derivations()
+        if "paramlib_view" not in st.session_state:
+            st.session_state["paramlib_view"] = "index"
 
-        # Category label mapping
-        _cat_labels = {
-            "adhesion": "Cell Adhesion",
-            "culture_conditions": "Culture Conditions",
-            "fabrication": "Fabrication",
-            "gel_penetration": "Gel Penetration",
-            "o2_transport": "O2 Transport",
-            "proliferation": "Proliferation",
-            "scaffold_materials": "Scaffold Materials",
-        }
+        _render_paramlib_header(all_params, derivations)
 
-        # Search bar
+        prev_search = st.session_state.get("paramlib_search_prev", "")
         search_text = st.text_input(
-            "Search parameters",
-            placeholder="e.g. collagen stiffness, GelMA porosity, HUVEC proliferation ...",
+            "Search across name / material / cell type / conditions / DOI",
+            placeholder="e.g. collagen stiffness, GelMA porosity, HUVEC O2 uptake ...",
             key="param_search",
         )
+        if search_text and search_text != prev_search:
+            st.session_state["paramlib_view"] = "search"
+        st.session_state["paramlib_search_prev"] = search_text
 
-        # Filter row
-        fc1, fc2, fc3, fc4 = st.columns(4)
-        with fc1:
-            sel_category = st.selectbox(
-                "Category",
-                ["All"] + [_cat_labels.get(c, c.replace("_", " ").title()) for c in all_categories],
-                key="param_cat_filter",
-            )
-        with fc2:
-            sel_material = st.selectbox(
-                "Material",
-                ["All"] + all_materials,
-                key="param_mat_filter",
-            )
-        with fc3:
-            sel_cell_type = st.selectbox(
-                "Cell Type",
-                ["All"] + all_cell_types,
-                key="param_cell_filter",
-            )
-        with fc4:
-            sel_confidence = st.selectbox(
-                "Confidence",
-                ["All"] + [c.title() for c in all_confidences],
-                key="param_conf_filter",
-            )
+        nav_cols = st.columns([1, 1, 4])
+        with nav_cols[0]:
+            if st.session_state["paramlib_view"] != "index":
+                if st.button("All categories", key="paramlib_back_to_index"):
+                    st.session_state["paramlib_view"] = "index"
+                    st.session_state.pop("paramlib_selected_id", None)
+                    st.rerun()
+        with nav_cols[1]:
+            if st.session_state["paramlib_view"] != "all":
+                if st.button("View full table", key="paramlib_view_all"):
+                    st.session_state["paramlib_view"] = "all"
+                    st.rerun()
 
-        # Apply filters
-        filtered = all_params
+        st.divider()
+        view = st.session_state["paramlib_view"]
 
-        if search_text:
-            q = search_text.lower()
-            filtered = [
-                p for p in filtered
-                if q in (p.get("parameter") or "").lower()
-                or q in (p.get("material") or "").lower()
-                or q in (p.get("cell_type") or "").lower()
-                or q in (p.get("conditions") or "").lower()
-                or q in (p.get("notes") or "").lower()
-                or q in (p.get("table_name") or "").lower()
+        def _apply_search(rows: list, q: str) -> list:
+            if not q:
+                return rows
+            ql = q.lower()
+            return [
+                p for p in rows
+                if ql in (p.get("parameter") or "").lower()
+                or ql in (p.get("material") or "").lower()
+                or ql in (p.get("cell_type") or "").lower()
+                or ql in (p.get("conditions") or "").lower()
+                or ql in (p.get("notes") or "").lower()
+                or ql in (p.get("table_name") or "").lower()
+                or ql in (p.get("doi") or "").lower()
             ]
 
-        if sel_category != "All":
-            # Reverse lookup from label to key
-            _label_to_key = {v: k for k, v in _cat_labels.items()}
-            cat_key = _label_to_key.get(sel_category, sel_category.lower().replace(" ", "_"))
-            filtered = [p for p in filtered if p.get("table_name") == cat_key]
+        if view == "index":
+            _render_category_cards(all_params)
+            with st.expander("How this library is built"):
+                st.markdown(
+                    "- **Literature parameters** (222) are extracted from primary "
+                    "publications. Each entry links to its DOI or PubMed identifier."
+                )
+                st.markdown(
+                    "- **Model estimates** (39) are derived where direct measurements "
+                    "are unavailable. Every estimate carries a structured derivation: "
+                    "method, basis, assumptions, uncertainty range, and conditions that "
+                    "would invalidate the estimate."
+                )
+                st.markdown(
+                    "- **Confidence labels** are assigned during curation. High = direct "
+                    "measurement under standard conditions in the cited paper. Medium = "
+                    "supported by the cited source but with notable extrapolation. Low = "
+                    "preliminary or single-study."
+                )
+                st.markdown(
+                    "- **Coverage gaps and corrections welcome.** This is a contribution "
+                    "to the field; the goal is to be useful, not comprehensive on day one."
+                )
 
-        if sel_material != "All":
-            filtered = [p for p in filtered if p.get("material") == sel_material]
+            with st.expander("Cite this resource"):
+                bib = (
+                    "@misc{stromalytix2026params,\n"
+                    "  title   = {Stromalytix Parameter Library: Curated Bioengineering Constants},\n"
+                    "  year    = {2026},\n"
+                    "  note    = {261 parameters with DOI provenance across scaffold materials,\n"
+                    "             cell adhesion, proliferation, oxygen transport, migration, fabrication},\n"
+                    "  url     = {https://stromalytix.streamlit.app}\n"
+                    "}"
+                )
+                st.code(bib, language="bibtex")
 
-        if sel_cell_type != "All":
-            filtered = [p for p in filtered if p.get("cell_type") == sel_cell_type]
+        elif view == "search":
+            results = _apply_search(all_params, search_text)
+            st.markdown(f"**{len(results)}** parameters match \"{search_text}\"")
+            _render_param_table(results, key_prefix="paramlib_search")
 
-        if sel_confidence != "All":
-            filtered = [p for p in filtered if (p.get("confidence") or "").lower() == sel_confidence.lower()]
+        elif view.startswith("category:"):
+            cat_key = view.split(":", 1)[1]
+            cat_label = _PARAM_CAT_LABELS.get(cat_key, cat_key.replace("_", " ").title())
+            cat_rows = [p for p in all_params if p.get("table_name") == cat_key]
+            if search_text:
+                cat_rows = _apply_search(cat_rows, search_text)
+            high = sum(1 for p in cat_rows if (p.get("confidence") or "").lower() == "high")
+            med = sum(1 for p in cat_rows if (p.get("confidence") or "").lower() == "medium")
+            low = sum(1 for p in cat_rows if (p.get("confidence") or "").lower() == "low")
+            est = sum(1 for p in cat_rows if p.get("source") == "model_estimate")
 
-        # Results count
-        st.markdown(f"**{len(filtered)}** parameters found")
+            st.markdown(f"#### {cat_label}")
+            st.caption(_PARAM_CAT_BLURBS.get(cat_key, ""))
+            stat_html = (
+                "<div style=\"color:#888;font-size:0.85rem;"
+                "font-family:'JetBrains Mono',monospace;\">"
+                f"{len(cat_rows)} parameters &middot; {high} high &middot; {med} medium &middot; "
+                f"{low} low &middot; {est} model estimates"
+                "</div>"
+            )
+            st.markdown(stat_html, unsafe_allow_html=True)
 
-        if filtered:
-            # Build dataframe for display
-            df_rows = []
-            for p in filtered:
-                source_link = _source_url(p)
-                df_rows.append({
-                    "Parameter": p.get("parameter", ""),
-                    "Value": p.get("value", ""),
-                    "Unit": p.get("unit", ""),
-                    "Material": p.get("material") or "-",
-                    "Cell Type": p.get("cell_type") or "-",
-                    "Category": _cat_labels.get(p.get("table_name", ""), p.get("table_name", "")),
-                    "Conditions": p.get("conditions") or "-",
-                    "Confidence": (p.get("confidence") or "").title(),
-                    "Reference": source_link,
-                    "Source": _source_label(p.get("source", "")),
-                })
+            mats = sorted({p.get("material") for p in cat_rows if p.get("material")})
+            cells = sorted({p.get("cell_type") for p in cat_rows if p.get("cell_type")})
+            confs = ["High", "Medium", "Low"]
 
-            df = pd.DataFrame(df_rows)
+            fc1, fc2, fc3 = st.columns(3)
+            with fc1:
+                sel_mat = st.selectbox("Material", ["All"] + mats, key=f"paramlib_cat_mat_{cat_key}")
+            with fc2:
+                sel_cell = st.selectbox("Cell Type", ["All"] + cells, key=f"paramlib_cat_cell_{cat_key}")
+            with fc3:
+                sel_conf = st.selectbox("Confidence", ["All"] + confs, key=f"paramlib_cat_conf_{cat_key}")
 
-            st.dataframe(
-                df,
-                column_config={
-                    "Reference": st.column_config.LinkColumn(
-                        "Reference",
-                        display_text=r"https://(?:doi\.org/|pubmed\.ncbi\.nlm\.nih\.gov/)(.+?)/?$",
-                        help="Click to open publication (DOI or PubMed)",
-                    ),
-                    "Value": st.column_config.NumberColumn("Value", format="%.4g"),
-                    "Confidence": st.column_config.TextColumn("Confidence", width="small"),
-                    "Source": st.column_config.TextColumn("Source", width="small"),
-                },
-                use_container_width=True,
-                hide_index=True,
-                height=600,
+            filt = cat_rows
+            if sel_mat != "All":
+                filt = [p for p in filt if p.get("material") == sel_mat]
+            if sel_cell != "All":
+                filt = [p for p in filt if p.get("cell_type") == sel_cell]
+            if sel_conf != "All":
+                filt = [p for p in filt if (p.get("confidence") or "").lower() == sel_conf.lower()]
+
+            _render_param_table(filt, key_prefix=f"paramlib_cat_{cat_key}")
+
+        elif view == "all":
+            rows = _apply_search(all_params, search_text)
+            st.markdown(f"#### Full table - {len(rows)} parameters")
+            st.caption(
+                "All parameters in one view. Use the search box above or the category cards "
+                "on the index for a guided entry."
             )
 
-            # Category breakdown
-            with st.expander("Category breakdown"):
-                cat_counts = {}
-                for p in all_params:
-                    cat = _cat_labels.get(p.get("table_name", ""), p.get("table_name", ""))
-                    cat_counts[cat] = cat_counts.get(cat, 0) + 1
-                for cat_name in sorted(cat_counts.keys()):
-                    st.markdown(f"- **{cat_name}**: {cat_counts[cat_name]} parameters")
+            mats = sorted({p.get("material") for p in rows if p.get("material")})
+            cells = sorted({p.get("cell_type") for p in rows if p.get("cell_type")})
+            cats = sorted({p.get("table_name") for p in rows if p.get("table_name")})
+            confs = ["High", "Medium", "Low"]
 
-            # Cite this resource
-            with st.expander("Cite this resource"):
-                st.code(
-                    """@misc{stromalytix2026params,
-  title   = {Stromalytix Parameter Library: Curated Bioengineering Constants},
-  author  = {K-Dense},
-  year    = {2026},
-  note    = {560 parameters with DOI provenance across scaffold materials,
-             cell adhesion, proliferation, O2 transport, and fabrication},
-  url     = {https://stromalytix.streamlit.app}
-}""",
-                    language="bibtex",
+            fc1, fc2, fc3, fc4 = st.columns(4)
+            with fc1:
+                sel_cat_label = st.selectbox(
+                    "Category",
+                    ["All"] + [_PARAM_CAT_LABELS.get(c, c.replace("_", " ").title()) for c in cats],
+                    key="paramlib_all_cat",
                 )
-                st.caption(
-                    "Parameters are curated from primary literature and auto-extracted with "
-                    "confidence scoring. Each entry links to its source DOI."
-                )
-        else:
-            st.info("No parameters match your current filters. Try broadening your search.")
+            with fc2:
+                sel_mat = st.selectbox("Material", ["All"] + mats, key="paramlib_all_mat")
+            with fc3:
+                sel_cell = st.selectbox("Cell Type", ["All"] + cells, key="paramlib_all_cell")
+            with fc4:
+                sel_conf = st.selectbox("Confidence", ["All"] + confs, key="paramlib_all_conf")
+
+            if sel_cat_label != "All":
+                rev = {v: k for k, v in _PARAM_CAT_LABELS.items()}
+                cat_key = rev.get(sel_cat_label, sel_cat_label.lower().replace(" ", "_"))
+                rows = [p for p in rows if p.get("table_name") == cat_key]
+            if sel_mat != "All":
+                rows = [p for p in rows if p.get("material") == sel_mat]
+            if sel_cell != "All":
+                rows = [p for p in rows if p.get("cell_type") == sel_cell]
+            if sel_conf != "All":
+                rows = [p for p in rows if (p.get("confidence") or "").lower() == sel_conf.lower()]
+
+            _render_param_table(rows, key_prefix="paramlib_all")
 
 
-# =====================================================================
 # TAB 2 — Protocol Explorer
 # =====================================================================
 
