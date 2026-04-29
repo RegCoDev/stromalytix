@@ -46,6 +46,163 @@ def _build_llm(temperature: float = 0.2, max_tokens: int = 4096):
         api_key=os.getenv("ANTHROPIC_API_KEY"),
     )
 
+
+# Tissue physiological stiffness ranges (kPa). Sources cited in TISSUE_STIFFNESS_REFS.
+# These are PHYSIOLOGICAL targets — what the cell actually wants — not material capability.
+# Used by deterministic fallback in synthesize_variance_report() and by the
+# stiffness sanity-check that augments the LLM-based variance analysis.
+TISSUE_STIFFNESS_KPA = {
+    "hepatic":   {"min": 1.0,  "max": 6.0,   "optimal": 3.0,   "ref": "10.1016/j.actbio.2021.04.026"},
+    "liver":     {"min": 1.0,  "max": 6.0,   "optimal": 3.0,   "ref": "10.1016/j.actbio.2021.04.026"},
+    "cardiac":   {"min": 8.0,  "max": 16.0,  "optimal": 10.0,  "ref": "10.1242/jcs.029678"},   # Engler 2008
+    "heart":     {"min": 8.0,  "max": 16.0,  "optimal": 10.0,  "ref": "10.1242/jcs.029678"},
+    "neural":    {"min": 0.1,  "max": 1.0,   "optimal": 0.5,   "ref": "10.1242/jcs.029678"},
+    "brain":     {"min": 0.1,  "max": 1.0,   "optimal": 0.5,   "ref": "10.1242/jcs.029678"},
+    "cartilage": {"min": 24.0, "max": 100.0, "optimal": 60.0,  "ref": "10.1016/j.matbio.2014.08.011"},
+    "vascular":  {"min": 4.0,  "max": 16.0,  "optimal": 10.0,  "ref": "10.1146/annurev-bioeng-071910-124751"},
+    "tumor":     {"min": 2.0,  "max": 12.0,  "optimal": 6.0,   "ref": "10.1158/0008-5472.CAN-09-4622"},
+    "bone":      {"min": 100.0,"max": 50000.0,"optimal": 10000.0,"ref": "10.1016/j.bone.2012.10.006"},
+    "skin":      {"min": 1.0,  "max": 100.0, "optimal": 30.0,  "ref": "10.1016/j.jmbbm.2010.11.005"},
+    "lung":      {"min": 0.5,  "max": 3.0,   "optimal": 1.5,   "ref": "10.1183/09031936.00185511"},
+    "kidney":    {"min": 1.0,  "max": 6.0,   "optimal": 3.0,   "ref": "10.1038/nrneph.2014.140"},
+    "intestinal":{"min": 1.0,  "max": 5.0,   "optimal": 2.5,   "ref": "10.1152/ajpgi.00399.2015"},
+    "pancreatic":{"min": 1.0,  "max": 4.0,   "optimal": 2.0,   "ref": "10.1158/0008-5472.CAN-09-4622"},
+}
+
+
+def _z_score(value: float, vmin: float, vmax: float) -> float:
+    """Map a value into [-1, +1] deviation score against a [min, max] band.
+    0.0 = within band. ±1.0 = at or beyond ±100% of band-width outside band."""
+    if vmin <= value <= vmax:
+        return 0.0
+    band = max(vmax - vmin, 1e-9)
+    if value < vmin:
+        return max(-1.0, -(vmin - value) / band)
+    return min(1.0, (value - vmax) / band)
+
+
+def _flag_from_score(score: float) -> str:
+    """Map deviation score → green/yellow/red risk flag."""
+    a = abs(score)
+    if a < 0.15:
+        return "green"
+    if a < 0.5:
+        return "yellow"
+    return "red"
+
+
+def _deterministic_fallback_report(profile: ConstructProfile, docs: List[Document]) -> "VarianceReport":
+    """Build a VarianceReport without the LLM, using:
+      - tissue physiological stiffness ranges (TISSUE_STIFFNESS_KPA)
+      - parameter library cues for porosity / pore size / culture duration
+      - retrieved docs for PMID citations
+    Used when LLM produces no structured output. Never returns empty deviation_scores.
+    """
+    benchmarks: Dict[str, Dict] = {}
+    deviations: Dict[str, float] = {}
+    flags: Dict[str, str] = {}
+
+    # Stiffness — anchored to tissue physiology
+    if profile.stiffness_kpa is not None and profile.target_tissue:
+        tt = (profile.target_tissue or "").lower().strip()
+        ref = TISSUE_STIFFNESS_KPA.get(tt)
+        if ref:
+            benchmarks["stiffness_kpa"] = {
+                "min": ref["min"], "max": ref["max"], "unit": "kPa",
+                "optimal": ref["optimal"], "source_doi": ref["ref"]
+            }
+            score = _z_score(profile.stiffness_kpa, ref["min"], ref["max"])
+            deviations["stiffness_kpa"] = round(score, 3)
+            flags["stiffness_kpa"] = _flag_from_score(score)
+
+    # Porosity — broad TE rule of thumb 60–85% for most soft-tissue scaffolds
+    if profile.porosity_percent is not None:
+        benchmarks["porosity_percent"] = {"min": 60.0, "max": 85.0, "unit": "%", "optimal": 75.0,
+                                          "note": "Broad TE rule-of-thumb for soft-tissue scaffolds"}
+        score = _z_score(profile.porosity_percent, 60.0, 85.0)
+        deviations["porosity_percent"] = round(score, 3)
+        flags["porosity_percent"] = _flag_from_score(score)
+
+    # Pore size — Wolf 2013 critical migration threshold ~7 µm; upper soft-cap 500 µm
+    if profile.pore_size_um is not None:
+        benchmarks["pore_size_um"] = {"min": 50.0, "max": 500.0, "unit": "µm", "optimal": 250.0,
+                                      "source_pmid": "23696811"}  # Wolf et al 2013
+        score = _z_score(profile.pore_size_um, 50.0, 500.0)
+        deviations["pore_size_um"] = round(score, 3)
+        flags["pore_size_um"] = _flag_from_score(score)
+
+    # Culture duration — application-dependent rough envelope
+    if profile.culture_duration_days is not None:
+        benchmarks["culture_duration_days"] = {"min": 3, "max": 28, "unit": "days", "optimal": 14,
+                                               "note": "Typical TE envelope; longer for cell-ag whole-cuts"}
+        score = _z_score(float(profile.culture_duration_days), 3.0, 28.0)
+        deviations["culture_duration_days"] = round(score, 3)
+        flags["culture_duration_days"] = _flag_from_score(score)
+
+    # Build PMID list from retrieved docs (validates with vault)
+    pmids: List[str] = []
+    references: List[Dict] = []
+    for doc in docs[:5]:
+        pmid = (doc.metadata or {}).get("pmid", "")
+        if pmid and pmid not in pmids:
+            pmids.append(pmid)
+            references.append({
+                "pmid": pmid,
+                "title": (doc.metadata or {}).get("title", ""),
+                "year": str((doc.metadata or {}).get("year", "")),
+                "relevance_note": "Retrieved from vault hybrid search; LLM synthesis fell back to deterministic mode."
+            })
+
+    # Narrative — templated, names what was checked + tells the user the report is in fallback mode
+    narrative_parts = [
+        "Variance report generated in deterministic-fallback mode (LLM synthesis did not produce a structured response on this run).",
+    ]
+    if profile.target_tissue and "stiffness_kpa" in deviations:
+        tt = profile.target_tissue
+        score = deviations["stiffness_kpa"]
+        flag = flags["stiffness_kpa"]
+        ref = TISSUE_STIFFNESS_KPA.get((tt or "").lower())
+        if ref:
+            if flag == "green":
+                narrative_parts.append(
+                    f"Stiffness {profile.stiffness_kpa} kPa is within the {ref['min']}-{ref['max']} kPa "
+                    f"physiological range for {tt} tissue (DOI: {ref['ref']})."
+                )
+            elif flag == "yellow":
+                narrative_parts.append(
+                    f"Stiffness {profile.stiffness_kpa} kPa is moderately outside the {ref['min']}-{ref['max']} kPa "
+                    f"physiological range for {tt} tissue (DOI: {ref['ref']}); expect altered phenotype."
+                )
+            else:
+                narrative_parts.append(
+                    f"Stiffness {profile.stiffness_kpa} kPa is well outside the {ref['min']}-{ref['max']} kPa "
+                    f"physiological range for {tt} tissue (DOI: {ref['ref']}); high risk of mismatched mechanotransduction."
+                )
+    if "pore_size_um" in deviations and flags["pore_size_um"] != "green":
+        narrative_parts.append(
+            f"Pore size {profile.pore_size_um} µm flagged ({flags['pore_size_um']}) — Wolf et al 2013 (PMID: 23696811) "
+            f"established 7 µm as the critical migration threshold; design typically targets 50-500 µm."
+        )
+    if "porosity_percent" in deviations and flags["porosity_percent"] != "green":
+        narrative_parts.append(
+            f"Porosity {profile.porosity_percent}% is outside the 60-85% soft-tissue rule-of-thumb."
+        )
+    narrative_parts.append(
+        "For a fully literature-grounded narrative with inline PMID citations, retry the assessment when LLM service is responsive."
+    )
+    narrative = " ".join(narrative_parts)
+
+    return VarianceReport(
+        construct_profile=profile,
+        benchmark_ranges=benchmarks,
+        deviation_scores=deviations,
+        risk_flags=flags,
+        ai_narrative=narrative,
+        supporting_pmids=pmids,
+        key_references=references,
+    )
+
+
 # Load environment variables
 load_dotenv()
 
@@ -330,51 +487,66 @@ SCORING GUIDE:
 
 Include ALL numeric parameters from the construct profile in your analysis."""
 
-    # Get response
-    try:
-        response = llm.invoke(prompt)
-        response_text = response.content
+    # Try LLM with one retry. If both fail, fall back to deterministic z-score report.
+    last_err = None
+    for attempt in (1, 2):
+        try:
+            attempt_prompt = prompt
+            if attempt == 2:
+                # Stricter retry: emphasize the format requirement
+                attempt_prompt = (
+                    "FORMAT IS MANDATORY. Your response MUST contain exactly one "
+                    "<variance_report>...</variance_report> block with valid JSON "
+                    "inside. No prose before or after. No markdown fences inside the "
+                    "tags. Begin your response with the literal string "
+                    "'<variance_report>'.\n\n" + prompt
+                )
 
-        # Extract JSON from tags
-        pattern = r"<variance_report>(.*?)</variance_report>"
-        match = re.search(pattern, response_text, re.DOTALL)
+            response = llm.invoke(attempt_prompt)
+            response_text = response.content
 
-        if not match:
-            raise ValueError("No <variance_report> tags found in response")
+            # Try the strict tag extraction first
+            pattern = r"<variance_report>(.*?)</variance_report>"
+            match = re.search(pattern, response_text, re.DOTALL)
 
-        json_str = match.group(1).strip()
+            if match:
+                json_str = match.group(1).strip()
+            else:
+                # Lenient fallback: find the outermost {...} JSON block
+                m2 = re.search(r"\{.*\}", response_text, re.DOTALL)
+                if not m2:
+                    raise ValueError("No <variance_report> tags AND no JSON object found in response")
+                json_str = m2.group(0).strip()
 
-        # Clean up markdown code blocks if present
-        json_str = re.sub(r"^```json\s*", "", json_str)
-        json_str = re.sub(r"\s*```$", "", json_str)
+            # Clean up markdown code blocks if present
+            json_str = re.sub(r"^```(?:json)?\s*", "", json_str)
+            json_str = re.sub(r"\s*```$", "", json_str)
 
-        # Parse JSON
-        report_dict = json.loads(json_str)
+            # Parse JSON (lenient — repairs trailing commas etc.)
+            report_dict = _parse_json_lenient(json_str)
 
-        # Add construct_profile to the dict
-        report_dict["construct_profile"] = profile
+            # Validate required fields are populated, not just present
+            required = ("benchmark_ranges", "deviation_scores", "risk_flags")
+            if not all(report_dict.get(k) for k in required):
+                raise ValueError(
+                    f"LLM returned response with empty {[k for k in required if not report_dict.get(k)]}"
+                )
 
-        # Ensure key_references exists
-        if "key_references" not in report_dict:
-            report_dict["key_references"] = []
+            # Add construct_profile + ensure key_references exists
+            report_dict["construct_profile"] = profile
+            report_dict.setdefault("key_references", [])
+            report_dict.setdefault("supporting_pmids", [])
 
-        # Create VarianceReport
-        variance_report = VarianceReport(**report_dict)
+            return VarianceReport(**report_dict)
 
-        return variance_report
+        except Exception as e:
+            last_err = e
+            print(f"[synthesize_variance_report] attempt {attempt} failed: {e}")
+            continue
 
-    except Exception as e:
-        # Return error report
-        print(f"Error synthesizing variance report: {e}")
-        return VarianceReport(
-            construct_profile=profile,
-            benchmark_ranges={},
-            deviation_scores={},
-            risk_flags={},
-            ai_narrative=f"Error generating variance report: {str(e)}",
-            supporting_pmids=[],
-            key_references=[]
-        )
+    # Both LLM attempts failed — deterministic fallback. NEVER returns empty deviation_scores.
+    print(f"[synthesize_variance_report] LLM failed after retries; using deterministic fallback. last_err={last_err}")
+    return _deterministic_fallback_report(profile, docs)
 
 
 def _parse_json_lenient(text: str) -> dict:
