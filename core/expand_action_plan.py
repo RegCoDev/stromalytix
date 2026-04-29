@@ -40,16 +40,9 @@ def expand_action_plan_narrative(
 
     Raises RuntimeError if no API key is available.
     """
-    api_key = _anthropic_key_for_expand()
-    if not api_key:
-        raise RuntimeError("ANTHROPIC_API_KEY not configured")
-
-    llm = ChatAnthropic(
-        model="claude-haiku-4-5-20251001",
-        temperature=0.2,
-        max_tokens=2048,
-        api_key=api_key,
-    )
+    # Route through rag._build_llm() — prefers LiteLLM/OpenRouter, falls back to Anthropic
+    from core.rag import _build_llm
+    llm = _build_llm(temperature=0.2, max_tokens=2048)
     profile_json = profile.model_dump_json(indent=2)
     narrative = report.ai_narrative[:4000] if report.ai_narrative else ""
 

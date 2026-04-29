@@ -62,14 +62,9 @@ def parse_protocol_to_profile(text: str) -> dict:
         return _regex_extract(text)
 
     try:
-        from langchain_anthropic import ChatAnthropic
-
-        llm = ChatAnthropic(
-            model="claude-haiku-4-5-20251001",
-            temperature=0.0,
-            max_tokens=1024,
-            api_key=api_key,
-        )
+        # Route through rag._build_llm() — prefers LiteLLM/OpenRouter, falls back to Anthropic
+        from core.rag import _build_llm
+        llm = _build_llm(temperature=0.0, max_tokens=1024)
 
         prompt = f"""Extract tissue engineering construct parameters from this protocol text.
 Return ONLY a JSON object with these exact keys (use null for missing values):
