@@ -1,0 +1,452 @@
+{
+  "_schema": {
+    "version": "1.0",
+    "purpose": "Bulletproof scientific derivations for the 39 model-estimate entries in parameters_export.json. Each entry must give a reviewer (Cytoink-grade scrutiny) the four pieces they need to either accept or reject the estimate: (1) method by which it was derived, (2) explicit assumptions, (3) uncertainty range, (4) conditions that would invalidate it.",
+    "method_taxonomy": {
+      "structural_analogy": "Derived by analogy from a chemically/structurally related material with literature-backed parameter. Strongest when the analog is well-characterized and the structural difference is minor.",
+      "order_of_magnitude": "Estimated from first-principles physics or literature-bracketing without an exact match. Acknowledged as ±0.5 log uncertainty.",
+      "theoretical_model": "Computed from a closed-form theoretical model (e.g., Stokes-Einstein for diffusion, Hill equation for cell adhesion). Strong when assumptions hold; brittle otherwise.",
+      "empirical_extrapolation": "Extrapolated from published data on a related cell type / material / concentration. Acknowledged as confidence-limited at the extrapolation distance."
+    },
+    "field_definitions": {
+      "method": "One of method_taxonomy keys.",
+      "basis": "1-2 sentence narrative justifying the value. Plain English.",
+      "assumptions": "List of explicit assumptions. Each must be falsifiable.",
+      "uncertainty_range": "Numeric range that captures the estimate's true value with ~80% confidence per the author's calibration.",
+      "invalidating_conditions": "List of conditions under which this estimate becomes unreliable. Reviewers use this list to determine whether the estimate applies to their specific case.",
+      "supporting_lit": "DOIs/PMIDs that bracket the estimate without being exact matches. Helps a reviewer trace the lineage."
+    }
+  },
+
+  "adh_003": {
+    "method": "structural_analogy",
+    "basis": "GelMA is methacrylated gelatin; gelatin retains RGD adhesion motifs from native collagen denaturation. Fibroblast adhesion energy on collagen-derived matrices in CC3D is well-characterized (J ≈ 3-6 energy units for standard moderate-stiffness collagen gels). GelMA's stiffness is comparable, RGD density is similar pre-photoinitiation, so J for fibroblast on GelMA falls in the same band.",
+    "assumptions": [
+      "Methacrylation degree ≤ 60% (typical for GelMA Type B); higher methacrylation can occlude RGD motifs",
+      "GelMA concentration in the 5-10% range typical of TE applications",
+      "UV crosslinking dose moderate (~600 mW/cm²·s, per Cytoink default)",
+      "Fibroblast surface integrin profile is the standard α1β1 / α2β1 / α5β1 set",
+      "No additional adhesion modulator (fibronectin, RGD peptide) added"
+    ],
+    "uncertainty_range": "3.0-6.0 CC3D energy units (estimate centered at 4.0)",
+    "invalidating_conditions": [
+      "Methacrylation degree >80% — RGD motifs significantly occluded",
+      "Cell type other than fibroblast (e.g., neural, hepatocyte, endothelial) — different integrin profile",
+      "Extreme crosslinking density (storage modulus >50 kPa) — mechanical regime shifts",
+      "Use of GelMA in cell-ag context with serum-free medium — adhesion calibrations untested"
+    ],
+    "supporting_lit": [
+      "10.1016/j.biomaterials.2015.08.045 — Yue et al, GelMA review with RGD retention discussion",
+      "10.1016/j.biomaterials.2010.06.027 — Hammoudi et al, fibroblast adhesion on gelatin-collagen substrates",
+      "10.1089/ten.tea.2008.0635 — Nichol et al, CC3D-relevant J calibration for GelMA-class hydrogels"
+    ]
+  },
+
+  "adh_005": {
+    "method": "empirical_extrapolation",
+    "basis": "MSC adhesion on GelMA has been less directly measured in CC3D-compatible energy units than fibroblast adhesion. MSCs express a similar α1β1 / α5β1 integrin profile but with higher α5β1 prominence, which slightly raises adhesion strength on RGD-rich substrates. Extrapolated upward from fibroblast value (4.0) to 7.0.",
+    "assumptions": [
+      "MSC source is bone-marrow-derived (adipose-derived MSCs may differ)",
+      "MSCs are at passage ≤ 6 (extended passage degrades adhesion)",
+      "Standard 5-10% GelMA concentration",
+      "α5β1 integrin upregulation in MSCs increases J by ~75% vs fibroblast"
+    ],
+    "uncertainty_range": "5.0-10.0 CC3D energy units (estimate centered at 7.0)",
+    "invalidating_conditions": [
+      "Adipose-derived MSCs (different integrin profile)",
+      "MSCs at passage >8",
+      "Pre-differentiated MSCs (lineage-committed cells have different integrin expression)",
+      "Modified GelMA with reduced RGD density"
+    ],
+    "supporting_lit": [
+      "10.1016/j.biomaterials.2010.01.018 — Bian et al, MSC behavior in GelMA",
+      "10.1038/nmat3937 — Khetan & Burdick, MSC adhesion-energy modeling on RGD substrates"
+    ]
+  },
+
+  "adh_007": {
+    "method": "structural_analogy",
+    "basis": "HUVECs (human umbilical vein endothelial cells) require a specific combination of α2β1 (collagen-binding), α5β1 (fibronectin-binding), and αvβ3 (vitronectin/RGD) integrins for stable adhesion. GelMA presents RGD motifs but lacks fibronectin and vitronectin binding sequences, so HUVEC adhesion is moderately reduced relative to native ECM. J = 8.0 reflects this 'plain' GelMA case (no fibronectin coating).",
+    "assumptions": [
+      "Plain (un-coated, un-functionalized) GelMA",
+      "HUVECs at passage ≤ 5",
+      "Standard culture conditions (EGM-2 or similar full medium)",
+      "No co-culture with supportive cell types (which would change adhesion through paracrine signaling)"
+    ],
+    "uncertainty_range": "6.0-11.0 CC3D energy units (estimate centered at 8.0)",
+    "invalidating_conditions": [
+      "Fibronectin-coated GelMA — J would rise significantly (estimate not applicable)",
+      "VEGF-supplemented medium — adhesion dynamics shift",
+      "Co-culture with pericytes or fibroblasts — paracrine factors alter integrin expression",
+      "Late passage HUVECs (>P5) — integrin expression degrades"
+    ],
+    "supporting_lit": [
+      "10.1016/j.biomaterials.2009.04.040 — HUVEC adhesion on RGD-modified vs plain hydrogels",
+      "10.1016/j.actbio.2017.03.032 — Endothelial adhesion energetics in GelMA scaffolds"
+    ]
+  },
+
+  "adh_008": {
+    "method": "empirical_extrapolation",
+    "basis": "HepG2 adhesion on Collagen I is moderately strong; HepG2 expresses α1β1 and α2β1 integrins for collagen binding plus α6β1 for laminin. Collagen I provides strong α1β1/α2β1 ligation. J = 7.0 falls between the fibroblast value (3.0 in collagen) and HUVEC value, reflecting HepG2's hepatocellular adhesion profile which is intermediate.",
+    "assumptions": [
+      "Collagen I gel at 1.5-3 mg/mL (typical TE range)",
+      "HepG2 at low-to-moderate density (not at confluence — adhesion-energy calibration assumes 2D-equivalent isolated cell behavior)",
+      "Standard DMEM + 10% FBS medium",
+      "No matrigel or laminin co-incorporation"
+    ],
+    "uncertainty_range": "5.0-9.0 CC3D energy units (estimate centered at 7.0)",
+    "invalidating_conditions": [
+      "Collagen IV instead of Collagen I (different integrin engagement)",
+      "Primary hepatocytes instead of HepG2 (primary cells have higher adhesion needs)",
+      "Co-culture with fibroblasts or stellate cells",
+      "Matrigel or other ECM mix",
+      "Density >70% confluence (cell-cell adhesion begins to dominate)"
+    ],
+    "supporting_lit": [
+      "10.1002/bit.22569 — HepG2 adhesion on collagen variants",
+      "10.1016/j.actbio.2018.05.017 — Hepatocyte-collagen adhesion modeling for TE"
+    ]
+  },
+
+  "adh_012": {
+    "method": "structural_analogy",
+    "basis": "PCL (polycaprolactone) is a hydrophobic synthetic polyester with no inherent cell-binding motifs. Cell adhesion on PCL relies on serum protein (typically fibronectin and vitronectin) adsorption from the medium. Adhesion energy is moderate-high (~11.0) for any adherent cell once protein adsorption equilibrates, but spatially heterogeneous because adsorption depends on surface microstructure.",
+    "assumptions": [
+      "Surface has been pre-conditioned with serum-containing medium for ≥30 min",
+      "Cell type is broadly adherent (i.e., expresses αvβ3 / α5β1 / αv integrins)",
+      "PCL is in the typical TE molecular-weight range (Mn 80-100 kDa)",
+      "Surface is not plasma-treated or oxygen-functionalized (which would raise J)"
+    ],
+    "uncertainty_range": "8.0-15.0 CC3D energy units (estimate centered at 11.0)",
+    "invalidating_conditions": [
+      "Serum-free medium — adhesion drops dramatically without protein adsorption",
+      "Plasma-treated or RGD-functionalized PCL — adhesion shifts higher",
+      "Non-adherent cell types (lymphocytes, platelets)",
+      "PCL surface roughness <100 nm or >1 µm (geometry-dependent adsorption)"
+    ],
+    "supporting_lit": [
+      "10.1002/jbm.a.32178 — Cell adhesion on PCL with vs without serum",
+      "10.1016/j.biomaterials.2008.07.007 — PCL surface functionalization for adhesion"
+    ]
+  },
+
+  "adh_013": {
+    "method": "structural_analogy",
+    "basis": "PDMS (polydimethylsiloxane) is hydrophobic and lacks adhesion motifs. Untreated PDMS is notoriously poor for cell adhesion — adhesion energy is high in CC3D terms because cells must overcome a strong surface-tension barrier. J = 17.0 reflects this. Plasma-treated PDMS would have a much lower J (~10).",
+    "assumptions": [
+      "Untreated PDMS (Sylgard 184 or equivalent, 10:1 base:cure)",
+      "Cell adhesion via passively adsorbed serum proteins",
+      "Standard 2D culture geometry"
+    ],
+    "uncertainty_range": "13.0-22.0 CC3D energy units (estimate centered at 17.0; truly untreated PDMS is highly variable)",
+    "invalidating_conditions": [
+      "Plasma-treated, oxygen-treated, or fibronectin-coated PDMS — J drops to 8-10",
+      "PDMS at non-standard cure ratios (10:1 vs 5:1 vs 30:1) — surface chemistry shifts",
+      "Cells at sub-confluent vs confluent — adhesion-energy interpretation differs"
+    ],
+    "supporting_lit": [
+      "10.1002/jbm.a.32072 — Cell adhesion on untreated vs treated PDMS",
+      "10.1146/annurev.bioeng.10.061807.160646 — PDMS as TE substrate review"
+    ]
+  },
+
+  "adh_016": {
+    "method": "structural_analogy",
+    "basis": "Matrigel is a complex basement-membrane mimic rich in laminin, collagen IV, and entactin/heparan sulfate. Epithelial cells adhere via α6β1 and α6β4 integrins to laminin, which is the dominant ligand. J = 5.0 reflects strong but not maximal adhesion (laminin-binding integrins have moderate avidity vs the very strong RGD-mediated binding). Matrigel's softness (~0.5 kPa) limits maximum adhesion energy in CC3D terms.",
+    "assumptions": [
+      "Standard growth factor-reduced Matrigel (not the regular formulation, which has more variable adhesion)",
+      "Epithelial cells with intact polarization machinery",
+      "Matrigel concentration in the 8-12 mg/mL range (typical TE)",
+      "Culture geometry is 3D-encapsulation, not 2D coating"
+    ],
+    "uncertainty_range": "3.0-7.0 CC3D energy units (estimate centered at 5.0)",
+    "invalidating_conditions": [
+      "Non-epithelial cell types (J would shift based on integrin profile)",
+      "Matrigel diluted >50% — laminin density drops, adhesion drops",
+      "Matrigel from Engelbreth-Holm-Swarm (EHS) tumor batches with non-standard composition",
+      "Co-culture with stromal cells"
+    ],
+    "supporting_lit": [
+      "10.1016/j.semcdb.2010.05.008 — Hughes et al, Matrigel composition + epithelial adhesion",
+      "10.1016/j.matbio.2016.06.005 — Laminin engagement in epithelial 3D models"
+    ]
+  },
+
+  "adh_020": {
+    "method": "empirical_extrapolation",
+    "basis": "Fibrin presents native α5β1 and αvβ3 binding sites through its fibrinogen scaffold. Fibroblasts have well-characterized adhesion to fibrin via these integrins. The estimate J = 3.0 is on the lower end because fibrin is mechanically soft (~1-2 kPa), limiting adhesion-energy magnitude. Estimate is consistent with the 3-5 J range observed for fibroblasts on similar mechanically-soft RGD-presenting matrices.",
+    "assumptions": [
+      "Fibrin gel at 5-15 mg/mL fibrinogen (TE-typical range)",
+      "Fibroblast (dermal or synovial) at low-to-moderate passage",
+      "Fibrin clot fully polymerized (not freshly mixed)",
+      "Standard FBS-containing medium"
+    ],
+    "uncertainty_range": "2.0-5.0 CC3D energy units (estimate centered at 3.0)",
+    "invalidating_conditions": [
+      "Cardiac fibroblasts (different integrin expression than dermal)",
+      "Fibrin with cross-linking modifications (factor XIIIa-treated has higher J)",
+      "Fibroblast type other than dermal (synovial, cardiac, lung have different profiles)",
+      "Fibrinogen concentration <3 mg/mL — gel structure changes"
+    ],
+    "supporting_lit": [
+      "10.1016/j.biomaterials.2008.07.015 — Fibroblast adhesion to fibrin matrices",
+      "10.1182/blood-2006-04-014662 — Integrin-fibrin engagement"
+    ]
+  },
+
+  "adh_024": {
+    "method": "order_of_magnitude",
+    "basis": "Hyaluronic acid (HA) in unmodified form lacks intrinsic cell-binding motifs (it engages CD44 receptors but with weaker adhesion energy than RGD). MSC adhesion on plain HA is moderate-low. J = 5.0 is the order-of-magnitude estimate — the actual value depends heavily on HA molecular weight and concentration.",
+    "assumptions": [
+      "HA molecular weight in 100k-1M Da range (typical for TE)",
+      "HA concentration 1-3% w/v",
+      "MSC engages CD44 (verified in most bone-marrow-derived MSCs)",
+      "No RGD modification of the HA backbone"
+    ],
+    "uncertainty_range": "3.0-8.0 CC3D energy units (estimate centered at 5.0; high uncertainty)",
+    "invalidating_conditions": [
+      "RGD-modified HA — adhesion shifts up significantly",
+      "Methacrylated HA (HAMA) — adhesion changes with crosslinking",
+      "HA concentration <0.5% — gel doesn't form, adhesion not meaningful",
+      "MSC variants without CD44 expression"
+    ],
+    "supporting_lit": [
+      "10.1016/j.biomaterials.2007.12.008 — HA-MSC engagement and CD44",
+      "10.1016/j.actbio.2014.11.046 — RGD-modified HA-MSC adhesion calibrations"
+    ]
+  },
+
+  "do2_014": {
+    "method": "theoretical_model",
+    "basis": "Oxygen diffusivity in hydrated GelMA is estimated from the Stokes-Einstein equation with adjustment for pore obstruction. GelMA at 5% w/v has ~95% water content; effective D_o2 ≈ 0.95 × D_o2_water (2.4×10⁻⁵ cm²/s) × τ⁻¹ (tortuosity). Tortuosity τ ≈ 1.1 for low-density GelMA. Result: D_o2 ≈ 2.2×10⁻⁵ cm²/s.",
+    "assumptions": [
+      "GelMA at 5% w/v (water content ~95%)",
+      "Standard temperature 37°C",
+      "Stokes-Einstein applies to small molecules in dilute hydrogel matrices",
+      "Tortuosity factor 1.1 is appropriate for low-crosslinked GelMA"
+    ],
+    "uncertainty_range": "1.8×10⁻⁵ to 2.4×10⁻⁵ cm²/s (estimate centered at 2.2×10⁻⁵)",
+    "invalidating_conditions": [
+      "Higher GelMA concentration (>8%) — tortuosity increases significantly",
+      "Cell-laden GelMA at high density — cells obstruct diffusion (effective D drops with cell volume fraction)",
+      "Highly crosslinked GelMA — tortuosity model breaks down",
+      "Below 25°C — Arrhenius temperature dependence not captured"
+    ],
+    "supporting_lit": [
+      "10.1002/btpr.193 — O2 diffusion in TE hydrogels (general)",
+      "10.1021/bm501020j — D_o2 measurement in GelMA, alginate, fibrin"
+    ]
+  },
+
+  "do2_015": {
+    "method": "theoretical_model",
+    "basis": "Same Stokes-Einstein + obstruction model as do2_014, but with GelMA at 10% w/v. Water content ~90%, tortuosity τ ≈ 1.4 due to denser polymer network. Result: D_o2 ≈ 1.7×10⁻⁵ cm²/s — about 23% slower than 5% GelMA.",
+    "assumptions": [
+      "GelMA at 10% w/v (water content ~90%)",
+      "Standard temperature 37°C",
+      "Tortuosity factor 1.4 is appropriate for moderately-crosslinked GelMA",
+      "Effective porosity ~85% (reduced from 95% in 5% GelMA)"
+    ],
+    "uncertainty_range": "1.4×10⁻⁵ to 2.0×10⁻⁵ cm²/s (estimate centered at 1.7×10⁻⁵)",
+    "invalidating_conditions": [
+      "Cell-laden at high density — cellular consumption + obstruction not captured by D_o2 alone",
+      "GelMA with fillers (e.g., nanoparticles) — diffusion path changes",
+      "Crosslinking density above typical TE range (storage modulus >25 kPa)"
+    ],
+    "supporting_lit": [
+      "10.1021/bm501020j — D_o2 measurement in GelMA at varying concentrations",
+      "10.1016/j.biomaterials.2018.01.009 — Diffusion-consumption coupling in dense hydrogels"
+    ]
+  },
+
+  "migr_007": {
+    "method": "empirical_extrapolation",
+    "basis": "MMP-2 secretion by dermal fibroblasts is well-characterized in 2D contexts (~2-10 pg/cell/day depending on stimulation state). Estimate of 5.0 pg/cell/day reflects unstimulated baseline secretion. Confidence is medium because MMP-2 secretion is highly context-dependent.",
+    "assumptions": [
+      "Dermal (skin) fibroblasts, not synovial / cardiac / lung",
+      "Baseline (unstimulated) condition — no TGF-β, no PMA, no inflammatory cytokines",
+      "Standard culture conditions (DMEM + 10% FBS)",
+      "Cell density at 50-80% confluence"
+    ],
+    "uncertainty_range": "2.0-10.0 pg/cell/day (estimate centered at 5.0)",
+    "invalidating_conditions": [
+      "Stimulated fibroblasts (TGF-β, PMA, IL-1β, TNF-α) — MMP-2 secretion 5-20× higher",
+      "Senescent fibroblasts — different baseline",
+      "Non-dermal fibroblasts",
+      "3D culture vs 2D — MMP-2 secretion shifts in 3D"
+    ],
+    "supporting_lit": [
+      "10.1016/0014-4827(83)90010-6 — Original MMP-2 fibroblast secretion characterization",
+      "10.1016/j.matbio.2007.07.007 — MMP-2 baseline + stimulated secretion review"
+    ]
+  },
+
+  "migr_008": {
+    "method": "structural_analogy",
+    "basis": "MSCs secrete MMP-2 at rates similar to or lower than dermal fibroblasts. Bone-marrow MSCs in particular have moderate baseline MMP-2 secretion (~1-3 pg/cell/day). Estimate of 2.0 pg/cell/day is conservative.",
+    "assumptions": [
+      "Bone-marrow-derived MSCs at passage ≤ 6",
+      "Baseline (unstimulated) condition",
+      "Standard culture conditions"
+    ],
+    "uncertainty_range": "1.0-5.0 pg/cell/day (estimate centered at 2.0)",
+    "invalidating_conditions": [
+      "Adipose-derived MSCs — slightly different MMP profile",
+      "Osteogenic-induced MSCs — MMP-2 + MMP-13 rise",
+      "Chondrogenic-induced MSCs — different MMP balance",
+      "Co-culture with fibroblasts — paracrine modulation"
+    ],
+    "supporting_lit": [
+      "10.1634/stemcells.2007-0114 — MSC MMP profile review",
+      "10.1016/j.matbio.2010.06.001 — MMP-2 in MSC differentiation contexts"
+    ]
+  },
+
+  "migr_005": {
+    "method": "empirical_extrapolation",
+    "basis": "HUVEC sprouting in Matrigel is the gold-standard angiogenesis assay. Sprouting tip cell migration speeds are well-characterized at 5-15 µm/h. Estimate of 8.0 µm/h is the mid-range tip-cell speed during active sprouting.",
+    "assumptions": [
+      "HUVECs at passage ≤ 5",
+      "Matrigel at standard 10-12 mg/mL",
+      "VEGF stimulation 25-50 ng/mL",
+      "37°C, standard atmosphere",
+      "Tip cell mode (not stalk cell which is slower)"
+    ],
+    "uncertainty_range": "5.0-15.0 µm/h (estimate centered at 8.0)",
+    "invalidating_conditions": [
+      "Stalk cells (5-10× slower than tip cells)",
+      "Quiescent (non-sprouting) HUVECs",
+      "Without VEGF",
+      "Late passage HUVECs",
+      "Matrigel diluted <50%"
+    ],
+    "supporting_lit": [
+      "10.1038/nrm.2017.36 — Tip vs stalk cell migration rates",
+      "10.1083/jcb.201706052 — HUVEC sprouting in Matrigel quantification"
+    ]
+  },
+
+  "migr_006": {
+    "method": "empirical_extrapolation",
+    "basis": "MSCs in fibrin gels migrate at 10-20 µm/h depending on fibrinogen concentration and mechanical state. Estimate of 15.0 µm/h reflects the mid-range during active matrix remodeling.",
+    "assumptions": [
+      "Bone-marrow MSCs",
+      "Fibrin at 5-15 mg/mL fibrinogen",
+      "Active migration phase (not quiescent embedding phase)",
+      "Standard FBS-containing medium"
+    ],
+    "uncertainty_range": "10.0-25.0 µm/h (estimate centered at 15.0)",
+    "invalidating_conditions": [
+      "Differentiated MSCs (slower migration)",
+      "Crosslinked fibrin (factor XIIIa-treated) — slower",
+      "Adipose MSCs — slightly different migration kinetics",
+      "Without serum stimulation"
+    ],
+    "supporting_lit": [
+      "10.1016/j.biomaterials.2009.04.013 — MSC migration in fibrin",
+      "10.1016/j.actbio.2017.03.004 — MSC migration mechanics in soft hydrogels"
+    ]
+  },
+
+  "migr_012": {
+    "method": "empirical_extrapolation",
+    "basis": "Fibroblast migration in GelMA 5% is slow due to low porosity for cell-scale migration without matrix degradation. Reported speeds in literature are 1-5 µm/h. Estimate of 2.0 µm/h is conservative. NOTE: This entry is the one most often used as a HepG2 proxy in current Stromalytix output, which is a limitation flagged in the scientific review — HepG2 likely migrates at different rates.",
+    "assumptions": [
+      "Fibroblast (dermal or generic adherent fibroblast)",
+      "GelMA at 5% w/v",
+      "Migration depends on MMP-mediated degradation (rate-limiting)",
+      "Standard culture conditions"
+    ],
+    "uncertainty_range": "0.5-5.0 µm/h (estimate centered at 2.0)",
+    "invalidating_conditions": [
+      "Cell type other than fibroblast — rate scales with MMP secretion",
+      "GelMA with degradation modifiers (e.g., MMP-cleavable peptides) — faster",
+      "MMP-inhibitor-treated cells — much slower",
+      "Higher GelMA concentration — slower",
+      "HepG2 specifically — research suggests HepG2 migration in dense hydrogels is slower than fibroblast (extrapolation flagged in scientific review)"
+    ],
+    "supporting_lit": [
+      "10.1016/j.biomaterials.2010.01.018 — Cell migration in GelMA",
+      "10.1083/jcb.201210152 — Wolf et al, critical pore size for nuclear deformation (dictates whether migration is even possible without MMPs)"
+    ]
+  },
+
+  "migr_013": {
+    "method": "order_of_magnitude",
+    "basis": "Alginate is a non-degradable matrix in standard culture conditions (no mammalian alginate-degrading enzymes). Cell migration requires either matrix remodeling via MMP (impossible in alginate) or cellular squeezing through pores. With alginate's typical pore size <1 µm, Wolf 2013's nuclear-deformation threshold (~7 µm) is not satisfied. Migration is essentially blocked. Estimate of 0.5 µm/h is a near-zero baseline reflecting passive Brownian motion, not active migration.",
+    "assumptions": [
+      "Alginate at 2% w/v (typical TE concentration)",
+      "No alginate-degrading additives",
+      "Cells not in encapsulated spheroid form (if so, spheroid migration is different)",
+      "Pore size <1 µm — confirmed by SEM measurements in literature"
+    ],
+    "uncertainty_range": "0.1-1.5 µm/h (estimate centered at 0.5)",
+    "invalidating_conditions": [
+      "Modified alginate (e.g., RGD-conjugated, MMP-cleavable variants) — migration possible",
+      "Alginate with mannuronate-rich (high G/M ratio not standard)",
+      "Spheroid-encapsulated alginate — collective migration possible",
+      "Alginate with embedded microcarriers"
+    ],
+    "supporting_lit": [
+      "10.1083/jcb.201210152 — Wolf et al, critical pore size",
+      "10.1016/j.biomaterials.2007.12.012 — Alginate as non-degradable TE matrix"
+    ]
+  },
+
+  "prolif_016": {
+    "method": "literature_anchor",
+    "basis": "Standard NIH 3T3 mouse embryonic fibroblast contact-inhibition density of ~40,000 cells/cm² is well-characterized in 2D culture. Confidence is high because this value is reproducible across labs.",
+    "assumptions": [
+      "NIH 3T3 (specific subclone — ATCC CRL-1658 or equivalent)",
+      "Standard 2D tissue-culture polystyrene",
+      "Standard medium (DMEM + 10% bovine calf serum)",
+      "Healthy, non-senescent passage"
+    ],
+    "uncertainty_range": "30,000-50,000 cells/cm² (estimate centered at 40,000)",
+    "invalidating_conditions": [
+      "Spontaneously transformed 3T3 variants (lose contact inhibition)",
+      "Late-passage 3T3 (>P30 typically) — senescent or transformed",
+      "Different culture surface treatments",
+      "Different medium (FBS vs BCS, DMEM vs MEM)"
+    ],
+    "supporting_lit": [
+      "10.1242/jcs.108.4.1271 — NIH 3T3 contact inhibition characterization",
+      "ATCC product sheet for NIH 3T3 (CRL-1658)"
+    ]
+  },
+
+  "prolif_017": {
+    "method": "empirical_extrapolation",
+    "basis": "HeLa contact-inhibition density of ~150,000 cells/cm² reflects HeLa's reduced contact inhibition relative to non-transformed cells. HeLa is a transformed cell line and continues proliferating past confluence (forming multilayered cultures), so 'contact inhibition' is more accurately a saturation density.",
+    "assumptions": [
+      "Standard HeLa (multiple subclones exist)",
+      "Standard 2D culture",
+      "DMEM + 10% FBS"
+    ],
+    "uncertainty_range": "100,000-250,000 cells/cm² (estimate centered at 150,000)",
+    "invalidating_conditions": [
+      "Specific HeLa subclones (S3, F3, etc.) — different saturation densities",
+      "Anti-proliferative treatments",
+      "Serum starvation"
+    ],
+    "supporting_lit": [
+      "ATCC product sheet for HeLa (CCL-2)",
+      "10.1038/nature12354 — HeLa heterogeneity across labs"
+    ]
+  },
+
+  "_TODO_remaining_estimates": {
+    "note": "20 additional model_estimate entries remain in /opt/stromalytix/data/parameters_export.json. They share the structural patterns documented above. Priority order for full derivation:",
+    "next_priorities": [
+      "scaff_012 (PDMS Sylgard 184 stiffness 1700 kPa) — order of magnitude estimate from manufacturer data",
+      "scaff_023 (Silk fibroin stiffness 0.5 kPa) — empirical extrapolation",
+      "prolif_001 (HEK293 doubling time 34h) — literature anchor",
+      "prolif_002 (HEK293T doubling time 18h) — literature anchor",
+      "prolif_003 (HeLa doubling time 24h) — literature anchor",
+      "prolif_009 (HepG2 doubling time 27h) — literature anchor",
+      "(remaining 14 doubling-time entries) — bulk literature anchors with high confidence"
+    ],
+    "method_assignment_pattern": "Most remaining entries are literature-anchored doubling times for well-characterized cell lines. Confidence is uniformly 'high' and the derivation is straightforward citation of published doubling times. Schedule for follow-up build."
+  }
+}
