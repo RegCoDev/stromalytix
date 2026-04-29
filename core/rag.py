@@ -14,9 +14,37 @@ from dotenv import load_dotenv
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
 from langchain_anthropic import ChatAnthropic
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from core.models import ConstructProfile, VarianceReport
+
+
+def _build_llm(temperature: float = 0.2, max_tokens: int = 4096):
+    """Build LLM client. Prefers LiteLLM proxy on this VPS;
+    falls back to OpenRouter direct, then Anthropic (legacy)."""
+    litellm_key = os.getenv("LITELLM_MASTER_KEY") or os.getenv("LITELLM_API_KEY")
+    if litellm_key:
+        return ChatOpenAI(
+            model=os.getenv("STROMALYTIX_LLM_MODEL", "gpt-oss"),
+            temperature=temperature,
+            max_tokens=max_tokens,
+            api_key=litellm_key,
+            base_url=os.getenv("LITELLM_BASE_URL", "http://127.0.0.1:4000/v1"),
+        )
+    if os.getenv("OPENROUTER_API_KEY"):
+        return ChatOpenAI(
+            model=os.getenv("STROMALYTIX_LLM_MODEL", "openai/gpt-oss-120b:free"),
+            temperature=temperature,
+            max_tokens=max_tokens,
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+            base_url="https://openrouter.ai/api/v1",
+        )
+    return ChatAnthropic(
+        model="claude-sonnet-4-6",
+        temperature=temperature,
+        max_tokens=max_tokens,
+        api_key=os.getenv("ANTHROPIC_API_KEY"),
+    )
 
 # Load environment variables
 load_dotenv()
@@ -234,13 +262,7 @@ def synthesize_variance_report(profile: ConstructProfile, docs: List[Document]) 
     Raises:
         ValueError: If synthesis fails completely
     """
-    # Initialize Sonnet
-    llm = ChatAnthropic(
-        model="claude-sonnet-4-6",
-        temperature=0.2,
-        max_tokens=4096,
-        api_key=os.getenv("ANTHROPIC_API_KEY")
-    )
+    llm = _build_llm(temperature=0.2, max_tokens=4096)
 
     # Build document context
     doc_context = []
@@ -428,12 +450,7 @@ def generate_simulation_brief(profile: ConstructProfile, report: VarianceReport)
         for g in gaps:
             gaps_section += f"  - {g}\n"
 
-    llm = ChatAnthropic(
-        model="claude-sonnet-4-6",
-        temperature=0.3,
-        max_tokens=3000,
-        api_key=os.getenv("ANTHROPIC_API_KEY")
-    )
+    llm = _build_llm(temperature=0.3, max_tokens=3000)
 
     profile_json = profile.model_dump_json(indent=2)
     narrative = report.ai_narrative

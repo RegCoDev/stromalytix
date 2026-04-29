@@ -23,15 +23,21 @@ load_dotenv()
 # ---------------------------------------------------------------------------
 
 _OPENROUTER_MODELS = [
-    "qwen/qwen3.6-plus-preview:free",
-    "nvidia/nemotron-3-super-120b-a12b:free",
+    "openai/gpt-oss-120b:free",
     "qwen/qwen3-coder:free",
+    "qwen/qwen3-next-80b-a3b-instruct:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
     "minimax/minimax-m2.5:free",
 ]
 
 
 def _get_llm_config() -> dict:
-    """Return config for the best available LLM."""
+    """Return config for the best available LLM.
+
+    Order: OpenRouter (free, working) first. Anthropic only if explicitly
+    preferred via STROMALYTIX_PREFER_ANTHROPIC=1 (kept for the day Anthropic
+    credits return).
+    """
     def _secret(name):
         try:
             import streamlit as st
@@ -39,13 +45,20 @@ def _get_llm_config() -> dict:
         except Exception:
             return None
 
+    prefer_anthropic = (_secret("STROMALYTIX_PREFER_ANTHROPIC") or
+                        os.getenv("STROMALYTIX_PREFER_ANTHROPIC", "")).lower() in ("1", "true", "yes")
+
     anthropic_key = _secret("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
-    if anthropic_key:
+    or_key = _secret("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_API_KEY")
+
+    if prefer_anthropic and anthropic_key:
         return {"api_key": anthropic_key, "model": "claude-haiku-4-5-20251001", "provider": "anthropic"}
 
-    or_key = _secret("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_API_KEY")
     if or_key:
         return {"api_key": or_key, "model": _OPENROUTER_MODELS[0], "provider": "openrouter"}
+
+    if anthropic_key:
+        return {"api_key": anthropic_key, "model": "claude-haiku-4-5-20251001", "provider": "anthropic"}
 
     return {}
 
