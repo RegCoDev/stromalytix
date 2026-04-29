@@ -550,17 +550,13 @@ with tab_protocols:
         st.info("The Knowledge Vault indexes 396 protocols extracted from PubMed full-text articles, "
                 "each decomposed into structured steps with materials, cell types, parameters, and outcomes.")
     else:
-        # Stats row
+        # Stats row — show Protocols + Tissue Types (steps + parameters are noisy for buyers)
         stats = fetch_protocol_stats()
         if stats:
-            sc1, sc2, sc3, sc4 = st.columns(4)
+            sc1, sc2 = st.columns(2)
             with sc1:
                 st.metric("Protocols", stats.get("total_protocols", 0))
             with sc2:
-                st.metric("Steps", stats.get("total_steps", 0))
-            with sc3:
-                st.metric("Parameters", stats.get("total_step_parameters", 0))
-            with sc4:
                 tissues = stats.get("by_tissue", {})
                 st.metric("Tissue Types", len(tissues))
 
@@ -573,9 +569,27 @@ with tab_protocols:
         biofab_options = ["All"]
         conf_options = ["All", "High", "Medium", "Low"]
 
+        # Merge "bioprinted" / "bioprinting" / "extrusion_bioprinting" into a single
+        # "bioprinting" category — they're the same protocol family. Same for any
+        # variants the vault returns separately.
+        _BIOFAB_MERGE = {
+            "bioprinted": "bioprinting",
+            "bioprinting": "bioprinting",
+            "extrusion_bioprinting": "bioprinting",
+            "dlp_bioprinting": "bioprinting",
+            "extrusion bioprinting": "bioprinting",
+            "dlp bioprinting": "bioprinting",
+        }
+
+        def _normalize_biofab(name: str) -> str:
+            n = (name or "").strip().lower()
+            return _BIOFAB_MERGE.get(n, n)
+
         if stats:
             tissue_options += sorted(stats.get("by_tissue", {}).keys())
-            biofab_options += sorted(stats.get("by_biofab", {}).keys())
+            # De-dup biofab keys via the merge map
+            raw_biofab = list((stats.get("by_biofab") or {}).keys())
+            biofab_options += sorted({_normalize_biofab(b) for b in raw_biofab if b})
 
         with fc1:
             sel_tissue = st.selectbox("Tissue Type", tissue_options, key="proto_tissue")
@@ -589,12 +603,27 @@ with tab_protocols:
         biofab_arg = sel_biofab if sel_biofab != "All" else None
         conf_arg = sel_conf.lower() if sel_conf != "All" else None
 
-        result = fetch_protocols(
-            tissue_type=tissue_arg,
-            biofab_method=biofab_arg,
-            confidence=conf_arg,
-            limit=50,
-        )
+        # If the user picks the merged "bioprinting" category, we need to fetch
+        # all underlying variants. Run the request once per variant and combine.
+        if biofab_arg == "bioprinting":
+            variants = ["bioprinting", "bioprinted", "extrusion_bioprinting", "dlp_bioprinting"]
+            combined = []
+            seen_ids = set()
+            for v in variants:
+                r = fetch_protocols(tissue_type=tissue_arg, biofab_method=v,
+                                    confidence=conf_arg, limit=50)
+                for p in (r or {}).get("protocols", []) or []:
+                    if p.get("id") not in seen_ids:
+                        seen_ids.add(p.get("id"))
+                        combined.append(p)
+            result = {"protocols": combined[:50], "total": len(combined)}
+        else:
+            result = fetch_protocols(
+                tissue_type=tissue_arg,
+                biofab_method=biofab_arg,
+                confidence=conf_arg,
+                limit=50,
+            )
 
         if result and result.get("protocols"):
             protocols = result["protocols"]
@@ -606,14 +635,13 @@ with tab_protocols:
                 pmid = proto.get("source_pmid", "N/A")
                 title = proto.get("paper_title") or f"Protocol {pid}"
                 tissue = proto.get("target_tissue") or "-"
-                biofab = proto.get("biofab_method") or "-"
-                step_count = proto.get("step_count", 0)
+                biofab = _normalize_biofab(proto.get("biofab_method") or "-") or "-"
                 conf = (proto.get("confidence") or "low").title()
                 extr = proto.get("extraction_method") or "regex"
 
                 pmid_link = f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/" if pmid and pmid != "N/A" else ""
                 with st.expander(
-                    f"**{title[:80]}** | {tissue} | {biofab} | {step_count} steps | {conf}"
+                    f"**{title[:80]}** | {tissue} | {biofab} | {conf}"
                 ):
                     mc1, mc2, mc3, mc4 = st.columns(4)
                     mc1.markdown(f"**PMID:** [{pmid}]({pmid_link})" if pmid_link else f"**PMID:** {pmid}")
@@ -624,14 +652,46 @@ with tab_protocols:
                     # Load protocol detail directly (cached)
                     detail = fetch_protocol_detail(pid)
                     if detail and detail.get("steps"):
+                        # Section-header prefixes that PubMed full-text extraction often
+                        # leaves attached to the first step's description — strip them.
+                        _SECTION_PREFIX_RE = re.compile(
+                            r"^\s*(materials\s+and\s+methods?|methods?|materials|"
+                            r"experimental\s+(procedures?|methods?|section)|"
+                            r"procedure|protocol)\s*[:\.\-]?\s*",
+                            re.IGNORECASE,
+                        )
+
+                        def _clean_desc(text: str) -> str:
+                            if not text:
+                                return ""
+                            t = text.strip()
+                            # Strip section header up to 3x (catches "Methods Materials and Methods Procedure")
+                            for _ in range(3):
+                                t2 = _SECTION_PREFIX_RE.sub("", t).lstrip()
+                                if t2 == t:
+                                    break
+                                t = t2
+                            # Collapse internal whitespace
+                            t = re.sub(r"\s+", " ", t)
+                            return t
+
                         for step in detail["steps"]:
                             seq = step.get("seq", "?")
-                            action = step.get("action_type", "unknown")
-                            desc = step.get("description", "")
+                            action = step.get("action_type") or ""
+                            desc = _clean_desc(step.get("description", ""))
                             dur = step.get("duration") or ""
                             temp = step.get("temperature") or ""
 
-                            action_label = action.replace("_", " ").title()
+                            # Skip steps that are pure-unknown noise (no action, no description)
+                            if (action == "" or action.lower() == "unknown") and not desc:
+                                continue
+
+                            # "Unknown" action_type → render as generic "Procedure step"
+                            if not action or action.lower() == "unknown":
+                                action_label = "Procedure step"
+                            else:
+                                action_label = action.replace("_", " ").title()
+
                             step_header = f"**Step {seq}: {action_label}**"
                             if dur:
                                 step_header += f" ({dur})"
@@ -639,7 +699,7 @@ with tab_protocols:
                                 step_header += f" @ {temp}"
                             st.markdown(step_header)
                             if desc:
-                                st.markdown(f"> {desc[:300]}")
+                                st.markdown(desc[:300] + ("…" if len(desc) > 300 else ""))
 
                             # Materials
                             mats = step.get("materials", [])
