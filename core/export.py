@@ -225,17 +225,14 @@ def _generate_executive_summary(report: VarianceReport) -> str:
         f"See the detailed analysis section for parameter-specific recommendations."
     )
 
-    # Try LLM summary if API key available
+    # Try LLM summary if any LLM provider available
     try:
-        api_key = os.getenv("ANTHROPIC_API_KEY")
-        if api_key and report.ai_narrative:
-            from langchain_anthropic import ChatAnthropic
-            llm = ChatAnthropic(
-                model="claude-haiku-4-5-20251001",
-                temperature=0.2,
-                max_tokens=256,
-                api_key=api_key,
-            )
+        if report.ai_narrative and (
+            os.getenv("LITELLM_MASTER_KEY") or os.getenv("OPENROUTER_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
+        ):
+            # Route through rag._build_llm() — prefers LiteLLM/OpenRouter, falls back to Anthropic
+            from core.rag import _build_llm
+            llm = _build_llm(temperature=0.2, max_tokens=256)
             prompt = (
                 "Write exactly 3 sentences summarizing this tissue engineering analysis "
                 "for a non-scientist reader. Lead with the biggest risk. End with the key "
