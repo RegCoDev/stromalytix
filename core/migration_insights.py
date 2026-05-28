@@ -64,6 +64,40 @@ def analyse(profile: ConstructProfile) -> MigrationReport:
     return rpt
 
 
+# ── Physics helpers ───────────────────────────────────────────────────
+
+
+def _krogh_penetration_mm(
+    d_cm2_s: float,
+    c0_mol_cm3: float,
+    q_mol_cell_s: float,
+    density_cells_cm3: float,
+) -> float:
+    """Return the Krogh O2 penetration depth in millimetres.
+
+    Implements the Krogh tissue-cylinder critical thickness formula
+    (Krogh A, J Physiol 1919, PMID 16812529):
+
+        L_crit = sqrt(2 * D * C0 / (q * rho))
+
+    Args:
+        d_cm2_s:          O2 diffusivity in the scaffold, cm^2/s.
+        c0_mol_cm3:       Surface dissolved-O2 concentration, mol/cm^3.
+                          Air-saturated medium at 37 C: ~2.0e-7 mol/cm^3.
+        q_mol_cell_s:     Cellular O2 consumption rate, mol/cell/s.
+        density_cells_cm3: Cell density, cells/cm^3 (= cells/mL).
+
+    Returns:
+        Estimated O2 penetration depth in mm. Returns 99.0 if inputs
+        are non-positive (computationally safe sentinel for "no gradient").
+    """
+    denom = q_mol_cell_s * density_cells_cm3  # mol/(cm^3 * s)
+    if denom <= 0 or c0_mol_cm3 <= 0:
+        return 99.0
+    l_crit_cm = math.sqrt(2.0 * d_cm2_s * c0_mol_cm3 / denom)
+    return l_crit_cm * 10.0  # cm -> mm
+
+
 # ── Individual gradient analyses ──────────────────────────────────────
 
 
@@ -90,17 +124,14 @@ def _spontaneous_o2_gradient(
         q_vals = [("generic mammalian", 2e-17, "")]
 
     ct_name, q_val, doi_q = q_vals[0]
-    density = 1e6  # cells/mL default
+    density = 1e6  # cells/mL = cells/cm^3 (default seeding density)
 
-    half_cm = half_mm * 0.1
-    # Krogh cylinder: critical thickness L_crit = sqrt(2 * D * C0 / (q * rho))
-    c0_mol = o2_pct / 100.0 * 0.21e-3  # mol/cm3 at ~20% O2 in medium, approx
-    denom = q_val * density * 1e6  # consumption per cm3
-    if denom > 0 and c0_mol > 0:
-        l_crit_cm = math.sqrt(2 * d_val * c0_mol / denom)
-        l_crit_mm = l_crit_cm * 10.0
-    else:
-        l_crit_mm = 99.0
+    # Surface dissolved-O2 concentration in mol/cm^3.
+    # Air-saturated medium at 37 C: ~0.20 mM = 2.0e-7 mol/cm^3 at 21% O2.
+    # Scaled linearly with the supplied O2 tension.
+    c0_mol = (o2_pct / 21.0) * 2.0e-7   # mol/cm^3
+
+    l_crit_mm = _krogh_penetration_mm(d_val, c0_mol, q_val, density)
 
     sources = [s for s in [doi_d, doi_q] if s]
 
