@@ -14,6 +14,36 @@ from pathlib import Path
 from typing import Optional
 
 
+# Deterministic default so identical briefs produce identical runs. CC3D falls
+# back to a clock-based seed when <RandomSeed> is absent, which makes every run
+# differ — fatal for the reproducibility pillar (same inputs -> bounded repeatable
+# outputs). Override per run via the brief's "random_seed" key.
+DEFAULT_RANDOM_SEED = 12345
+
+
+def resolve_random_seed(brief: dict) -> int:
+    """Resolve the RNG seed for a run.
+
+    Precedence: ``key_parameters.random_seed`` -> top-level ``random_seed`` ->
+    ``DEFAULT_RANDOM_SEED``. Coerced to a non-negative int so it is safe to embed
+    in the Potts XML and to stamp into job metadata. Setting the Potts seed also
+    makes ``divide_cell_random_orientation`` (mitosis) deterministic, since CC3D
+    drives it from the same global RNG.
+    """
+    params = brief.get("key_parameters", brief) if isinstance(brief, dict) else {}
+    raw = None
+    if isinstance(params, dict):
+        raw = params.get("random_seed")
+    if raw is None and isinstance(brief, dict):
+        raw = brief.get("random_seed")
+    if raw is None:
+        return DEFAULT_RANDOM_SEED
+    try:
+        return abs(int(raw))
+    except (TypeError, ValueError):
+        return DEFAULT_RANDOM_SEED
+
+
 def _extract_val(val) -> float:
     """Extract numeric value from plain number or confidence-tagged dict."""
     if isinstance(val, dict):
@@ -43,6 +73,7 @@ def _generate_project_xml(
     has_pif: bool = False,
     potts_temperature: float = 10.0,
     neighbor_order: int = 2,
+    seed: int = DEFAULT_RANDOM_SEED,
 ) -> str:
     """Generate CC3D Simulation XML (.cc3d project file content)."""
 
@@ -129,6 +160,7 @@ def _generate_project_xml(
   <Potts>
     <Dimensions x="{dims[0]}" y="{dims[1]}" z="{dims[2]}"/>
     <Steps>{mcs_steps}</Steps>
+    <RandomSeed>{seed}</RandomSeed>
     <Temperature>{potts_temperature}</Temperature>
     <NeighborOrder>{neighbor_order}</NeighborOrder>
     <BoundaryConditions>
@@ -386,6 +418,9 @@ def generate_cc3d_project(
     """
     params = brief.get("key_parameters", brief)
 
+    # Deterministic RNG seed (also visible in the emitted XML -> self-describing).
+    random_seed = resolve_random_seed(brief)
+
     # Cell types — strip reserved CC3D names
     _reserved = {"medium", "scaffold", "wall"}
     cell_types_raw = params.get("cell_types", ["Cell_A", "Cell_B"])
@@ -500,6 +535,7 @@ def generate_cc3d_project(
         o2_boundary=o2_boundary,
         has_ecm_field=has_ecm_field,
         has_pif=bool(pif_content),
+        seed=random_seed,
     )
 
     return steppable_py, project_xml, pif_content
