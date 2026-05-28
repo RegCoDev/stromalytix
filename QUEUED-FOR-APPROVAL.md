@@ -1,3 +1,22 @@
+# Queued for your approval — MAS Opportunity Engine, cycle 002 addendum
+
+**2026-05-28 — cycle 002 added one commit to this branch:**
+
+| Commit | What |
+|---|---|
+| `ab6a1a7` | **fix(cc3d): seed Potts RNG for deterministic runs (C2, CRITICAL)** — `services/cc3d_runner_api/runner.py`. Adds `resolve_random_seed(brief)` + `DEFAULT_RANDOM_SEED`, emits `<RandomSeed>` in the Potts block, wires the seed through `generate_cc3d_project`. Also makes mitosis deterministic (same global RNG). +5 tests (the module had 0 — how C2 survived). Self-describing: the seed is visible in the emitted XML. |
+
+This closes backlog item **#2** (the second T0 trust-spine item, after cycle-001's
+Krogh fix #1). Verified by an independent `verifier` agent — PASS on all 6 checks
+(tests pass, `<RandomSeed>` correctly inside `<Potts>`, 3-tuple return unchanged so
+no caller breaks, no secrets, only 2 files touched, `/opt/stromalytix` untouched).
+**Decision: merge `ab6a1a7`?** Recommend yes — correctness + reproducibility, fully tested.
+
+Next T0 autonomous items still open (ranked): #3 per-run provenance (H2), #4 LLM-PMID
+cross-validation (H1), #6 scientific-spine tests, then #5 literature-validation suite.
+
+---
+
 # Queued for your approval — MAS Opportunity Engine, cycle 001
 
 **Branch:** `mas-opportunity-engine` (git worktree at `/root/worktrees/stromalytix-mas`)
