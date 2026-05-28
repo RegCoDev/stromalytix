@@ -14,3 +14,9 @@ data/chromadb_*_temp/
 # opportunity-engine test coverage
 .coverage
 opportunity_engine/**/__pycache__/
+
+# PII / local DBs — never track
+signups.csv
+jobs.db
+jobs.db-shm
+jobs.db-wal
