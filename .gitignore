@@ -10,3 +10,7 @@ data/chromadb_*_temp/
 
 .claude/settings.local.json
 
+
+# opportunity-engine test coverage
+.coverage
+opportunity_engine/**/__pycache__/
