@@ -1,20 +1,22 @@
 ﻿# Stromalytix
 
-Cell-ECM modeling for **biofabrication**: how cells adhere, migrate, and proliferate on bioinks, scaffolds, and engineered matrices. Literature-grounded benchmarks, optional CompuCell3D cloud runs, and scaffold geometry preview. Covers tissue engineering and cellular agriculture use cases.
+Software and robots for designing, simulating and manufacturing engineered tissues, in development. The broader goal spans tissues and biomaterials; liver is the first demonstration. Biofab Box is the planned hardware component.
+
+[Watch the prototype and inspect its evidence](https://regco.tech/stromalytix) · [Open the public reference library](https://stromalytix.streamlit.app)
 
 ## What It Does
 
-Chat-driven construct assessment for biofabrication workflows: PubMed RAG, FEA scaffold mechanics, optional CC3D cloud simulation, and scaffold preview. Describe your 3D cell culture protocol through a guided conversation. Stromalytix queries ~8,100 PubMed abstracts, synthesizes a variance report with PMID-cited risk analysis, and generates a CC3D simulation brief for your construct.
+The public `app.py` entry point is a research prototype:
 
-**You get:**
-- Radar chart showing protocol deviation across key parameters
-- Risk scorecard with color-coded risk flags
-- AI narrative citing specific PMIDs from the literature
-- Parameter scatter plot comparing your construct to published ranges
-- CC3D simulation brief predicting cell organization and failure modes
-- FEA scaffold mechanics (deformation, strain, failure risk)
-- Scaffold geometry preview and CC3D VTK output (when cloud sidecar is configured)
-- PDF variance report
+| Surface | Availability |
+| --- | --- |
+| Parameter Library | Bundled reference entries, search, source links and model-estimate derivations; no model account required. Counts are calculated from the bundled snapshot. |
+| Protocol Explorer | Requires a connected Knowledge Vault service. When unavailable, the app links to the recorded evidence workflow. |
+| Construct Assessment | Starts only when requested and needs a supported model provider. Outputs are literature-based hypotheses, not experimental validation. |
+| Simulation & exports | CC3D and FEA execution are not exposed by this public entry point. Repository modules and optional service code do not establish deployed capabilities. |
+| Current recorded proof | A source-linked liver-study workflow, a separate saved oxygen-transport calculation, proposed lab verification and a clearly labeled hardware concept, available at the demo link above. |
+
+The oxygen calculation is a computational prediction. Printer conversion, physical measurements, cell viability and tissue-function validation remain next steps.
 
 ## Quick Start
 
@@ -54,18 +56,18 @@ Layer 2 — Simulation & Prediction
   Simulation brief generation  |  Scaffold preview + CC3D visualization
 
 Layer 1 — Knowledge & Data
-  PubMed RAG (~8,100 abstracts)  |  ChromaDB vector search
+  Literature benchmarks  |  ChromaDB vector search
   Protocol ingestion (PDF/DOCX/TXT)  |  Literature benchmarks
 ```
 
 ## ChromaDB Collections
 
-| Collection | Docs | Content |
-|-----------|------|---------|
-| `stromalytix_kb` | ~8,100 | PubMed abstracts for RAG |
-| `calibration_benchmarks` | 13 | Literature benchmarks with DOIs |
+| Collection | Content |
+|-----------|---------|
+| `stromalytix_kb` | Literature corpus for retrieval, when configured |
+| `calibration_benchmarks` | Literature benchmarks with DOIs |
 
-Rebuilt by running `scripts/embed_and_index.py` and `scripts/embed_public_data.py`.
+Counts depend on the deployment's indexed snapshot. Rebuild with `scripts/embed_and_index.py` and `scripts/embed_public_data.py`; repository code alone does not establish a live corpus size.
 
 ## CC3D Cloud Sidecar (Optional)
 
@@ -84,7 +86,7 @@ CC3D_API_URL=http://YOUR_VPS_IP:8001
 CC3D_API_KEY=your-secret-key
 ```
 
-Without `CC3D_API_URL` / `CC3D_API_KEY`, the app still generates simulation briefs; the **Run CC3D** button stays disabled until the sidecar is configured.
+These settings configure the optional service integration. The current public `app.py` does not expose a working CC3D execution button; its simulation tab links to the separate saved oxygen calculation and verification plan.
 
 ## Deploy to Streamlit Cloud
 

@@ -26,11 +26,18 @@ st.set_page_config(
     page_title="Stromalytix | Bioengineering Protocol Intelligence",
     page_icon="\U0001f9ec",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="auto",
+)
+
+PROOF_URL = "https://regco.tech/stromalytix"
+CONFIDENCE_NOTE = (
+    "Confidence labels are curation annotations, not a probability of experimental "
+    "success or a measure of predictive validation. Inspect each entry's source, "
+    "conditions and derivation before use."
 )
 
 # ---------------------------------------------------------------------------
-# CSS — dark theme with emerald accent
+# CSS — RegCo dark theme with purple accent
 # ---------------------------------------------------------------------------
 st.markdown(
     """
@@ -53,15 +60,15 @@ st.markdown(
 
     /* Buttons */
     .stButton>button {
-        border: 1px solid #34d399;
-        color: #34d399;
+        border: 1px solid #a855f7;
+        color: #a855f7;
         background: transparent;
         font-weight: 500;
         transition: all 0.3s ease;
     }
 
     .stButton>button:hover {
-        background: #34d399;
+        background: #a855f7;
         color: #000000;
     }
 
@@ -89,7 +96,7 @@ st.markdown(
 
     /* Accent color for brand */
     .brand-text {
-        color: #34d399;
+        color: #a855f7;
         font-weight: bold;
     }
 
@@ -104,7 +111,7 @@ st.markdown(
     .stat-card .stat-num {
         font-size: 2rem;
         font-weight: 700;
-        color: #34d399;
+        color: #a855f7;
     }
     .stat-card .stat-label {
         font-size: 0.85rem;
@@ -121,13 +128,13 @@ st.markdown(
         margin-bottom: 0.5rem;
     }
     .protocol-card .proto-title {
-        color: #34d399;
+        color: #a855f7;
         font-weight: 600;
     }
 
     /* DOI link styling */
     a.doi-link {
-        color: #34d399 !important;
+        color: #a855f7 !important;
         text-decoration: none;
     }
     a.doi-link:hover {
@@ -137,7 +144,7 @@ st.markdown(
     /* Badge */
     .badge-pro {
         display: inline-block;
-        background: linear-gradient(135deg, #34d399, #059669);
+        background: linear-gradient(135deg, #a855f7, #7e22ce);
         color: #000;
         font-size: 0.7rem;
         font-weight: 700;
@@ -155,7 +162,7 @@ st.markdown(
         border-radius: 50%;
         margin-right: 6px;
     }
-    .vault-dot.on  { background: #34d399; }
+    .vault-dot.on  { background: #a855f7; }
     .vault-dot.off { background: #ef4444; }
     </style>
     """,
@@ -218,14 +225,9 @@ def vault_post(path: str, payload: dict, timeout: float = 15.0):
 
 @st.cache_data(ttl=60)
 def check_vault_health() -> bool:
-    url = get_vault_url()
-    if not url:
-        return False
-    try:
-        resp = httpx.get(f"{url}/health", timeout=5.0)
-        return resp.status_code == 200
-    except Exception:
-        return False
+    # Public health does not prove access: protocol endpoints require authentication.
+    result = vault_get("/protocols", params={"limit": 1}, timeout=5.0)
+    return isinstance(result, dict) and isinstance(result.get("protocols"), list)
 
 
 # ---------------------------------------------------------------------------
@@ -327,7 +329,7 @@ def _source_label(source: str) -> str:
 # ---------------------------------------------------------------------------
 with st.sidebar:
     st.markdown(
-        '<h2 style="margin-bottom:0"><span style="color:#34d399">&#x1F9EC;</span> Stromalytix</h2>',
+        '<h2 style="margin-bottom:0"><span style="color:#a855f7">&#x1F9EC;</span> Stromalytix</h2>',
         unsafe_allow_html=True,
     )
     st.caption("Bioengineering Protocol Intelligence")
@@ -336,9 +338,9 @@ with st.sidebar:
     # Vault connection status
     vault_ok = check_vault_health()
     dot_cls = "on" if vault_ok else "off"
-    dot_label = "Connected" if vault_ok else "Offline"
+    dot_label = "Available" if vault_ok else "Unavailable in this session"
     st.markdown(
-        f'<span class="vault-dot {dot_cls}"></span> Knowledge Vault: **{dot_label}**',
+        f'<span class="vault-dot {dot_cls}"></span> Protocol search: **{dot_label}**',
         unsafe_allow_html=True,
     )
 
@@ -354,7 +356,7 @@ with st.sidebar:
 
     st.divider()
     st.markdown(
-        '<p style="color:#555;font-size:0.75rem;">Built by <strong>K-Dense</strong></p>',
+        '<p style="color:#999;font-size:0.75rem;">Built by <strong>Reggie St. Louis</strong></p>',
         unsafe_allow_html=True,
     )
 
@@ -362,6 +364,15 @@ with st.sidebar:
 # ---------------------------------------------------------------------------
 # Main content — four tabs
 # ---------------------------------------------------------------------------
+
+st.title("Stromalytix")
+st.markdown("**Software and robots for engineered tissues.**")
+st.caption(
+    "Research prototype. Explore the reference library below, or watch the current "
+    "tissue-design workflow, oxygen calculation and Biofab Box concept. Liver is the "
+    "first demonstration; printer conversion and biological validation are next."
+)
+st.link_button("Watch the demo and inspect the lab plan", PROOF_URL)
 
 tab_params, tab_protocols, tab_assessment, tab_about = st.tabs(
     ["Parameter Library", "Protocol Explorer", "Assessment", "About"]
@@ -456,7 +467,7 @@ def _render_category_cards(all_params: list) -> None:
                 card_html = (
                     f'<div style="background:#111111;border:1px solid #222222;border-radius:0.5rem;'
                     f'padding:1rem 1.1rem;margin-bottom:0.5rem;min-height:150px;">'
-                    f'<div style="color:#34d399;font-weight:600;font-size:1.05rem;margin-bottom:0.35rem;">{label}</div>'
+                    f'<div style="color:#a855f7;font-weight:600;font-size:1.05rem;margin-bottom:0.35rem;">{label}</div>'
                     f'<div style="color:#888;font-size:0.78rem;margin-bottom:0.5rem;'
                     f"font-family:'JetBrains Mono',monospace;\">{meta_html}</div>"
                     f'<div style="color:#bbb;font-size:0.85rem;line-height:1.35;">{blurb}</div>'
@@ -536,13 +547,13 @@ def _render_derivation_panel(sel_id: str, est_rows: list) -> None:
     e_value = (entry or {}).get("value", "")
     e_unit = (entry or {}).get("unit", "")
     panel_html = (
-        '<div style="background:#0e1a14;border:1px solid #1f3a2c;border-left:3px solid #34d399;'
+        '<div style="background:#0e1a14;border:1px solid #1f3a2c;border-left:3px solid #a855f7;'
         'border-radius:0.5rem;padding:1rem 1.25rem;margin-top:0.75rem;">'
-        '<div style="color:#34d399;font-weight:600;font-size:0.95rem;margin-bottom:0.25rem;'
+        '<div style="color:#a855f7;font-weight:600;font-size:0.95rem;margin-bottom:0.25rem;'
         "font-family:'JetBrains Mono',monospace;\">"
         f'{sel_id}</div>'
         '<div style="color:#e0e0e0;font-size:1.05rem;font-weight:500;">'
-        f'{e_param} = <span style="color:#34d399">{e_value} {e_unit}</span></div>'
+        f'{e_param} = <span style="color:#a855f7">{e_value} {e_unit}</span></div>'
         '</div>'
     )
     st.markdown(panel_html, unsafe_allow_html=True)
@@ -572,7 +583,8 @@ with tab_params:
     if not all_params:
         st.markdown("### Parameter Library")
         st.warning(
-            "Parameter data not found. Ensure `data/parameters_export.json` is present in the repository."
+            "The reference data is temporarily unavailable. The recorded prototype "
+            "and saved results are available through the demo link above."
         )
     else:
         derivations = load_derivations()
@@ -626,21 +638,16 @@ with tab_params:
             _render_category_cards(all_params)
             with st.expander("How this library is built"):
                 st.markdown(
-                    "- **Literature parameters** (222) are extracted from primary "
+                    f"- **Literature parameters** ({lit_count}) are extracted from primary "
                     "publications. Each entry links to its DOI or PubMed identifier."
                 )
                 st.markdown(
-                    "- **Model estimates** (39) are derived where direct measurements "
+                    f"- **Model estimates** ({est_count}) are derived where direct measurements "
                     "are unavailable. Every estimate carries a structured derivation: "
                     "method, basis, assumptions, uncertainty range, and conditions that "
                     "would invalidate the estimate."
                 )
-                st.markdown(
-                    "- **Confidence labels** are assigned during curation. High = direct "
-                    "measurement under standard conditions in the cited paper. Medium = "
-                    "supported by the cited source but with notable extrapolation. Low = "
-                    "preliminary or single-study."
-                )
+                st.markdown(CONFIDENCE_NOTE)
                 st.markdown(
                     "- **Coverage gaps and corrections welcome.** This is a contribution "
                     "to the field; the goal is to be useful, not comprehensive on day one."
@@ -651,7 +658,7 @@ with tab_params:
                     "@misc{stromalytix2026params,\n"
                     "  title   = {Stromalytix Parameter Library: Curated Bioengineering Constants},\n"
                     "  year    = {2026},\n"
-                    "  note    = {261 parameters with DOI provenance across scaffold materials,\n"
+                    f"  note    = {{{len(all_params)} entries, including literature parameters and model estimates,\n"
                     "             cell adhesion, proliferation, oxygen transport, migration, fabrication},\n"
                     "  url     = {https://stromalytix.streamlit.app}\n"
                     "}"
@@ -757,11 +764,10 @@ with tab_protocols:
 
     if not vault_ok:
         st.warning(
-            "Protocol Explorer requires the Knowledge Vault service. "
-            "Configure `VAULT_API_URL` and `VAULT_API_KEY` in your environment or Streamlit secrets."
+            "Live protocol search is unavailable in this session. You can still "
+            "browse the Parameter Library or inspect the recorded evidence workflow."
         )
-        st.info("The Knowledge Vault indexes 396 protocols extracted from PubMed full-text articles, "
-                "each decomposed into structured steps with materials, cell types, parameters, and outcomes.")
+        st.link_button("Inspect the recorded evidence workflow", PROOF_URL + "#demo")
     else:
         # Stats row — show Protocols + Tissue Types (steps + parameters are noisy for buyers)
         stats = fetch_protocol_stats()
@@ -954,7 +960,11 @@ with tab_protocols:
         elif result is not None:
             st.info("No protocols match the current filters.")
         else:
-            st.error("Failed to fetch protocols from the vault.")
+            st.warning(
+                "Live protocol search is unavailable in this session. You can still "
+                "browse the Parameter Library or inspect the recorded evidence workflow."
+            )
+            st.link_button("Inspect the recorded evidence workflow", PROOF_URL + "#demo")
 
 
 # =====================================================================
@@ -963,15 +973,24 @@ with tab_protocols:
 
 with tab_assessment:
     st.markdown("### Construct Assessment")
-    st.caption("AI-powered analysis of your 3D culture protocol")
+    st.caption(
+        "Literature-based decision support for a proposed 3D culture experiment. "
+        "Assessments are hypotheses to investigate, not experimental validation."
+    )
 
     # Check for LLM key (any working provider — OpenRouter primary, Anthropic legacy)
     anthropic_key = _secret("ANTHROPIC_API_KEY", "")
     openrouter_key = _secret("OPENROUTER_API_KEY", "")
-    litellm_key = _secret("LITELLM_MASTER_KEY", "")
-    has_llm = bool(anthropic_key or openrouter_key or litellm_key)
+    has_llm = bool(anthropic_key or openrouter_key)
 
-    if not has_llm:
+    # Blueprint review: tabs execute together; opening the library must not start an LLM call.
+    if has_llm and not st.session_state.get("assessment_started", False):
+        st.write("Start a conversation to describe your construct and review its assumptions.")
+        st.caption("The reference library and recorded demo are available without starting an assessment.")
+        if st.button("Start assessment", key="start_assessment"):
+            st.session_state.assessment_started = True
+            st.rerun()
+    elif not has_llm:
         st.markdown(
             """
             The Assessment module uses AI to analyze your tissue engineering construct against
@@ -985,7 +1004,8 @@ with tab_assessment:
             """
         )
 
-        st.info("Assessment requires an AI model. Contact us for access or configure your API key.")
+        st.info("Live assessment is unavailable in this session. You can inspect the recorded prototype and saved results.")
+        st.link_button("View the prototype and results", PROOF_URL)
 
         st.markdown("#### Get notified when public access launches")
         with st.form("assessment_signup"):
@@ -1209,6 +1229,7 @@ with tab_assessment:
                 report = st.session_state.variance_report
 
                 st.markdown(f"#### Analysis: {profile.target_tissue or 'Your Construct'}")
+                st.info("Research prototype: literature matches and calculated estimates require independent experimental validation.")
 
                 # Hero summary
                 col_a, col_b = st.columns([1, 2])
@@ -1237,6 +1258,8 @@ with tab_assessment:
                 with rtab_feas:
                     render_results_feasibility_tab(profile, report)
                 with rtab_sim:
+                    st.info("CC3D and FEA execution are not available from this public interface.")
+                    st.link_button("Inspect the separate oxygen calculation and verification plan", PROOF_URL + "#calculation")
                     # Show pro badges for CC3D and FEA
                     st.markdown(
                         '<strong>CompuCell3D Simulation</strong> '
@@ -1269,10 +1292,12 @@ with tab_about:
 
     st.markdown(
         """
-        **Stromalytix** is protocol intelligence for bioengineering. It combines a curated
-        parameter library, structured protocol extraction from PubMed literature, and
-        AI-driven construct assessment to help researchers make better decisions about
-        3D cell culture design.
+        **Stromalytix** is developing software and robots for designing, simulating
+        and manufacturing engineered tissues across different tissues and biomaterials.
+        This public software prototype provides a reference parameter library.
+        Live protocol search and AI assessment depend on connected services;
+        their availability is shown in their tabs. Biofab Box is the planned hardware
+        component. Physical printing and biological validation remain next steps.
         """
     )
 
@@ -1280,14 +1305,14 @@ with tab_about:
 
     st.markdown("#### Parameter Library")
     st.markdown(
-        """
-        The parameter library contains **261 bioengineering constants** from two sources:
+        f"""
+        This snapshot contains **{len(params_data)} reference entries** from two sources:
 
-        **Literature** (222 entries) -- extracted from published papers, each linked to a
+        **Literature** ({lit_count} entries) -- extracted from published papers, each linked to a
         DOI or PubMed ID. Values are traceable to specific experimental conditions
         (temperature, concentration, crosslinking method, measurement technique).
 
-        **Model Estimate** (39 entries) -- derived from biophysical reasoning for
+        **Model Estimate** ({est_count} entries) -- derived from biophysical reasoning for
         computational simulation (e.g., CC3D adhesion energies). Clearly labeled and
         not presented as experimental measurements.
 
@@ -1299,16 +1324,14 @@ with tab_about:
         - **Fabrication** -- print speeds, pressures, nozzle diameters
         - **Gel Penetration** -- migration speeds, MMP secretion, critical pore sizes
 
-        Confidence levels:
-        - **High** -- directly measured, multiple concordant studies
-        - **Medium** -- single source or inferred from similar systems
-        - **Low** -- estimated or limited experimental support
         """
     )
+    st.caption(CONFIDENCE_NOTE)
 
     st.divider()
 
     st.markdown("#### Protocol Graph")
+    st.caption("Live protocol browsing is available only when the protocol service is connected.")
     st.markdown(
         """
         Protocols are automatically extracted from PubMed full-text articles using a
@@ -1329,11 +1352,10 @@ with tab_about:
     st.code(
         """@misc{stromalytix2026,
   title   = {Stromalytix: Bioengineering Protocol Intelligence},
-  author  = {K-Dense},
+  author  = {St. Louis, Reggie},
   year    = {2026},
-  note    = {Parameter library (560 entries), protocol graph (396 protocols),
-             and AI-driven construct assessment for tissue engineering
-             and cellular agriculture},
+  note    = {Research software prototype; reference parameters include
+             literature values and computational estimates},
   url     = {https://stromalytix.streamlit.app}
 }""",
         language="bibtex",
