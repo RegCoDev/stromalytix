@@ -117,3 +117,26 @@ def test_empty_protocol_response_and_later_failure_are_distinct(public_app, monk
         assert not any("Live protocol search is unavailable" in item.value for item in app.warning)
     else:
         assert any("Live protocol search is unavailable" in item.value for item in app.warning)
+
+
+@pytest.mark.parametrize("variant_status", [200, 503])
+def test_merged_bioprinting_filter_preserves_failed_variants(public_app, monkeypatch, variant_status):
+    import httpx
+
+    app, _ = public_app
+    app.secrets["VAULT_API_URL"] = "https://vault.test"
+    app.secrets["VAULT_API_KEY"] = "test-only"
+    def response(url, **kwargs):
+        variant = (kwargs.get("params") or {}).get("biofab_method")
+        code = variant_status if variant == "extrusion_bioprinting" else 200
+        payload = ({"total_protocols": 0, "by_biofab": {"bioprinting": 0}}
+                   if url.endswith("/stats") else {"protocols": [], "total": 0})
+        return httpx.Response(code, json=payload, request=httpx.Request("GET", url))
+    monkeypatch.setattr(httpx, "get", Mock(side_effect=response))
+    app.run()
+    app.selectbox(key="proto_biofab").select("bioprinting").run()
+    assert not app.exception
+    empty_message = any("No protocols match" in item.value for item in app.info)
+    failure_message = any("Live protocol search is unavailable" in item.value for item in app.warning)
+    assert empty_message is (variant_status == 200)
+    assert failure_message is (variant_status != 200)

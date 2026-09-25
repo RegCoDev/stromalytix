@@ -828,14 +828,18 @@ with tab_protocols:
             variants = ["bioprinting", "bioprinted", "extrusion_bioprinting", "dlp_bioprinting"]
             combined = []
             seen_ids = set()
+            result = None
             for v in variants:
                 r = fetch_protocols(tissue_type=tissue_arg, biofab_method=v,
                                     confidence=conf_arg, limit=50)
-                for p in (r or {}).get("protocols", []) or []:
+                if r is None:
+                    break  # A failed variant is not an empty or complete search result.
+                for p in r.get("protocols", []) or []:
                     if p.get("id") not in seen_ids:
                         seen_ids.add(p.get("id"))
                         combined.append(p)
-            result = {"protocols": combined[:50], "total": len(combined)}
+            else:
+                result = {"protocols": combined[:50], "total": len(combined)}
         else:
             result = fetch_protocols(
                 tissue_type=tissue_arg,
